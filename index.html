@@ -1606,7 +1606,7 @@ function buildNode(id, depth, siblingIndex, siblingCount) {
 
   const editBtn = document.createElement('span');
   editBtn.className = 'edit-vitals-btn';
-  editBtn.textContent = '\u270F\uFE0F';
+  editBtn.textContent = '\uD83D\uDD17'.length ? '\u270F\uFE0F' : '\u270F\uFE0F';
   editBtn.title = 'Add photo, birth/death year, or marriage dates for ' + p.name;
   editBtn.setAttribute('role', 'button');
   editBtn.setAttribute('tabindex', '0');
