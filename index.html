@@ -325,8 +325,29 @@
     font-size: 0.78rem;
     color: var(--ink-soft);
     font-style: italic;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.15rem;
   }
-  .partners mark { background: #ffd866; color: var(--ink); border-radius: 3px; padding: 0 2px; }
+  .partner-unit {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .partner-sep { font-style: italic; }
+  .partner-name mark { background: #ffd866; color: var(--ink); border-radius: 3px; padding: 0 2px; }
+
+  .photo-thumb-sm {
+    width: 1.15rem;
+    height: 1.15rem;
+    margin-top: 0;
+  }
+
+  .partners > .vitals-panel-holder {
+    flex-basis: 100%;
+    width: 100%;
+  }
 
   .meta-row {
     display: flex;
@@ -405,10 +426,104 @@
     width: 1.6rem;
     height: 1.6rem;
     border-radius: 50%;
-    object-fit: cover;
+    overflow: hidden;
+    position: relative;
     border: 1.5px solid #fff;
     box-shadow: 0 0 0 1.5px var(--level-color, var(--branch-color, var(--ink-soft)));
     margin-top: 0.05rem;
+    cursor: pointer;
+  }
+  .photo-thumb img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transform-origin: center center;
+  }
+  .photo-thumb:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+  .lightbox-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 16, 10, 0.82);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.2rem;
+  }
+  .lightbox-card {
+    background: var(--paper);
+    border-radius: 12px;
+    padding: 1rem;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  }
+  .lightbox-card .lb-name {
+    font-family: 'Lora', serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.6rem;
+  }
+  .lightbox-photo-full {
+    max-width: min(80vw, 420px);
+    max-height: 55vh;
+    border-radius: 8px;
+    display: block;
+    margin: 0 auto 0.8rem;
+    object-fit: contain;
+  }
+  .lb-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+  .lb-actions button {
+    padding: 0.55rem 0.9rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    border-radius: 7px;
+    min-height: 40px;
+  }
+  .lb-recenter { background: var(--ink); color: var(--paper); border: 1.5px solid var(--ink); }
+  .lb-close { background: #fff; color: var(--ink); border: 1.5px solid var(--rule-soft); }
+
+  .crop-editor-frame {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+    margin: 0 auto 0.9rem;
+    border: 2px solid var(--rule);
+    touch-action: none;
+    cursor: grab;
+    background: var(--paper-deep);
+  }
+  .crop-editor-frame:active { cursor: grabbing; }
+  .crop-editor-frame img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transform-origin: center center;
+    pointer-events: none;
+  }
+  .crop-zoom-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    max-width: 260px;
+    margin: 0 auto 0.8rem;
+  }
+  .crop-zoom-row input[type="range"] { flex: 1 1 auto; }
+  .crop-hint {
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    margin-bottom: 0.7rem;
   }
 
   .vitals-panel {
@@ -873,7 +988,7 @@
   Lineage reconstructed from the original document's color-coding and layout, verified generation by generation with the family historian.
 </footer>
 
-<script>const PEOPLE_DATA = [{"id":"henry","name":"Henry","partners":["Estelle"],"generation":"A","branch":"Henry","parent":null},{"id":"dave","name":"Dave","partners":["Bea"],"generation":"A","branch":"Dave","parent":null},{"id":"jack","name":"Jack","partners":["Gertrude"],"generation":"A","branch":"Jack","parent":null},{"id":"bessie","name":"Bessie","partners":["Joe Grossman"],"generation":"A","branch":"Bessie","parent":null},{"id":"saul","name":"Saul","partners":["Claire","Jeanette"],"generation":"A","branch":"Saul","parent":null},{"id":"milt","name":"Milt","partners":["Sarah"],"generation":"A","branch":"Milt","parent":null},{"id":"evelyn","name":"Evelyn","partners":["Bernie Weisman"],"generation":"A","branch":"Evelyn","parent":null},{"id":"sylvia","name":"Sylvia","partners":["Seymour Feldman","Sol Rappaport"],"generation":"A","branch":"Sylvia","parent":null},{"id":"rudy","name":"Rudy","partners":["Maxine"],"generation":"A","branch":"Rudy","parent":null},{"id":"phyllis","name":"Phyllis","partners":["Allan Wolfson"],"generation":"B","branch":"Henry","parent":"henry"},{"id":"enid","name":"Enid","partners":["Seymour Sarrel"],"generation":"B","branch":"Henry","parent":"henry"},{"id":"carol","name":"Carol","partners":["Mike Quinn","Armando (Louie) DaCosta","Mike Simkowitz"],"generation":"C","branch":"Henry","parent":"phyllis"},{"id":"elliot","name":"Elliot","partners":["Ellie"],"generation":"C","branch":"Henry","parent":"phyllis"},{"id":"bart","name":"Bart","partners":["Annie"],"generation":"C","branch":"Henry","parent":"enid"},{"id":"louis","name":"Louis","partners":["Marla"],"generation":"C","branch":"Henry","parent":"enid"},{"id":"ronald","name":"Ronald","partners":["Gina"],"generation":"C","branch":"Henry","parent":"enid"},{"id":"allison","name":"Allison","partners":["Frank Lehner"],"generation":"D","branch":"Henry","parent":"carol"},{"id":"danielle","name":"Danielle","partners":["Chris Candelario","Micaias Marmol"],"generation":"D","branch":"Henry","parent":"carol"},{"id":"melissa","name":"Melissa","partners":[],"generation":"D","branch":"Henry","parent":"carol"},{"id":"denise","name":"Denise","partners":[],"generation":"D","branch":"Henry","parent":"carol"},{"id":"marki","name":"Marki","partners":[],"generation":"D","branch":"Henry","parent":"elliot"},{"id":"carly","name":"Carly","partners":[],"generation":"D","branch":"Henry","parent":"elliot"},{"id":"lucy_henry","name":"Lucy","partners":[],"generation":"D","branch":"Henry","parent":"elliot"},{"id":"matthew_henry","name":"Matthew","partners":[],"generation":"D","branch":"Henry","parent":"bart"},{"id":"eric","name":"Eric","partners":[],"generation":"D","branch":"Henry","parent":"louis"},{"id":"jacob_henry","name":"Jacob","partners":[],"generation":"D","branch":"Henry","parent":"louis"},{"id":"julia","name":"Julia","partners":[],"generation":"D","branch":"Henry","parent":"ronald"},{"id":"ava","name":"Ava","partners":[],"generation":"D","branch":"Henry","parent":"ronald"},{"id":"jayden","name":"Jayden","partners":[],"generation":"E","branch":"Henry","parent":"allison"},{"id":"alyssa","name":"Alyssa","partners":[],"generation":"E","branch":"Henry","parent":"allison"},{"id":"chase","name":"Chase","partners":[],"generation":"E","branch":"Henry","parent":"allison"},{"id":"jake_daniel","name":"Jake Daniel","partners":[],"generation":"E","branch":"Henry","parent":"allison"},{"id":"chris","name":"Chris","partners":[],"generation":"E","branch":"Henry","parent":"danielle"},{"id":"mailani","name":"Mailani","partners":[],"generation":"E","branch":"Henry","parent":"danielle"},{"id":"julian","name":"Julian","partners":[],"generation":"E","branch":"Henry","parent":"danielle"},{"id":"arthur","name":"Arthur","partners":["Joyce"],"generation":"B","branch":"Jack","parent":"jack"},{"id":"barry","name":"Barry","partners":["Marlene"],"generation":"B","branch":"Jack","parent":"jack"},{"id":"gary","name":"Gary","partners":["Lisa"],"generation":"C","branch":"Jack","parent":"arthur"},{"id":"drew","name":"Drew","partners":["Ledi"],"generation":"C","branch":"Jack","parent":"arthur"},{"id":"lonny","name":"Lonny","partners":["Holly"],"generation":"C","branch":"Jack","parent":"arthur"},{"id":"lee_jack","name":"Lee","partners":["Amy"],"generation":"C","branch":"Jack","parent":"barry"},{"id":"lauren_jack","name":"Lauren","partners":["Mike Macieira"],"generation":"C","branch":"Jack","parent":"barry"},{"id":"jessica","name":"Jessica","partners":[],"generation":"D","branch":"Jack","parent":"gary"},{"id":"joshua","name":"Joshua","partners":[],"generation":"D","branch":"Jack","parent":"gary"},{"id":"austin_mark","name":"Austin Mark","partners":[],"generation":"D","branch":"Jack","parent":"drew"},{"id":"melaina","name":"Melaina","partners":[],"generation":"D","branch":"Jack","parent":"lonny"},{"id":"seth_jack","name":"Seth","partners":[],"generation":"D","branch":"Jack","parent":"lee_jack"},{"id":"aaron","name":"Aaron","partners":[],"generation":"D","branch":"Jack","parent":"lee_jack"},{"id":"harvey","name":"Harvey","partners":["Susan","Rita"],"generation":"B","branch":"Dave","parent":"dave"},{"id":"rita_cookie","name":"Rita / Cookie","partners":["Jack Wisser"],"generation":"B","branch":"Dave","parent":"dave"},{"id":"steven","name":"Steven","partners":["Cheryl","Wendy"],"generation":"C","branch":"Dave","parent":"harvey"},{"id":"lisa_dave","name":"Lisa","partners":["Greg Jacobson"],"generation":"C","branch":"Dave","parent":"harvey"},{"id":"heidi","name":"Heidi","partners":["Peter Richardson"],"generation":"C","branch":"Dave","parent":"harvey"},{"id":"greg_dave","name":"Greg","partners":["Desiree"],"generation":"C","branch":"Dave","parent":"rita_cookie"},{"id":"candice","name":"Candice","partners":["Chad Eisenberger"],"generation":"C","branch":"Dave","parent":"rita_cookie"},{"id":"david_dave","name":"David","partners":[],"generation":"D","branch":"Dave","parent":"steven"},{"id":"brian","name":"Brian","partners":[],"generation":"D","branch":"Dave","parent":"steven"},{"id":"brianna","name":"Brianna","partners":[],"generation":"D","branch":"Dave","parent":"lisa_dave"},{"id":"samantha_dave","name":"Samantha","partners":[],"generation":"D","branch":"Dave","parent":"lisa_dave"},{"id":"benjamin","name":"Benjamin","partners":[],"generation":"D","branch":"Dave","parent":"lisa_dave"},{"id":"jacob_dave","name":"Jacob","partners":[],"generation":"D","branch":"Dave","parent":"heidi"},{"id":"zach","name":"Zach","partners":[],"generation":"D","branch":"Dave","parent":"heidi"},{"id":"seth_dave","name":"Seth","partners":[],"generation":"D","branch":"Dave","parent":"greg_dave","confidence":"assumed_order"},{"id":"alexa_dave","name":"Alexa","partners":[],"generation":"D","branch":"Dave","parent":"greg_dave","confidence":"assumed_order"},{"id":"hailey","name":"Hailey","partners":[],"generation":"D","branch":"Dave","parent":"greg_dave","confidence":"assumed_order"},{"id":"lily_dave","name":"Lily","partners":[],"generation":"D","branch":"Dave","parent":"candice","confidence":"assumed_order"},{"id":"jessie","name":"Jessie","partners":[],"generation":"D","branch":"Dave","parent":"candice","confidence":"assumed_order"},{"id":"scarlett","name":"Scarlett","partners":[],"generation":"E","branch":"Dave","parent":"dave","confidence":"unplaced"},{"id":"sandy","name":"Sandy","partners":["Faith"],"generation":"B","branch":"Bessie","parent":"bessie"},{"id":"robert","name":"Robert","partners":["Sherri"],"generation":"C","branch":"Bessie","parent":"sandy"},{"id":"jodi","name":"Jodi","partners":["Jeff Rose"],"generation":"C","branch":"Bessie","parent":"sandy"},{"id":"bari","name":"Bari","partners":["Jeff Rosenholtz"],"generation":"C","branch":"Bessie","parent":"sandy"},{"id":"dean","name":"Dean","partners":["Deana"],"generation":"C","branch":"Bessie","parent":"sandy"},{"id":"alaya","name":"Alaya","partners":[],"generation":"D","branch":"Bessie","parent":"robert"},{"id":"zachary_bessie","name":"Zachary","partners":[],"generation":"D","branch":"Bessie","parent":"robert"},{"id":"alexa_bessie","name":"Alexa","partners":[],"generation":"D","branch":"Bessie","parent":"bari"},{"id":"jordan_bessie","name":"Jordan","partners":[],"generation":"D","branch":"Bessie","parent":"bari"},{"id":"kaylee","name":"Kaylee","partners":[],"generation":"D","branch":"Bessie","parent":"bari"},{"id":"paige","name":"Paige","partners":[],"generation":"D","branch":"Bessie","parent":"dean"},{"id":"adam_bessie","name":"Adam","partners":[],"generation":"D","branch":"Bessie","parent":"dean"},{"id":"reese","name":"Reese","partners":[],"generation":"D","branch":"Bessie","parent":"dean"},{"id":"suzanne","name":"Suzanne","partners":["Mike Lindemann"],"generation":"B","branch":"Saul","parent":"saul"},{"id":"maxine_saul","name":"Maxine","partners":["Ron Rogers"],"generation":"B","branch":"Saul","parent":"saul"},{"id":"eddie","name":"Eddie","partners":["Raya"],"generation":"B","branch":"Saul","parent":"saul"},{"id":"linda","name":"Linda","partners":["Marc Lobur","Tom M."],"generation":"B","branch":"Saul","parent":"saul"},{"id":"michelle_saul","name":"Michelle","partners":["Jason Howlett"],"generation":"C","branch":"Saul","parent":"suzanne"},{"id":"sarah_saul","name":"Sarah","partners":["Tim Beuthe"],"generation":"C","branch":"Saul","parent":"suzanne"},{"id":"rebecca","name":"Rebecca","partners":["John Kreig"],"generation":"C","branch":"Saul","parent":"maxine_saul"},{"id":"autumn","name":"Autumn","partners":["Eddie Naniewicz"],"generation":"C","branch":"Saul","parent":"maxine_saul"},{"id":"jordan_eddie","name":"Jordan","partners":["Lauren Kranson"],"generation":"C","branch":"Saul","parent":"eddie"},{"id":"scott","name":"Scott","partners":[],"generation":"C","branch":"Saul","parent":"eddie"},{"id":"jeanette_linda","name":"Jeanette","partners":[],"generation":"C","branch":"Saul","parent":"linda"},{"id":"kevin","name":"Kevin","partners":[],"generation":"C","branch":"Saul","parent":"linda"},{"id":"emily","name":"Emily","partners":[],"generation":"D","branch":"Saul","parent":"michelle_saul"},{"id":"jane","name":"Jane","partners":[],"generation":"D","branch":"Saul","parent":"michelle_saul"},{"id":"nina","name":"Nina","partners":[],"generation":"D","branch":"Saul","parent":"sarah_saul"},{"id":"alex","name":"Alex","partners":[],"generation":"D","branch":"Saul","parent":"sarah_saul"},{"id":"abigail","name":"Abigail","partners":[],"generation":"D","branch":"Saul","parent":"rebecca"},{"id":"peyton","name":"Peyton","partners":[],"generation":"D","branch":"Saul","parent":"autumn"},{"id":"parker_saul","name":"Parker","partners":[],"generation":"D","branch":"Saul","parent":"autumn"},{"id":"norah_bee","name":"Norah Bee","partners":[],"generation":"D","branch":"Saul","parent":"jordan_eddie"},{"id":"alan","name":"Alan","partners":["Faith","Donna"],"generation":"B","branch":"Milt","parent":"milt"},{"id":"karen","name":"Karen","partners":["Larry Wolosky"],"generation":"B","branch":"Milt","parent":"milt"},{"id":"zachary_milt","name":"Zachary","partners":[],"generation":"C","branch":"Milt","parent":"alan"},{"id":"madeline","name":"Madeline","partners":[],"generation":"C","branch":"Milt","parent":"alan"},{"id":"hannah","name":"Hannah","partners":[],"generation":"C","branch":"Milt","parent":"alan"},{"id":"adam_karen","name":"Adam","partners":["Michelle"],"generation":"C","branch":"Milt","parent":"karen"},{"id":"samantha_karen","name":"Samantha","partners":[],"generation":"C","branch":"Milt","parent":"karen"},{"id":"colin","name":"Colin","partners":[],"generation":"D","branch":"Milt","parent":"adam_karen"},{"id":"mackenzie","name":"Mackenzie","partners":[],"generation":"D","branch":"Milt","parent":"samantha_karen"},{"id":"marty","name":"Marty","partners":["Ronnie"],"generation":"B","branch":"Evelyn","parent":"evelyn"},{"id":"narda","name":"Narda","partners":["Larry Deutchman","Gary Shomsky"],"generation":"B","branch":"Evelyn","parent":"evelyn"},{"id":"beth","name":"Beth","partners":["Daryl Binsky"],"generation":"C","branch":"Evelyn","parent":"marty"},{"id":"neil","name":"Neil","partners":["Dani"],"generation":"C","branch":"Evelyn","parent":"marty"},{"id":"ryan","name":"Ryan","partners":[],"generation":"C","branch":"Evelyn","parent":"narda"},{"id":"brett","name":"Brett","partners":[],"generation":"C","branch":"Evelyn","parent":"narda"},{"id":"brooklyn","name":"Brooklyn","partners":[],"generation":"D","branch":"Evelyn","parent":"beth"},{"id":"ilana","name":"Ilana","partners":[],"generation":"D","branch":"Evelyn","parent":"beth"},{"id":"evan","name":"Evan","partners":[],"generation":"D","branch":"Evelyn","parent":"beth"},{"id":"allegra","name":"Allegra","partners":[],"generation":"D","branch":"Evelyn","parent":"neil"},{"id":"luma","name":"Luma","partners":[],"generation":"D","branch":"Evelyn","parent":"neil"},{"id":"benicio","name":"Benicio","partners":[],"generation":"D","branch":"Evelyn","parent":"neil"},{"id":"sidney","name":"Sidney","partners":["Bonnie"],"generation":"B","branch":"Sylvia","parent":"sylvia"},{"id":"paul","name":"Paul","partners":["Carin"],"generation":"B","branch":"Sylvia","parent":"sylvia"},{"id":"carol_sue","name":"Carol Sue","partners":[],"generation":"B","branch":"Sylvia","parent":"sylvia"},{"id":"craig_sylvia","name":"Craig","partners":["Laura"],"generation":"B","branch":"Sylvia","parent":"sylvia"},{"id":"aurea_casas","name":"Aurea Casas","partners":["Andre Apostol"],"generation":"B","branch":"Sylvia","parent":"sylvia"},{"id":"seth_sidney","name":"Seth","partners":[],"generation":"C","branch":"Sylvia","parent":"sidney"},{"id":"jill","name":"Jill","partners":["Tim McAndrew"],"generation":"C","branch":"Sylvia","parent":"sidney"},{"id":"shane","name":"Shane","partners":["Julie Tibbitt"],"generation":"C","branch":"Sylvia","parent":"paul"},{"id":"michelle_mimi","name":"Michelle/Mimi","partners":["Lee Kravetz"],"generation":"C","branch":"Sylvia","parent":"paul"},{"id":"lena","name":"Lena","partners":["Brian Limperopulos"],"generation":"C","branch":"Sylvia","parent":"craig_sylvia"},{"id":"brad","name":"Brad","partners":["Bailey"],"generation":"C","branch":"Sylvia","parent":"craig_sylvia"},{"id":"jen","name":"Jen","partners":["Rob Munro"],"generation":"C","branch":"Sylvia","parent":"aurea_casas"},{"id":"david_sylvia","name":"David","partners":["Nikki"],"generation":"C","branch":"Sylvia","parent":"aurea_casas"},{"id":"gus","name":"Gus","partners":[],"generation":"D","branch":"Sylvia","parent":"jill"},{"id":"sabine","name":"Sabine","partners":[],"generation":"D","branch":"Sylvia","parent":"shane"},{"id":"elliott","name":"Elliott","partners":[],"generation":"D","branch":"Sylvia","parent":"shane"},{"id":"lily_shane","name":"Lily","partners":[],"generation":"D","branch":"Sylvia","parent":"shane"},{"id":"alec","name":"Alec","partners":[],"generation":"D","branch":"Sylvia","parent":"michelle_mimi"},{"id":"chloe","name":"Chloe","partners":[],"generation":"D","branch":"Sylvia","parent":"michelle_mimi"},{"id":"craig_lena","name":"Craig","partners":[],"generation":"D","branch":"Sylvia","parent":"lena"},{"id":"molly","name":"Molly","partners":[],"generation":"D","branch":"Sylvia","parent":"lena"},{"id":"isadora","name":"Isadora","partners":[],"generation":"D","branch":"Sylvia","parent":"brad"},{"id":"juniper_jane","name":"Juniper Jane","partners":[],"generation":"D","branch":"Sylvia","parent":"brad"},{"id":"etta_mae","name":"Etta Mae","partners":[],"generation":"D","branch":"Sylvia","parent":"brad"},{"id":"cami","name":"Cami","partners":[],"generation":"D","branch":"Sylvia","parent":"jen"},{"id":"lucy_jen","name":"Lucy","partners":[],"generation":"D","branch":"Sylvia","parent":"david_sylvia"},{"id":"jude","name":"Jude","partners":[],"generation":"D","branch":"Sylvia","parent":"david_sylvia"},{"id":"sadie","name":"Sadie","partners":[],"generation":"D","branch":"Sylvia","parent":"david_sylvia"},{"id":"bruce","name":"Bruce","partners":["Barbara","Debbie"],"generation":"B","branch":"Rudy","parent":"rudy"},{"id":"lori","name":"Lori","partners":["Glenn Robertson"],"generation":"B","branch":"Rudy","parent":"rudy"},{"id":"helene","name":"Helene","partners":["Greg Pry"],"generation":"B","branch":"Rudy","parent":"rudy"},{"id":"daniel","name":"Daniel","partners":[],"generation":"C","branch":"Rudy","parent":"bruce"},{"id":"hilary","name":"Hilary","partners":["Robbie Widlansky"],"generation":"C","branch":"Rudy","parent":"bruce"},{"id":"andrew","name":"Andrew","partners":["Brittni"],"generation":"C","branch":"Rudy","parent":"lori"},{"id":"matthew_lori","name":"Matthew","partners":[],"generation":"C","branch":"Rudy","parent":"lori"},{"id":"michael_helene","name":"Michael","partners":["Betti"],"generation":"C","branch":"Rudy","parent":"helene"},{"id":"kristen","name":"Kristen","partners":[],"generation":"C","branch":"Rudy","parent":"helene"},{"id":"keith","name":"Keith","partners":[],"generation":"C","branch":"Rudy","parent":"helene"},{"id":"devyn","name":"Devyn","partners":[],"generation":"D","branch":"Rudy","parent":"hilary"},{"id":"kylie","name":"Kylie","partners":[],"generation":"D","branch":"Rudy","parent":"andrew","confidence":"assumed_gap"},{"id":"parker_andrew","name":"Parker","partners":[],"generation":"D","branch":"Rudy","parent":"andrew","confidence":"assumed_gap"},{"id":"savannah","name":"Savannah","partners":[],"generation":"D","branch":"Rudy","parent":"michael_helene"},{"id":"kaitlyn","name":"Kaitlyn","partners":[],"generation":"D","branch":"Rudy","parent":"michael_helene"},{"id":"logan","name":"Logan","partners":[],"generation":"D","branch":"Rudy","parent":"michael_helene"}];</script>
+<script>const PEOPLE_DATA = [{"id":"henry","name":"Henry","partners":["Estelle"],"generation":"A","branch":"Henry","parent":null},{"id":"dave","name":"Dave","partners":["Bea"],"generation":"A","branch":"Dave","parent":null},{"id":"jack","name":"Jack","partners":["Gertrude"],"generation":"A","branch":"Jack","parent":null},{"id":"bessie","name":"Bessie","partners":["Joe Grossman"],"generation":"A","branch":"Bessie","parent":null},{"id":"saul","name":"Saul","partners":["Claire","Jeanette"],"generation":"A","branch":"Saul","parent":null},{"id":"milt","name":"Milt","partners":["Sarah"],"generation":"A","branch":"Milt","parent":null},{"id":"evelyn","name":"Evelyn","partners":["Bernie Weisman"],"generation":"A","branch":"Evelyn","parent":null},{"id":"sylvia","name":"Sylvia","partners":["Seymour Feldman","Sol Rappaport"],"generation":"A","branch":"Sylvia","parent":null},{"id":"rudy","name":"Rudy","partners":["Maxine"],"generation":"A","branch":"Rudy","parent":null},{"id":"phyllis","name":"Phyllis","partners":["Allan Wolfson"],"generation":"B","branch":"Henry","parent":"henry"},{"id":"enid","name":"Enid","partners":["Seymour Sarrel"],"generation":"B","branch":"Henry","parent":"henry"},{"id":"carol","name":"Carol","partners":["Mike Quinn","Armando (Louie) DaCosta","Mike Simkowitz"],"generation":"C","branch":"Henry","parent":"phyllis"},{"id":"elliot","name":"Elliot","partners":["Ellie"],"generation":"C","branch":"Henry","parent":"phyllis"},{"id":"bart","name":"Bart","partners":["Annie"],"generation":"C","branch":"Henry","parent":"enid"},{"id":"louis","name":"Louis","partners":["Marla"],"generation":"C","branch":"Henry","parent":"enid"},{"id":"ronald","name":"Ronald","partners":["Gina"],"generation":"C","branch":"Henry","parent":"enid"},{"id":"allison","name":"Allison","partners":["Frank Lehner"],"generation":"D","branch":"Henry","parent":"carol"},{"id":"danielle","name":"Danielle","partners":["Chris Candelario","Micaias Marmol"],"generation":"D","branch":"Henry","parent":"carol"},{"id":"melissa","name":"Melissa","partners":[],"generation":"D","branch":"Henry","parent":"carol"},{"id":"denise","name":"Denise","partners":[],"generation":"D","branch":"Henry","parent":"carol"},{"id":"marki","name":"Marki","partners":[],"generation":"D","branch":"Henry","parent":"elliot"},{"id":"carly","name":"Carly","partners":[],"generation":"D","branch":"Henry","parent":"elliot"},{"id":"lucy_henry","name":"Lucy","partners":[],"generation":"D","branch":"Henry","parent":"elliot"},{"id":"matthew_henry","name":"Matthew","partners":[],"generation":"D","branch":"Henry","parent":"bart"},{"id":"eric","name":"Eric","partners":[],"generation":"D","branch":"Henry","parent":"louis"},{"id":"jacob_henry","name":"Jacob","partners":[],"generation":"D","branch":"Henry","parent":"louis"},{"id":"julia","name":"Julia","partners":[],"generation":"D","branch":"Henry","parent":"ronald"},{"id":"ava","name":"Ava","partners":[],"generation":"D","branch":"Henry","parent":"ronald"},{"id":"jayden","name":"Jayden","partners":[],"generation":"E","branch":"Henry","parent":"allison"},{"id":"alyssa","name":"Alyssa","partners":[],"generation":"E","branch":"Henry","parent":"allison"},{"id":"chase","name":"Chase","partners":[],"generation":"E","branch":"Henry","parent":"allison"},{"id":"jake_daniel","name":"Jake Daniel","partners":[],"generation":"E","branch":"Henry","parent":"allison"},{"id":"chris","name":"Chris","partners":[],"generation":"E","branch":"Henry","parent":"danielle"},{"id":"mailani","name":"Mailani","partners":[],"generation":"E","branch":"Henry","parent":"danielle"},{"id":"julian","name":"Julian","partners":[],"generation":"E","branch":"Henry","parent":"danielle"},{"id":"arthur","name":"Arthur","partners":["Joyce"],"generation":"B","branch":"Jack","parent":"jack"},{"id":"barry","name":"Barry","partners":["Marlene"],"generation":"B","branch":"Jack","parent":"jack"},{"id":"gary","name":"Gary","partners":["Lisa"],"generation":"C","branch":"Jack","parent":"arthur"},{"id":"drew","name":"Drew","partners":["Ledi"],"generation":"C","branch":"Jack","parent":"arthur"},{"id":"lonny","name":"Lonny","partners":["Holly"],"generation":"C","branch":"Jack","parent":"arthur"},{"id":"lee_jack","name":"Lee","partners":["Amy"],"generation":"C","branch":"Jack","parent":"barry"},{"id":"lauren_jack","name":"Lauren","partners":["Mike Macieira"],"generation":"C","branch":"Jack","parent":"barry"},{"id":"jessica","name":"Jessica","partners":[],"generation":"D","branch":"Jack","parent":"gary"},{"id":"joshua","name":"Joshua","partners":[],"generation":"D","branch":"Jack","parent":"gary"},{"id":"austin_mark","name":"Austin Mark","partners":[],"generation":"D","branch":"Jack","parent":"drew"},{"id":"melaina","name":"Melaina","partners":[],"generation":"D","branch":"Jack","parent":"lonny"},{"id":"seth_jack","name":"Seth","partners":[],"generation":"D","branch":"Jack","parent":"lee_jack"},{"id":"aaron","name":"Aaron","partners":[],"generation":"D","branch":"Jack","parent":"lee_jack"},{"id":"harvey","name":"Harvey","partners":["Susan","Rita"],"generation":"B","branch":"Dave","parent":"dave"},{"id":"rita_cookie","name":"Rita / Cookie","partners":["Jack Wisser"],"generation":"B","branch":"Dave","parent":"dave"},{"id":"steven","name":"Steven","partners":["Cheryl","Wendy"],"generation":"C","branch":"Dave","parent":"harvey"},{"id":"lisa_dave","name":"Lisa","partners":["Greg Jacobson"],"generation":"C","branch":"Dave","parent":"harvey"},{"id":"heidi","name":"Heidi","partners":["Peter Richardson"],"generation":"C","branch":"Dave","parent":"harvey"},{"id":"greg_dave","name":"Greg","partners":["Desiree"],"generation":"C","branch":"Dave","parent":"rita_cookie"},{"id":"candice","name":"Candice","partners":["Chad Eisenberger"],"generation":"C","branch":"Dave","parent":"rita_cookie"},{"id":"david_dave","name":"David","partners":[],"generation":"D","branch":"Dave","parent":"steven"},{"id":"brian","name":"Brian","partners":[],"generation":"D","branch":"Dave","parent":"steven"},{"id":"brianna","name":"Brianna","partners":[],"generation":"D","branch":"Dave","parent":"lisa_dave"},{"id":"samantha_dave","name":"Samantha","partners":[],"generation":"D","branch":"Dave","parent":"lisa_dave"},{"id":"benjamin","name":"Benjamin","partners":[],"generation":"D","branch":"Dave","parent":"lisa_dave"},{"id":"jacob_dave","name":"Jacob","partners":[],"generation":"D","branch":"Dave","parent":"heidi"},{"id":"zach","name":"Zach","partners":[],"generation":"D","branch":"Dave","parent":"heidi"},{"id":"seth_dave","name":"Seth","partners":[],"generation":"D","branch":"Dave","parent":"greg_dave","confidence":"assumed_order"},{"id":"alexa_dave","name":"Alexa","partners":[],"generation":"D","branch":"Dave","parent":"greg_dave","confidence":"assumed_order"},{"id":"hailey","name":"Hailey","partners":[],"generation":"D","branch":"Dave","parent":"greg_dave","confidence":"assumed_order"},{"id":"lily_dave","name":"Lily","partners":[],"generation":"D","branch":"Dave","parent":"candice","confidence":"assumed_order"},{"id":"jessie","name":"Jessie","partners":[],"generation":"D","branch":"Dave","parent":"candice","confidence":"assumed_order"},{"id":"scarlett","name":"Scarlett","partners":[],"generation":"E","branch":"Dave","parent":"dave","confidence":"unplaced"},{"id":"sandy","name":"Sandy","partners":["Faith"],"generation":"B","branch":"Bessie","parent":"bessie"},{"id":"robert","name":"Robert","partners":["Sherri"],"generation":"C","branch":"Bessie","parent":"sandy"},{"id":"jodi","name":"Jodi","partners":["Jeff Rose"],"generation":"C","branch":"Bessie","parent":"sandy"},{"id":"bari","name":"Bari","partners":["Jeff Rosenholtz"],"generation":"C","branch":"Bessie","parent":"sandy"},{"id":"dean","name":"Dean","partners":["Deana"],"generation":"C","branch":"Bessie","parent":"sandy"},{"id":"alaya","name":"Alaya","partners":[],"generation":"D","branch":"Bessie","parent":"robert"},{"id":"zachary_bessie","name":"Zachary","partners":[],"generation":"D","branch":"Bessie","parent":"robert"},{"id":"alexa_bessie","name":"Alexa","partners":[],"generation":"D","branch":"Bessie","parent":"bari"},{"id":"jordan_bessie","name":"Jordan","partners":[],"generation":"D","branch":"Bessie","parent":"bari"},{"id":"kaylee","name":"Kaylee","partners":[],"generation":"D","branch":"Bessie","parent":"bari"},{"id":"paige","name":"Paige","partners":[],"generation":"D","branch":"Bessie","parent":"dean"},{"id":"adam_bessie","name":"Adam","partners":[],"generation":"D","branch":"Bessie","parent":"dean"},{"id":"reese","name":"Reese","partners":[],"generation":"D","branch":"Bessie","parent":"dean"},{"id":"suzanne","name":"Suzanne","partners":["Mike Lindemann"],"generation":"B","branch":"Saul","parent":"saul"},{"id":"maxine_saul","name":"Maxine","partners":["Ron Rogers"],"generation":"B","branch":"Saul","parent":"saul"},{"id":"eddie","name":"Eddie","partners":["Raya"],"generation":"B","branch":"Saul","parent":"saul"},{"id":"linda","name":"Linda","partners":["Marc Lobur","Tom M."],"generation":"B","branch":"Saul","parent":"saul"},{"id":"michelle_saul","name":"Michelle","partners":["Jason Howlett"],"generation":"C","branch":"Saul","parent":"suzanne"},{"id":"sarah_saul","name":"Sarah","partners":["Tim Beuthe"],"generation":"C","branch":"Saul","parent":"suzanne"},{"id":"rebecca","name":"Rebecca","partners":["John Kreig"],"generation":"C","branch":"Saul","parent":"maxine_saul"},{"id":"autumn","name":"Autumn","partners":["Eddie Naniewicz"],"generation":"C","branch":"Saul","parent":"maxine_saul"},{"id":"jordan_eddie","name":"Jordan","partners":["Lauren Kranson"],"generation":"C","branch":"Saul","parent":"eddie"},{"id":"scott","name":"Scott","partners":[],"generation":"C","branch":"Saul","parent":"eddie"},{"id":"jeanette_linda","name":"Jeanette","partners":[],"generation":"C","branch":"Saul","parent":"linda"},{"id":"kevin","name":"Kevin","partners":[],"generation":"C","branch":"Saul","parent":"linda"},{"id":"emily","name":"Emily","partners":[],"generation":"D","branch":"Saul","parent":"michelle_saul"},{"id":"jane","name":"Jane","partners":[],"generation":"D","branch":"Saul","parent":"michelle_saul"},{"id":"nina","name":"Nina","partners":[],"generation":"D","branch":"Saul","parent":"sarah_saul"},{"id":"alex","name":"Alex","partners":[],"generation":"D","branch":"Saul","parent":"sarah_saul"},{"id":"abigail","name":"Abigail","partners":[],"generation":"D","branch":"Saul","parent":"rebecca"},{"id":"peyton","name":"Peyton","partners":[],"generation":"D","branch":"Saul","parent":"autumn"},{"id":"parker_saul","name":"Parker","partners":[],"generation":"D","branch":"Saul","parent":"autumn"},{"id":"norah_bee","name":"Norah Bee","partners":[],"generation":"D","branch":"Saul","parent":"jordan_eddie"},{"id":"alan","name":"Alan","partners":["Faith","Donna"],"generation":"B","branch":"Milt","parent":"milt"},{"id":"karen","name":"Karen","partners":["Larry Wolosky"],"generation":"B","branch":"Milt","parent":"milt"},{"id":"zachary_milt","name":"Zachary","partners":[],"generation":"C","branch":"Milt","parent":"alan"},{"id":"madeline","name":"Madeline","partners":[],"generation":"C","branch":"Milt","parent":"alan"},{"id":"hannah","name":"Hannah","partners":[],"generation":"C","branch":"Milt","parent":"alan"},{"id":"adam_karen","name":"Adam","partners":["Michelle"],"generation":"C","branch":"Milt","parent":"karen"},{"id":"samantha_karen","name":"Samantha","partners":[],"generation":"C","branch":"Milt","parent":"karen"},{"id":"colin","name":"Colin","partners":[],"generation":"D","branch":"Milt","parent":"adam_karen"},{"id":"mackenzie","name":"Mackenzie","partners":[],"generation":"D","branch":"Milt","parent":"samantha_karen"},{"id":"marty","name":"Marty","partners":["Ronnie"],"generation":"B","branch":"Evelyn","parent":"evelyn"},{"id":"narda","name":"Narda","partners":["Larry Deutchman","Gary Shomsky"],"generation":"B","branch":"Evelyn","parent":"evelyn"},{"id":"beth","name":"Beth","partners":["Daryl Binsky"],"generation":"C","branch":"Evelyn","parent":"marty"},{"id":"neil","name":"Neil","partners":["Dani"],"generation":"C","branch":"Evelyn","parent":"marty"},{"id":"ryan","name":"Ryan","partners":[],"generation":"C","branch":"Evelyn","parent":"narda"},{"id":"brett","name":"Brett","partners":[],"generation":"C","branch":"Evelyn","parent":"narda"},{"id":"brooklyn","name":"Brooklyn","partners":[],"generation":"D","branch":"Evelyn","parent":"beth"},{"id":"ilana","name":"Ilana","partners":[],"generation":"D","branch":"Evelyn","parent":"beth"},{"id":"evan","name":"Evan","partners":[],"generation":"D","branch":"Evelyn","parent":"beth"},{"id":"allegra","name":"Allegra","partners":[],"generation":"D","branch":"Evelyn","parent":"neil"},{"id":"luma","name":"Luma","partners":[],"generation":"D","branch":"Evelyn","parent":"neil"},{"id":"benicio","name":"Benicio","partners":[],"generation":"D","branch":"Evelyn","parent":"neil"},{"id":"sidney","name":"Sidney","partners":["Bonnie"],"generation":"B","branch":"Sylvia","parent":"sylvia"},{"id":"paul","name":"Paul","partners":["Carin","Lisa"],"generation":"B","branch":"Sylvia","parent":"sylvia"},{"id":"carol_sue","name":"Carol Sue","partners":[],"generation":"B","branch":"Sylvia","parent":"sylvia"},{"id":"craig_sylvia","name":"Craig","partners":["Laura"],"generation":"B","branch":"Sylvia","parent":"sylvia"},{"id":"aurea_casas","name":"Aurea Casas","partners":["Andre Apostol"],"generation":"B","branch":"Sylvia","parent":"sylvia"},{"id":"seth_sidney","name":"Seth","partners":[],"generation":"C","branch":"Sylvia","parent":"sidney"},{"id":"jill","name":"Jill","partners":["Tim McAndrew"],"generation":"C","branch":"Sylvia","parent":"sidney"},{"id":"shane","name":"Shane","partners":["Julie Tibbitt"],"generation":"C","branch":"Sylvia","parent":"paul"},{"id":"michelle_mimi","name":"Michelle/Mimi","partners":["Lee Kravetz"],"generation":"C","branch":"Sylvia","parent":"paul"},{"id":"lena","name":"Lena","partners":["Brian Limperopulos"],"generation":"C","branch":"Sylvia","parent":"craig_sylvia"},{"id":"brad","name":"Brad","partners":["Bailey"],"generation":"C","branch":"Sylvia","parent":"craig_sylvia"},{"id":"jen","name":"Jen","partners":["Rob Munro"],"generation":"C","branch":"Sylvia","parent":"aurea_casas"},{"id":"david_sylvia","name":"David","partners":["Nikki"],"generation":"C","branch":"Sylvia","parent":"aurea_casas"},{"id":"gus","name":"Gus","partners":[],"generation":"D","branch":"Sylvia","parent":"jill"},{"id":"sabine","name":"Sabine","partners":[],"generation":"D","branch":"Sylvia","parent":"shane"},{"id":"elliott","name":"Elliott","partners":[],"generation":"D","branch":"Sylvia","parent":"shane"},{"id":"lily_shane","name":"Lily","partners":[],"generation":"D","branch":"Sylvia","parent":"shane"},{"id":"alec","name":"Alec","partners":[],"generation":"D","branch":"Sylvia","parent":"michelle_mimi"},{"id":"chloe","name":"Chloe","partners":[],"generation":"D","branch":"Sylvia","parent":"michelle_mimi"},{"id":"craig_lena","name":"Craig","partners":[],"generation":"D","branch":"Sylvia","parent":"lena"},{"id":"molly","name":"Molly","partners":[],"generation":"D","branch":"Sylvia","parent":"lena"},{"id":"isadora","name":"Isadora","partners":[],"generation":"D","branch":"Sylvia","parent":"brad"},{"id":"juniper_jane","name":"Juniper Jane","partners":[],"generation":"D","branch":"Sylvia","parent":"brad"},{"id":"etta_mae","name":"Etta Mae","partners":[],"generation":"D","branch":"Sylvia","parent":"brad"},{"id":"cami","name":"Cami","partners":[],"generation":"D","branch":"Sylvia","parent":"jen"},{"id":"lucy_jen","name":"Lucy","partners":[],"generation":"D","branch":"Sylvia","parent":"david_sylvia"},{"id":"jude","name":"Jude","partners":[],"generation":"D","branch":"Sylvia","parent":"david_sylvia"},{"id":"sadie","name":"Sadie","partners":[],"generation":"D","branch":"Sylvia","parent":"david_sylvia"},{"id":"bruce","name":"Bruce","partners":["Barbara","Debbie"],"generation":"B","branch":"Rudy","parent":"rudy"},{"id":"lori","name":"Lori","partners":["Glenn Robertson"],"generation":"B","branch":"Rudy","parent":"rudy"},{"id":"helene","name":"Helene","partners":["Greg Pry"],"generation":"B","branch":"Rudy","parent":"rudy"},{"id":"daniel","name":"Daniel","partners":[],"generation":"C","branch":"Rudy","parent":"bruce"},{"id":"hilary","name":"Hilary","partners":["Robbie Widlansky"],"generation":"C","branch":"Rudy","parent":"bruce"},{"id":"andrew","name":"Andrew","partners":["Brittni"],"generation":"C","branch":"Rudy","parent":"lori"},{"id":"matthew_lori","name":"Matthew","partners":[],"generation":"C","branch":"Rudy","parent":"lori"},{"id":"michael_helene","name":"Michael","partners":["Betti"],"generation":"C","branch":"Rudy","parent":"helene"},{"id":"kristen","name":"Kristen","partners":[],"generation":"C","branch":"Rudy","parent":"helene"},{"id":"keith","name":"Keith","partners":[],"generation":"C","branch":"Rudy","parent":"helene"},{"id":"devyn","name":"Devyn","partners":[],"generation":"D","branch":"Rudy","parent":"hilary"},{"id":"kylie","name":"Kylie","partners":[],"generation":"D","branch":"Rudy","parent":"andrew","confidence":"assumed_gap"},{"id":"parker_andrew","name":"Parker","partners":[],"generation":"D","branch":"Rudy","parent":"andrew","confidence":"assumed_gap"},{"id":"savannah","name":"Savannah","partners":[],"generation":"D","branch":"Rudy","parent":"michael_helene"},{"id":"kaitlyn","name":"Kaitlyn","partners":[],"generation":"D","branch":"Rudy","parent":"michael_helene"},{"id":"logan","name":"Logan","partners":[],"generation":"D","branch":"Rudy","parent":"michael_helene"}];</script>
 <script>
 const BRANCH_COLOR = {
   Henry: 'var(--c-henry)', Dave: 'var(--c-dave)', Jack: 'var(--c-jack)',
@@ -978,11 +1093,15 @@ function setExpanded(row, expanded) {
 // Stored locally in this browser only (no server/backend exists for this static file).
 const VITALS_PREFIX = 'wfc-vitals-';
 const vitalsStore = {};
-PEOPLE_DATA.forEach(p => {
+function loadVitalsFromStorage(id) {
   try {
-    const raw = localStorage.getItem(VITALS_PREFIX + p.id);
-    if (raw) vitalsStore[p.id] = JSON.parse(raw);
+    const raw = localStorage.getItem(VITALS_PREFIX + id);
+    if (raw) vitalsStore[id] = JSON.parse(raw);
   } catch (e) { /* localStorage unavailable; vitals just won't persist */ }
+}
+PEOPLE_DATA.forEach(p => {
+  loadVitalsFromStorage(p.id);
+  (p.partners || []).forEach((_, idx) => loadVitalsFromStorage(p.id + '__p' + idx));
 });
 
 function getVitals(id) {
@@ -1012,6 +1131,42 @@ function resizeImageFile(file, maxDim, callback) {
   reader.readAsDataURL(file);
 }
 
+// ---- Photo crop (pan/zoom) ----
+// Pan is stored as pixel offsets relative to a fixed reference frame size (the crop
+// editor's frame), then scaled proportionally whenever rendered at a different size
+// (e.g. the small ~26px row thumbnail) so the same crop looks consistent everywhere.
+const CROP_REFERENCE_FRAME = 220;
+
+function applyCropTransform(imgEl, vitals, renderedPx) {
+  const zoom = vitals.photoZoom || 1;
+  const panX = vitals.photoPanX || 0;
+  const panY = vitals.photoPanY || 0;
+  const ratio = renderedPx / CROP_REFERENCE_FRAME;
+  imgEl.style.transform = `translate(${panX * ratio}px, ${panY * ratio}px) scale(${zoom})`;
+}
+
+function partnerId(personId, index) {
+  return personId + '__p' + index;
+}
+
+function makePhotoThumb(id, displayName, vitals, sizeClass) {
+  const wrap = document.createElement('span');
+  wrap.className = 'photo-thumb' + (sizeClass ? ' ' + sizeClass : '');
+  wrap.setAttribute('role', 'button');
+  wrap.setAttribute('tabindex', '0');
+  wrap.title = 'View photo';
+  wrap.setAttribute('aria-label', 'View photo of ' + displayName);
+  const img = document.createElement('img');
+  img.src = vitals.photo;
+  img.alt = '';
+  wrap.appendChild(img);
+  applyCropTransform(img, vitals, sizeClass === 'photo-thumb-sm' ? 20 : 26);
+  const open = (e) => { e.stopPropagation(); openPhotoLightbox(id, displayName); };
+  wrap.addEventListener('click', open);
+  wrap.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(e); } });
+  return wrap;
+}
+
 function vitalsLabel(v) {
   let yearPart = '';
   if (v.yearBorn && v.yearDeceased) yearPart = `(${v.yearBorn}\u2013${v.yearDeceased})`;
@@ -1026,8 +1181,9 @@ function marriageLabel(v) {
   return '';
 }
 
-function renderVitalsPanel(p, container) {
-  const v = getVitals(p.id);
+function renderVitalsPanel(id, displayName, container, opts) {
+  opts = opts || {};
+  const v = getVitals(id);
   const panel = document.createElement('div');
   panel.className = 'vitals-panel';
   panel.innerHTML = `
@@ -1040,10 +1196,11 @@ function renderVitalsPanel(p, container) {
       <div class="vp-field"><label>Year Born</label><input type="text" class="vp-yearBorn" inputmode="numeric" placeholder="e.g. 1920" value="${escapeHtml(v.yearBorn || '')}"></div>
       <div class="vp-field"><label>Year Deceased</label><input type="text" class="vp-yearDeceased" inputmode="numeric" placeholder="leave blank if living" value="${escapeHtml(v.yearDeceased || '')}"></div>
     </div>
+    ${opts.showMarriage ? `
     <div class="vp-row">
       <div class="vp-field"><label>Date Married</label><input type="text" class="vp-dateMarried" placeholder="e.g. 1950" value="${escapeHtml(v.dateMarried || '')}"></div>
       <div class="vp-field"><label>Marriage Ended</label><input type="text" class="vp-dateMarriageEnd" placeholder="if divorced/widowed" value="${escapeHtml(v.dateMarriageEnd || '')}"></div>
-    </div>
+    </div>` : ''}
     <div class="vp-actions">
       <button type="button" class="vp-cancel">Cancel</button>
       <button type="button" class="vp-save">Save</button>
@@ -1053,38 +1210,131 @@ function renderVitalsPanel(p, container) {
   container.appendChild(panel);
 
   let pendingPhoto = v.photo || null;
+  let pendingCropReset = false;
   const photoInput = panel.querySelector('.vp-photo-input');
   const photoPreview = panel.querySelector('.vp-photo-preview');
   photoInput.addEventListener('change', () => {
     const file = photoInput.files[0];
     if (!file) return;
-    resizeImageFile(file, 240, (dataUrl) => {
+    resizeImageFile(file, 640, (dataUrl) => {
       pendingPhoto = dataUrl;
       photoPreview.src = dataUrl;
       photoPreview.style.display = '';
+      pendingCropReset = true;
     });
   });
   const removeBtn = panel.querySelector('.vp-remove-photo');
   if (removeBtn) {
     removeBtn.addEventListener('click', () => {
       pendingPhoto = null;
+      pendingCropReset = true;
       photoPreview.style.display = 'none';
       photoPreview.src = '';
     });
   }
   panel.querySelector('.vp-cancel').addEventListener('click', () => panel.remove());
   panel.querySelector('.vp-save').addEventListener('click', () => {
+    const dateMarriedEl = panel.querySelector('.vp-dateMarried');
+    const dateMarriageEndEl = panel.querySelector('.vp-dateMarriageEnd');
     const newVitals = {
       yearBorn: panel.querySelector('.vp-yearBorn').value.trim(),
       yearDeceased: panel.querySelector('.vp-yearDeceased').value.trim(),
-      dateMarried: panel.querySelector('.vp-dateMarried').value.trim(),
-      dateMarriageEnd: panel.querySelector('.vp-dateMarriageEnd').value.trim(),
+      dateMarried: dateMarriedEl ? dateMarriedEl.value.trim() : (v.dateMarried || ''),
+      dateMarriageEnd: dateMarriageEndEl ? dateMarriageEndEl.value.trim() : (v.dateMarriageEnd || ''),
       photo: pendingPhoto,
+      photoZoom: pendingCropReset ? 1 : (v.photoZoom || 1),
+      photoPanX: pendingCropReset ? 0 : (v.photoPanX || 0),
+      photoPanY: pendingCropReset ? 0 : (v.photoPanY || 0),
     };
-    saveVitals(p.id, newVitals);
+    saveVitals(id, newVitals);
     panel.remove();
-    refreshPersonRow(p.id);
+    if (opts.onSaved) opts.onSaved();
   });
+}
+
+function buildPartnersElement(person) {
+  const partnersEl = document.createElement('div');
+  partnersEl.className = 'partners';
+  if (!person.partners || !person.partners.length) return partnersEl;
+
+  person.partners.forEach((partnerName, idx) => {
+    if (idx > 0) {
+      const sep = document.createElement('span');
+      sep.className = 'partner-sep';
+      sep.textContent = ' & ';
+      partnersEl.appendChild(sep);
+    }
+    const pid = partnerId(person.id, idx);
+    const pv = getVitals(pid);
+
+    const unit = document.createElement('span');
+    unit.className = 'partner-unit';
+
+    if (pv.photo) {
+      unit.appendChild(makePhotoThumb(pid, partnerName, pv, 'photo-thumb-sm'));
+    }
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'partner-name';
+    nameSpan.dataset.original = partnerName;
+    nameSpan.textContent = partnerName;
+    unit.appendChild(nameSpan);
+
+    const yLabel = vitalsLabel(pv);
+    if (yLabel) {
+      const yEl = document.createElement('span');
+      yEl.className = 'vitals-text';
+      yEl.textContent = ' ' + yLabel;
+      unit.appendChild(yEl);
+    }
+    const mLabel = marriageLabel(pv);
+    if (mLabel) {
+      const mEl = document.createElement('span');
+      mEl.className = 'marriage-text';
+      mEl.textContent = '  (' + mLabel + ')';
+      unit.appendChild(mEl);
+    }
+
+    const editBtn = document.createElement('span');
+    editBtn.className = 'edit-vitals-btn';
+    editBtn.textContent = '\u270F\uFE0F';
+    editBtn.title = 'Add photo or info for ' + partnerName;
+    editBtn.setAttribute('role', 'button');
+    editBtn.setAttribute('tabindex', '0');
+    editBtn.setAttribute('aria-label', 'Edit details for ' + partnerName);
+    const openEdit = (e) => {
+      e.stopPropagation();
+      const already = partnersEl.querySelector(':scope > .vitals-panel[data-for="' + pid + '"]');
+      if (already) { already.remove(); return; }
+      const otherOpen = partnersEl.querySelector(':scope > .vitals-panel');
+      if (otherOpen) otherOpen.remove();
+      const panelHolder = document.createElement('div');
+      panelHolder.className = 'vitals-panel-holder';
+      partnersEl.appendChild(panelHolder);
+      renderVitalsPanel(pid, partnerName, panelHolder, {
+        showMarriage: true,
+        onSaved: () => refreshPartners(person.id),
+      });
+      panelHolder.firstElementChild && panelHolder.firstElementChild.setAttribute('data-for', pid);
+    };
+    editBtn.addEventListener('click', openEdit);
+    editBtn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openEdit(e); } });
+    unit.appendChild(editBtn);
+
+    partnersEl.appendChild(unit);
+  });
+
+  return partnersEl;
+}
+
+function refreshPartners(personId) {
+  const li = document.querySelector('li[data-id="' + personId + '"]');
+  if (!li) return;
+  const row = li.querySelector(':scope > .node-row');
+  const oldPartnersEl = row.querySelector('.partners');
+  const p = byId[personId];
+  const freshPartnersEl = buildPartnersElement(p);
+  if (oldPartnersEl) oldPartnersEl.replaceWith(freshPartnersEl);
 }
 
 function refreshPersonRow(id) {
@@ -1094,22 +1344,18 @@ function refreshPersonRow(id) {
   const v = getVitals(id);
   const p = byId[id];
 
-  let photoEl = row.querySelector('.photo-thumb');
-  const dotEl = row.querySelector('.dot');
+  const existingPhotoEl = row.querySelector(':scope > .photo-thumb');
+  const existingDotEl = row.querySelector(':scope > .dot');
   if (v.photo) {
-    if (!photoEl) {
-      photoEl = document.createElement('img');
-      photoEl.className = 'photo-thumb';
-      dotEl.replaceWith(photoEl);
-    }
-    photoEl.src = v.photo;
-  } else if (photoEl) {
+    const freshThumb = makePhotoThumb(id, p.name, v);
+    (existingPhotoEl || existingDotEl).replaceWith(freshThumb);
+  } else if (existingPhotoEl) {
     const newDot = document.createElement('span');
     newDot.className = 'dot';
-    photoEl.replaceWith(newDot);
+    existingPhotoEl.replaceWith(newDot);
   }
 
-  let yearsEl = row.querySelector('.vitals-text');
+  let yearsEl = row.querySelector('.name + .vitals-text');
   const label = vitalsLabel(v);
   if (label) {
     if (!yearsEl) {
@@ -1121,21 +1367,127 @@ function refreshPersonRow(id) {
   } else if (yearsEl) {
     yearsEl.remove();
   }
+}
 
-  let marriageEl = row.querySelector('.marriage-text');
-  const mLabel = marriageLabel(v);
-  const partnersEl = row.querySelector('.partners');
-  if (mLabel && partnersEl) {
-    if (!marriageEl) {
-      marriageEl = document.createElement('span');
-      marriageEl.className = 'marriage-text';
-      partnersEl.insertAdjacentElement('beforeend', marriageEl);
-    }
-    marriageEl.textContent = '  (' + mLabel + ')';
-  } else if (marriageEl) {
-    marriageEl.remove();
+// ---- Photo lightbox + recenter/crop editor ----
+function closeLightbox() {
+  const existing = document.querySelector('.lightbox-overlay');
+  if (existing) existing.remove();
+}
+
+function openPhotoLightbox(personId, displayName) {
+  closeLightbox();
+  const v = getVitals(personId);
+  if (!v.photo) return;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'lightbox-overlay';
+  overlay.innerHTML = `
+    <div class="lightbox-card">
+      <div class="lb-name">${escapeHtml(displayName)}</div>
+      <img class="lightbox-photo-full" src="${v.photo}" alt="">
+      <div class="lb-actions">
+        <button type="button" class="lb-close">Close</button>
+        <button type="button" class="lb-recenter">Recenter Photo</button>
+      </div>
+    </div>
+  `;
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeLightbox(); });
+  overlay.querySelector('.lb-close').addEventListener('click', closeLightbox);
+  overlay.querySelector('.lb-recenter').addEventListener('click', () => openCropEditor(personId, displayName));
+  document.body.appendChild(overlay);
+}
+
+function openCropEditor(personId, displayName) {
+  closeLightbox();
+  const v = getVitals(personId);
+  if (!v.photo) return;
+
+  let zoom = v.photoZoom || 1;
+  let panX = v.photoPanX || 0;
+  let panY = v.photoPanY || 0;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'lightbox-overlay';
+  overlay.innerHTML = `
+    <div class="lightbox-card">
+      <div class="lb-name">Recenter ${escapeHtml(displayName)}'s photo</div>
+      <div class="crop-editor-frame">
+        <img class="crop-editor-img" src="${v.photo}" alt="">
+      </div>
+      <div class="crop-hint">Drag the photo to reposition &middot; use the slider to zoom</div>
+      <div class="crop-zoom-row">
+        <span style="font-size:0.75rem;">&minus;</span>
+        <input type="range" class="crop-zoom-slider" min="1" max="3" step="0.05" value="${zoom}">
+        <span style="font-size:0.75rem;">+</span>
+      </div>
+      <div class="lb-actions">
+        <button type="button" class="lb-close vp-cancel-crop">Cancel</button>
+        <button type="button" class="lb-recenter vp-save-crop">Save</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const frame = overlay.querySelector('.crop-editor-frame');
+  const img = overlay.querySelector('.crop-editor-img');
+  const slider = overlay.querySelector('.crop-zoom-slider');
+
+  function render() {
+    img.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+  }
+  render();
+
+  // clamp pan so the image can't be dragged far enough to reveal empty space
+  function clamp() {
+    const maxOffset = CROP_REFERENCE_FRAME * (zoom - 1) / 2;
+    panX = Math.max(-maxOffset, Math.min(maxOffset, panX));
+    panY = Math.max(-maxOffset, Math.min(maxOffset, panY));
+  }
+
+  let dragging = false, startX = 0, startY = 0, startPanX = 0, startPanY = 0;
+  frame.addEventListener('pointerdown', (e) => {
+    dragging = true;
+    try { frame.setPointerCapture(e.pointerId); } catch (err) { /* synthetic or unsupported pointer, ignore */ }
+    startX = e.clientX; startY = e.clientY;
+    startPanX = panX; startPanY = panY;
+  });
+  frame.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    panX = startPanX + (e.clientX - startX);
+    panY = startPanY + (e.clientY - startY);
+    clamp();
+    render();
+  });
+  const endDrag = () => { dragging = false; };
+  frame.addEventListener('pointerup', endDrag);
+  frame.addEventListener('pointercancel', endDrag);
+  frame.addEventListener('pointerleave', endDrag);
+
+  slider.addEventListener('input', () => {
+    zoom = parseFloat(slider.value);
+    clamp();
+    render();
+  });
+
+  overlay.querySelector('.vp-cancel-crop').addEventListener('click', () => openPhotoLightbox(personId, displayName));
+  overlay.querySelector('.vp-save-crop').addEventListener('click', () => {
+    const updated = Object.assign({}, getVitals(personId), { photoZoom: zoom, photoPanX: panX, photoPanY: panY });
+    saveVitals(personId, updated);
+    refreshAfterVitalsChange(personId);
+    closeLightbox();
+  });
+}
+
+function refreshAfterVitalsChange(id) {
+  if (byId[id]) {
+    refreshPersonRow(id);
+  } else {
+    // partner pseudo-ids look like `${ownerPersonId}__p${index}`
+    refreshPartners(id.split('__p')[0]);
   }
 }
+
 
 function buildNode(id, depth, siblingIndex, siblingCount) {
   const p = byId[id];
@@ -1201,14 +1553,7 @@ function buildNode(id, depth, siblingIndex, siblingCount) {
   }
   wrap.appendChild(nameLine);
 
-  if (p.partners && p.partners.length) {
-    const partEl = document.createElement('div');
-    partEl.className = 'partners';
-    const txt = p.partners.join(' & ');
-    partEl.dataset.original = txt;
-    partEl.textContent = txt;
-    wrap.appendChild(partEl);
-  }
+  wrap.appendChild(buildPartnersElement(p));
 
   const meta = document.createElement('div');
   meta.className = 'meta-row';
@@ -1270,7 +1615,7 @@ function buildNode(id, depth, siblingIndex, siblingCount) {
     e.stopPropagation();
     const existing = wrap.querySelector(':scope > .vitals-panel');
     if (existing) { existing.remove(); return; }
-    renderVitalsPanel(p, wrap);
+    renderVitalsPanel(p.id, p.name, wrap, { showMarriage: false, onSaved: () => refreshPersonRow(p.id) });
   };
   editBtn.addEventListener('click', openVitalsEditor);
   editBtn.addEventListener('keydown', (e) => {
@@ -1287,12 +1632,11 @@ function buildNode(id, depth, siblingIndex, siblingCount) {
   row.appendChild(wrap);
   li.appendChild(row);
 
-  // apply any vitals already saved from a previous visit (photo / years / marriage dates)
+  // apply any vitals already saved from a previous visit (own photo / years)
+  // partner photos, years, and marriage dates are already included via buildPartnersElement above
   const existingVitals = getVitals(p.id);
   if (existingVitals.photo) {
-    const photoEl = document.createElement('img');
-    photoEl.className = 'photo-thumb';
-    photoEl.src = existingVitals.photo;
+    const photoEl = makePhotoThumb(p.id, p.name, existingVitals);
     dot.replaceWith(photoEl);
   }
   const initialYearsLabel = vitalsLabel(existingVitals);
@@ -1301,16 +1645,6 @@ function buildNode(id, depth, siblingIndex, siblingCount) {
     yearsEl.className = 'vitals-text';
     yearsEl.textContent = ' ' + initialYearsLabel;
     nameEl.insertAdjacentElement('afterend', yearsEl);
-  }
-  const initialMarriageLabel = marriageLabel(existingVitals);
-  if (initialMarriageLabel) {
-    const partEl = wrap.querySelector('.partners');
-    if (partEl) {
-      const marriageEl = document.createElement('span');
-      marriageEl.className = 'marriage-text';
-      marriageEl.textContent = '  (' + initialMarriageLabel + ')';
-      partEl.appendChild(marriageEl);
-    }
   }
 
   if (hasKids) {
@@ -1463,12 +1797,12 @@ function runSearch() {
     li.classList.toggle('hidden-by-search', !shouldShow);
 
     const nameEl = li.querySelector(':scope > .node-row .name');
-    const partEl = li.querySelector(':scope > .node-row .partners');
+    const partnerNameEls = li.querySelectorAll(':scope > .node-row .partner-name');
     const breadcrumb = li.querySelector(':scope > .node-row .breadcrumb');
 
     // Only highlight text on actual matches, not ancestors shown just for context
     if (nameEl) highlight(nameEl, isMatch ? query : '');
-    if (partEl) highlight(partEl, isMatch ? query : '');
+    partnerNameEls.forEach(el => highlight(el, isMatch ? query : ''));
 
     if (query && isMatch && !li.classList.contains('hidden-by-filter')) {
       visibleCount++;
