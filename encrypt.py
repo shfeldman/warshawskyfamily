@@ -223,13 +223,14 @@ async function tryDecrypt(pwd) {
 }
 
 // ── Render decrypted page ─────────────────────────────────────────────────
-// Use a full-screen iframe with srcdoc so the browser treats the decrypted
-// HTML as a fresh page — all scripts execute normally, no conflicts.
 function render(html) {
+  // Wipe the gate page completely so nothing shows behind the iframe
+  document.body.innerHTML = '';
+  document.documentElement.style.cssText = 'margin:0;padding:0;overflow:hidden;height:100%;';
+  document.body.style.cssText = 'margin:0;padding:0;overflow:hidden;height:100%;';
   const iframe = document.createElement('iframe');
-  iframe.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;border:none;z-index:999999;';
+  iframe.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;border:none;';
   iframe.srcdoc = html;
-  document.body.style.overflow = 'hidden';
   document.body.appendChild(iframe);
 }
 
