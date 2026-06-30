@@ -328,21 +328,61 @@
   }
   .name mark { background: #ffd866; color: inherit; border-radius: 3px; padding: 0 2px; }
 
-  .partners {
-    font-size: 0.78rem;
+  .marriages {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-top: 0.1rem;
+  }
+  .marriage-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    padding: 0.3rem 0.5rem;
+    background: var(--paper-deep);
+    border-left: 3px solid var(--rule-soft);
+    border-radius: 0 5px 5px 0;
+  }
+  .marriage-block.marriage-multiple {
+    border-left-color: var(--branch-color, var(--rule-soft));
+  }
+  .marriage-header {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--ink-soft);
-    font-style: italic;
+    font-style: normal;
+  }
+  .marriage-row {
     display: flex;
     align-items: center;
+    gap: 0.3rem;
     flex-wrap: wrap;
-    gap: 0.15rem;
+  }
+  .marriage-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    font-style: normal;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+  .marriage-date-known {
+    font-size: 0.7rem;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+  .marriage-date-unknown {
+    font-size: 0.68rem;
+    color: var(--ink-soft);
+    opacity: 0.5;
+    font-style: italic;
   }
   .partner-unit {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
   }
-  .partner-sep { font-style: italic; }
   .partner-name mark { background: #ffd866; color: var(--ink); border-radius: 3px; padding: 0 2px; }
 
   .photo-thumb-sm {
@@ -1178,28 +1218,35 @@ function marriageLabel(v) {
 }
 
 function buildPartnersElement(person) {
-  const partnersEl = document.createElement('div');
-  partnersEl.className = 'partners';
-  if (!person.partners || !person.partners.length) return partnersEl;
+  const wrapper = document.createElement('div');
+  wrapper.className = 'marriages';
+  if (!person.partners || !person.partners.length) return wrapper;
 
-  // Add "Spouse:" / "Spouses:" label prefix
-  const labelSpan = document.createElement('span');
-  labelSpan.style.fontStyle = 'normal';
-  labelSpan.style.fontWeight = '600';
-  labelSpan.style.color = 'var(--ink-soft)';
-  labelSpan.style.marginRight = '0.2rem';
-  labelSpan.textContent = person.partners.length === 1 ? 'Spouse:' : 'Spouses:';
-  partnersEl.appendChild(labelSpan);
+  const multiple = person.partners.length > 1;
 
   person.partners.forEach((partnerName, idx) => {
-    if (idx > 0) {
-      const sep = document.createElement('span');
-      sep.className = 'partner-sep';
-      sep.textContent = ' & ';
-      partnersEl.appendChild(sep);
-    }
     const pid = partnerId(person.id, idx);
     const pv = getVitals(pid);
+
+    const block = document.createElement('div');
+    block.className = 'marriage-block' + (multiple ? ' marriage-multiple' : '');
+
+    // Numbered header for multiple marriages
+    if (multiple) {
+      const header = document.createElement('div');
+      header.className = 'marriage-header';
+      header.textContent = idx === 0 ? '1st Marriage' : idx === 1 ? '2nd Marriage' : idx === 2 ? '3rd Marriage' : (idx + 1) + 'th Marriage';
+      block.appendChild(header);
+    }
+
+    // Row: "Spouse: [photo] Name (vitals)"
+    const row = document.createElement('div');
+    row.className = 'marriage-row';
+
+    const label = document.createElement('span');
+    label.className = 'marriage-label';
+    label.textContent = 'Spouse:';
+    row.appendChild(label);
 
     const unit = document.createElement('span');
     unit.className = 'partner-unit';
@@ -1221,18 +1268,31 @@ function buildPartnersElement(person) {
       yEl.textContent = ' ' + yLabel;
       unit.appendChild(yEl);
     }
+
+    row.appendChild(unit);
+    block.appendChild(row);
+
+    // Marriage date row
+    const dateRow = document.createElement('div');
+    dateRow.className = 'marriage-row';
     const mLabel = marriageLabel(pv);
     if (mLabel) {
       const mEl = document.createElement('span');
-      mEl.className = 'marriage-text';
-      mEl.textContent = '  (' + mLabel + ')';
-      unit.appendChild(mEl);
+      mEl.className = 'marriage-date-known';
+      mEl.textContent = mLabel;
+      dateRow.appendChild(mEl);
+    } else {
+      const mEl = document.createElement('span');
+      mEl.className = 'marriage-date-unknown';
+      mEl.textContent = 'Marriage year unknown';
+      dateRow.appendChild(mEl);
     }
+    block.appendChild(dateRow);
 
-    partnersEl.appendChild(unit);
+    wrapper.appendChild(block);
   });
 
-  return partnersEl;
+  return wrapper;
 }
 
 // ---- Photo lightbox (view only) ----
