@@ -1,5 +1,18 @@
 [
   {
+    "id": "founders",
+    "name": "Louis Warshawsky",
+    "partners": [
+      "Rose Warshawsky"
+    ],
+    "generation": "A",
+    "branch": "Founders",
+    "parent": null,
+    "vitals": {
+      "photo": "founders.jpg"
+    }
+  },
+  {
     "id": "henry",
     "name": "Henry",
     "partners": [
@@ -145,13 +158,16 @@
   },
   {
     "id": "louis",
-    "name": "Louis",
+    "name": "Louis Sarrel",
     "partners": [
       "Marla"
     ],
     "generation": "C",
     "branch": "Henry",
-    "parent": "enid"
+    "parent": "enid",
+    "vitals": {
+      "photo": "louis.jpg"
+    }
   },
   {
     "id": "ronald",
@@ -1111,12 +1127,17 @@
     "id": "paul",
     "name": "Paul",
     "partners": [
-      "Carin",
+      "Carin Feldman",
       "Lisa"
     ],
     "generation": "B",
     "branch": "Sylvia",
-    "parent": "sylvia"
+    "parent": "sylvia",
+    "partnerVitals": {
+      "0": {
+        "photo": "paul__p0.jpg"
+      }
+    }
   },
   {
     "id": "carol_sue",
@@ -1156,13 +1177,16 @@
   },
   {
     "id": "jill",
-    "name": "Jill",
+    "name": "Jill McAndrew",
     "partners": [
       "Tim McAndrew"
     ],
     "generation": "C",
     "branch": "Sylvia",
-    "parent": "sidney"
+    "parent": "sidney",
+    "vitals": {
+      "photo": "jill.jpg"
+    }
   },
   {
     "id": "shane",

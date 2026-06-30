@@ -894,12 +894,14 @@
 const BRANCH_COLOR = {
   Henry: 'var(--c-henry)', Dave: 'var(--c-dave)', Jack: 'var(--c-jack)',
   Bessie: 'var(--c-bessie)', Saul: 'var(--c-saul)', Milt: 'var(--c-milt)',
-  Evelyn: 'var(--c-evelyn)', Sylvia: 'var(--c-sylvia)', Rudy: 'var(--c-rudy)'
+  Evelyn: 'var(--c-evelyn)', Sylvia: 'var(--c-sylvia)', Rudy: 'var(--c-rudy)',
+  Founders: 'var(--c-trunk, #8a6d1f)'
 };
 const BRANCH_HEX = {
   Henry: '#c1440e', Dave: '#0d5c8c', Jack: '#1f7a4d',
   Bessie: '#8a3f8c', Saul: '#6a4fb5', Milt: '#b8860b',
-  Evelyn: '#1f9489', Sylvia: '#c2287d', Rudy: '#8a5a1e'
+  Evelyn: '#1f9489', Sylvia: '#c2287d', Rudy: '#8a5a1e',
+  Founders: '#8a6d1f'
 };
 const GEN_LABEL = {
   A: 'Sibling', B: '1st Cousin', C: '2nd Cousin', D: '3rd Cousin', E: '4th Cousin'
@@ -1293,7 +1295,7 @@ function buildNode(id, depth, siblingIndex, siblingCount) {
 }
 
 const treeEl = document.getElementById('tree');
-const roots = PEOPLE_DATA.filter(p => p.generation === 'A');
+const roots = PEOPLE_DATA.filter(p => p.generation === 'A' && p.id !== 'founders');
 roots.sort((a,b) => BRANCH_ORDER.indexOf(a.branch) - BRANCH_ORDER.indexOf(b.branch));
 roots.forEach(r => {
   const li = buildNode(r.id, 0, 0, 1);
@@ -1833,7 +1835,9 @@ function computeExplorerLayout() {
     return x;
   }
   // shift the 9 branch roots down one level to make room for Louis & Rose above them
-  const rootXs = roots.map(r => { const x = layout(r.id, 1); nextX += 1; return x; });
+  const explorerRoots = PEOPLE_DATA.filter(p => p.generation === 'A' && p.id !== 'founders');
+  explorerRoots.sort((a,b) => BRANCH_ORDER.indexOf(a.branch) - BRANCH_ORDER.indexOf(b.branch));
+  const rootXs = explorerRoots.map(r => { const x = layout(r.id, 1); nextX += 1; return x; });
   const apexX = (Math.min(...rootXs) + Math.max(...rootXs)) / 2;
   positions[EXPLORER_ROOT_ID] = { x: apexX, y: 0 };
   return positions;
@@ -1857,6 +1861,7 @@ function buildExplorer() {
 
   let maxX = 0, maxY = 0;
   PEOPLE_DATA.forEach(p => {
+    if (p.id === 'founders') return;
     const pos = explorerPositions[p.id];
     if (!pos) return;
     maxX = Math.max(maxX, pos.x);
