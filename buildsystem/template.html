@@ -2175,6 +2175,15 @@ function computeExplorerLayout() {
   return positions;
 }
 
+// Returns first + last name only for tree branch view labels; uses nickname if present.
+function treeDisplayName(fullName) {
+  const nickMatch = fullName.match(/"([^"]+)"/);
+  const parts = fullName.replace(/"[^"]*"\s*/g, '').trim().split(/\s+/);
+  if (nickMatch) return nickMatch[1] + (parts.length > 1 ? ' ' + parts[parts.length - 1] : '');
+  if (parts.length <= 2) return fullName;
+  return parts[0] + ' ' + parts[parts.length - 1];
+}
+
 function buildExplorer() {
   if (explorerBuilt) return;
   explorerBuilt = true;
@@ -2224,7 +2233,8 @@ function buildExplorer() {
     const isGenA = p.generation === 'A';
     const fontSize = isGenA ? 11 : 8.5;
     const pillH = isGenA ? 24 : 18;
-    const pillW = Math.max(isGenA ? 60 : 44, p.name.length * (isGenA ? 6.5 : 5.0) + 18);
+    const displayName = treeDisplayName(p.name);
+    const pillW = Math.max(isGenA ? 60 : 44, displayName.length * (isGenA ? 6.5 : 5.0) + 18);
 
     const pill = document.createElementNS(ns, 'rect');
     pill.setAttribute('x', px - pillW / 2);
@@ -2251,7 +2261,7 @@ function buildExplorer() {
     label.setAttribute('fill', '#fff');
     label.style.pointerEvents = 'none';
     label.dataset.branch = p.branch;
-    label.textContent = p.name;
+    label.textContent = displayName;
     nodesG.appendChild(label);
 
     // Draw partner pills to the right, connected by a dashed marriage line
@@ -2296,7 +2306,7 @@ function buildExplorer() {
         pLabel.setAttribute('fill', color);
         pLabel.style.pointerEvents = 'none';
         pLabel.dataset.branch = p.branch;
-        pLabel.textContent = partnerName;
+        pLabel.textContent = treeDisplayName(partnerName);
         nodesG.appendChild(pLabel);
 
         offsetX = pPx + pPillW / 2 + 6;
