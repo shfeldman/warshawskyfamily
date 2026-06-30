@@ -543,6 +543,12 @@
     display: block;
     margin-top: 0.05rem;
   }
+  .vitals-location {
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    display: block;
+    margin-top: 0.05rem;
+  }
   .hebrew-name-value {
     direction: rtl;
     display: inline-block;
@@ -1778,6 +1784,13 @@ function buildNode(id, depth, siblingIndex, siblingCount) {
     wrap.insertBefore(hebEl, wrap.querySelector('.marriages') || wrap.querySelector('.meta-row'));
   }
 
+  if (p.vitals && p.vitals.location) {
+    const locEl = document.createElement('span');
+    locEl.className = 'vitals-location';
+    locEl.textContent = '📍 ' + p.vitals.location;
+    wrap.insertBefore(locEl, wrap.querySelector('.marriages') || wrap.querySelector('.meta-row'));
+  }
+
   if (hasKids) {
     const childUl = document.createElement('ul');
     const firstChildGen = byId[kids[0]].generation;
@@ -2789,13 +2802,15 @@ function flashListCard(id) {
   });
 
   function buildStats() {
+    const TODAY_YEAR = new Date().getFullYear();
     const people = PEOPLE_DATA.filter(p => p.id !== 'founders');
     const descendants = people.filter(p => p.generation && p.generation !== 'founders');
     const withPhoto = people.filter(p => p.vitals && p.vitals.photo).length;
     const withDOB = people.filter(p => p.vitals && p.vitals.dateOfBirth).length;
     const marriages = people.reduce((n, p) => n + (p.partners ? p.partners.length : 0), 0);
+    const grandchildren = descendants.filter(p => p.generation === 'B').length;
 
-    // Per-branch counts (descendants only)
+    // Per-branch counts
     const branchCounts = {};
     BRANCH_ORDER.forEach(b => branchCounts[b] = 0);
     descendants.forEach(p => { if (branchCounts[p.branch] !== undefined) branchCounts[p.branch]++; });
@@ -2805,6 +2820,38 @@ function flashListCard(id) {
     const genCounts = {A:0,B:0,C:0,D:0};
     descendants.forEach(p => { if (genCounts[p.generation] !== undefined) genCounts[p.generation]++; });
 
+    // Average age per generation (from DOBs)
+    const genAges = {A:[],B:[],C:[],D:[]};
+    descendants.forEach(p => {
+      if (p.vitals && p.vitals.dateOfBirth && genAges[p.generation]) {
+        const yr = parseInt(p.vitals.dateOfBirth.slice(0,4));
+        if (yr > 1800) genAges[p.generation].push(TODAY_YEAR - yr);
+      }
+    });
+    const avgAge = g => genAges[g].length ? Math.round(genAges[g].reduce((a,b)=>a+b,0)/genAges[g].length) : null;
+
+    // Decade of birth histogram
+    const decadeCounts = {};
+    descendants.forEach(p => {
+      if (p.vitals && p.vitals.dateOfBirth) {
+        const yr = parseInt(p.vitals.dateOfBirth.slice(0,4));
+        const dec = Math.floor(yr/10)*10;
+        decadeCounts[dec] = (decadeCounts[dec]||0) + 1;
+      }
+    });
+    const decades = Object.keys(decadeCounts).map(Number).sort();
+    const maxDec = Math.max(...Object.values(decadeCounts));
+
+    // Geographic spread
+    const locCounts = {};
+    descendants.forEach(p => {
+      const loc = p.vitals && p.vitals.location ? p.vitals.location.trim() : null;
+      if (loc) locCounts[loc] = (locCounts[loc]||0) + 1;
+    });
+    const topLocs = Object.entries(locCounts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    const maxLoc = topLocs[0] ? topLocs[0][1] : 1;
+    const withLocation = Object.values(locCounts).reduce((a,b)=>a+b,0);
+
     // Most common first names
     const nameFreq = {};
     descendants.forEach(p => {
@@ -2813,62 +2860,90 @@ function flashListCard(id) {
     });
     const topNames = Object.entries(nameFreq).filter(([,n])=>n>1).sort((a,b)=>b[1]-a[1]).slice(0,5);
 
-    // Biggest family (most children)
+    // Last name frequency
+    const lastFreq = {};
+    descendants.forEach(p => {
+      const parts = p.name.replace(/"[^"]*"\s*/g,'').trim().split(/\s+/);
+      if (parts.length >= 2) { const last = parts[parts.length-1]; lastFreq[last] = (lastFreq[last]||0)+1; }
+    });
+    const sortedLast = Object.entries(lastFreq).sort((a,b)=>b[1]-a[1]);
+    const topLast = sortedLast.slice(0,5);
+    const rareLast = sortedLast.filter(([,c])=>c===1).slice(0,6);
+    const maxL = topLast[0] ? topLast[0][1] : 1;
+
+    // Biggest family
     let biggestParent = null, biggestCount = 0;
     people.forEach(p => {
       const n = (childrenOf[p.id]||[]).length;
       if (n > biggestCount) { biggestCount = n; biggestParent = p; }
     });
 
+    const GEN_NUM = {A:'1',B:'2',C:'3',D:'4'};
+    const bar = (pct, color='') => `<div class="stats-bar-track"><div class="stats-bar-fill" style="width:${pct}%${color?';background:'+color:''}"></div></div>`;
+
     body.innerHTML = `
       <div class="stats-grid">
         <div class="stat-card"><span class="stat-num">${descendants.length}</span><span class="stat-label">Total People</span></div>
+        <div class="stat-card"><span class="stat-num">${grandchildren}</span><span class="stat-label">Grandchildren of Louis &amp; Rose</span></div>
         <div class="stat-card"><span class="stat-num">${marriages}</span><span class="stat-label">Marriages Recorded</span></div>
         <div class="stat-card"><span class="stat-num">${withPhoto}</span><span class="stat-label">Photos Uploaded</span></div>
         <div class="stat-card"><span class="stat-num">${withDOB}</span><span class="stat-label">Birthdays Known</span></div>
-        <div class="stat-card"><span class="stat-num">${biggestCount}</span><span class="stat-label">Most Children${biggestParent ? ' (' + treeDisplayName(biggestParent.name) + ')' : ''}</span></div>
-        <div class="stat-card"><span class="stat-num">${Object.keys(genCounts).filter(g=>genCounts[g]>0).length}</span><span class="stat-label">Generations</span></div>
+        <div class="stat-card"><span class="stat-num">${biggestCount}</span><span class="stat-label">Most Children${biggestParent?' ('+escapeHtml(treeDisplayName(biggestParent.name))+')':''}</span></div>
       </div>
+
+      <div class="stats-sub">
+        <h4>Average Age by Generation</h4>
+        ${['A','B','C','D'].filter(g=>avgAge(g)!==null).map(g=>`
+          <div class="stats-bar-row">
+            <span class="stats-bar-label">Gen. ${GEN_NUM[g]}</span>
+            ${bar(Math.round(avgAge(g)/100*100))}
+            <span class="stats-bar-count">${avgAge(g)} yrs</span>
+          </div>`).join('')}
+        ${['A','B','C','D'].every(g=>avgAge(g)===null) ? '<p style="font-size:0.8rem;color:var(--ink-soft);margin:0">Add birthdays to profiles to see averages.</p>' : ''}
+      </div>
+
+      ${decades.length ? `<div class="stats-sub">
+        <h4>Births by Decade</h4>
+        ${decades.map(d=>`<div class="stats-bar-row">
+          <span class="stats-bar-label">${d}s</span>
+          ${bar(Math.round(decadeCounts[d]/maxDec*100))}
+          <span class="stats-bar-count">${decadeCounts[d]}</span>
+        </div>`).join('')}
+      </div>` : ''}
+
+      <div class="stats-sub">
+        <h4>Geographic Spread${withLocation ? ' ('+withLocation+' people)' : ''}</h4>
+        ${topLocs.length ? topLocs.map(([loc,c])=>`<div class="stats-bar-row">
+          <span class="stats-bar-label">📍 ${escapeHtml(loc)}</span>
+          ${bar(Math.round(c/maxLoc*100))}
+          <span class="stats-bar-count">${c}</span>
+        </div>`).join('') : '<p style="font-size:0.8rem;color:var(--ink-soft);margin:0">No locations recorded yet. Add a city or state to each person\'s profile to see the map here.</p>'}
+      </div>
+
       <div class="stats-sub">
         <h4>People by Branch</h4>
-        ${BRANCH_ORDER.map(b => `
-          <div class="stats-bar-row">
-            <span class="stats-bar-label" style="color:${BRANCH_HEX[b]}">${b}</span>
-            <div class="stats-bar-track"><div class="stats-bar-fill" style="width:${Math.round(branchCounts[b]/maxBranch*100)}%;background:${BRANCH_HEX[b]}"></div></div>
-            <span class="stats-bar-count">${branchCounts[b]}</span>
-          </div>`).join('')}
+        ${BRANCH_ORDER.map(b=>`<div class="stats-bar-row">
+          <span class="stats-bar-label" style="color:${BRANCH_HEX[b]}">${b}</span>
+          ${bar(Math.round(branchCounts[b]/maxBranch*100), BRANCH_HEX[b])}
+          <span class="stats-bar-count">${branchCounts[b]}</span>
+        </div>`).join('')}
       </div>
+
       <div class="stats-sub">
         <h4>People by Generation</h4>
-        ${['A','B','C','D'].filter(g=>genCounts[g]>0).map(g => {
-          const num = {A:'1',B:'2',C:'3',D:'4'}[g];
-          const max = Math.max(...Object.values(genCounts));
+        ${['A','B','C','D'].filter(g=>genCounts[g]>0).map(g=>{
+          const max=Math.max(...Object.values(genCounts));
           return `<div class="stats-bar-row">
-            <span class="stats-bar-label">Gen. ${num}</span>
-            <div class="stats-bar-track"><div class="stats-bar-fill" style="width:${Math.round(genCounts[g]/max*100)}%"></div></div>
+            <span class="stats-bar-label">Gen. ${GEN_NUM[g]}</span>
+            ${bar(Math.round(genCounts[g]/max*100))}
             <span class="stats-bar-count">${genCounts[g]}</span>
           </div>`;
         }).join('')}
       </div>
-      ${topNames.length ? `<div class="stats-sub"><h4>Most Common First Names</h4>${topNames.map(([n,c])=>`<div class="stats-bar-row"><span class="stats-bar-label">${escapeHtml(n)}</span><div class="stats-bar-track"><div class="stats-bar-fill" style="width:${Math.round(c/topNames[0][1]*100)}%"></div></div><span class="stats-bar-count">${c}</span></div>`).join('')}</div>` : ''}
-      ${(()=>{
-        const lastFreq = {};
-        descendants.forEach(p => {
-          const parts = p.name.replace(/"[^"]*"\s*/g,'').trim().split(/\s+/);
-          if (parts.length >= 2) {
-            const last = parts[parts.length-1];
-            lastFreq[last] = (lastFreq[last]||0) + 1;
-          }
-        });
-        const sorted = Object.entries(lastFreq).sort((a,b)=>b[1]-a[1]);
-        const top = sorted.slice(0,5);
-        const bottom = sorted.filter(([,c])=>c===1).slice(0,5);
-        const maxL = top[0] ? top[0][1] : 1;
-        return top.length ? `
-          <div class="stats-sub"><h4>Most Common Last Names</h4>${top.map(([n,c])=>`<div class="stats-bar-row"><span class="stats-bar-label">${escapeHtml(n)}</span><div class="stats-bar-track"><div class="stats-bar-fill" style="width:${Math.round(c/maxL*100)}%"></div></div><span class="stats-bar-count">${c}</span></div>`).join('')}</div>
-          ${bottom.length ? `<div class="stats-sub"><h4>Rarest Last Names</h4><p style="font-size:0.8rem;color:var(--ink-soft);margin:0">${bottom.map(([n])=>escapeHtml(n)).join(', ')}</p></div>` : ''}
-        ` : '';
-      })()}
+
+      ${topNames.length?`<div class="stats-sub"><h4>Most Common First Names</h4>${topNames.map(([n,c])=>`<div class="stats-bar-row"><span class="stats-bar-label">${escapeHtml(n)}</span>${bar(Math.round(c/topNames[0][1]*100))}<span class="stats-bar-count">${c}</span></div>`).join('')}</div>`:''}
+      ${topLast.length?`<div class="stats-sub"><h4>Most Common Last Names</h4>${topLast.map(([n,c])=>`<div class="stats-bar-row"><span class="stats-bar-label">${escapeHtml(n)}</span>${bar(Math.round(c/maxL*100))}<span class="stats-bar-count">${c}</span></div>`).join('')}</div>`:''}
+      ${rareLast.length?`<div class="stats-sub"><h4>Rarest Last Names</h4><p style="font-size:0.8rem;color:var(--ink-soft);margin:0">${rareLast.map(([n])=>escapeHtml(n)).join(', ')}</p></div>`:''}
     `;
   }
 })();
