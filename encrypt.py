@@ -157,6 +157,18 @@ GATE_HTML = """\
 const ENCRYPTED = __ENCRYPTED_PAYLOAD__;
 const STORAGE_KEY = 'wfc_session';
 
+// Secret URL bypass: ?open=PASSWORD skips the gate entirely
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const bypass = params.get('open');
+  if (bypass) {
+    decrypt(ENCRYPTED.ct, ENCRYPTED.salt, ENCRYPTED.iv, bypass).then(html => {
+      if (html) render(html);
+    }).catch(() => {});
+    return;
+  }
+})();
+
 // Check remembered session
 (function() {
   try {
