@@ -2176,7 +2176,7 @@ backToTop.addEventListener('click', () => {
 // ---- Explorer view: visual branching diagram ----
 const GEN_DEPTH = { A: 0, B: 1, C: 2, D: 3, E: 4 };
 const LEVEL_TINT = { A: 0, B: 0, C: 22, D: 42, E: 58 }; // % white mixed in, by depth
-const NODE_SPACING_X = 90;
+const NODE_SPACING_X = 130;
 const NODE_SPACING_Y = 100;
 
 function lighten(hex, pct) {
@@ -2290,6 +2290,55 @@ function buildExplorer() {
     label.dataset.branch = p.branch;
     label.textContent = p.name;
     nodesG.appendChild(label);
+
+    // Draw partner pills to the right, connected by a dashed marriage line
+    if (p.partners && p.partners.length) {
+      const pFontSize = 7.5;
+      const pPillH = 15;
+      let offsetX = px + pillW / 2 + 10;
+      p.partners.forEach((partnerName) => {
+        const pPillW = Math.max(36, partnerName.length * 4.5 + 14);
+        const pPx = offsetX + pPillW / 2;
+
+        const mline = document.createElementNS(ns, 'line');
+        mline.setAttribute('x1', offsetX - 10);
+        mline.setAttribute('y1', py);
+        mline.setAttribute('x2', pPx - pPillW / 2);
+        mline.setAttribute('y2', py);
+        mline.setAttribute('stroke', color);
+        mline.setAttribute('stroke-width', 1.2);
+        mline.setAttribute('stroke-dasharray', '4,2');
+        mline.dataset.branch = p.branch;
+        edgesG.appendChild(mline);
+
+        const pPill = document.createElementNS(ns, 'rect');
+        pPill.setAttribute('x', pPx - pPillW / 2);
+        pPill.setAttribute('y', py - pPillH / 2);
+        pPill.setAttribute('width', pPillW);
+        pPill.setAttribute('height', pPillH);
+        pPill.setAttribute('rx', pPillH / 2);
+        pPill.setAttribute('fill', '#fff');
+        pPill.setAttribute('stroke', color);
+        pPill.setAttribute('stroke-width', 1.5);
+        pPill.dataset.branch = p.branch;
+        nodesG.appendChild(pPill);
+
+        const pLabel = document.createElementNS(ns, 'text');
+        pLabel.setAttribute('x', pPx);
+        pLabel.setAttribute('y', py + pFontSize * 0.36);
+        pLabel.setAttribute('text-anchor', 'middle');
+        pLabel.setAttribute('font-size', pFontSize);
+        pLabel.setAttribute('font-family', 'Inter, sans-serif');
+        pLabel.setAttribute('font-weight', 500);
+        pLabel.setAttribute('fill', color);
+        pLabel.style.pointerEvents = 'none';
+        pLabel.dataset.branch = p.branch;
+        pLabel.textContent = partnerName;
+        nodesG.appendChild(pLabel);
+
+        offsetX = pPx + pPillW / 2 + 6;
+      });
+    }
   });
 
   explorerViewBox = { minX: -NODE_SPACING_X, minY: 0, maxX: maxX * NODE_SPACING_X + NODE_SPACING_X, maxY: maxY * NODE_SPACING_Y + 80 };
