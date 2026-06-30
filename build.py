@@ -15,6 +15,7 @@ import base64
 import json
 import os
 import sys
+from datetime import date
 from pathlib import Path
 
 PHOTOS_DIR = Path(__file__).parent / "photos"
@@ -97,7 +98,18 @@ def main():
         template = f.read()
 
     people_json = json.dumps(people, separators=(",", ":"))
+
+    # Compute stats for the header
+    descendants = [p for p in people if p.get("branch") != "Founders"]
+    partner_count = sum(len(p.get("partners") or []) for p in descendants)
+    total_persons = len(descendants) + partner_count
+    build_date = date.today().strftime("%B %-d, %Y")
+
     output = template.replace("__PEOPLE_DATA_JSON__", people_json)
+    output = output.replace("__BUILD_DATE__", build_date)
+    output = output.replace("__TOTAL_PERSONS__", str(total_persons))
+    output = output.replace("__DESCENDANT_COUNT__", str(len(descendants)))
+    output = output.replace("__PARTNER_COUNT__", str(partner_count))
 
     if "__PEOPLE_DATA_JSON__" in output:
         print("ERROR: Placeholder was not replaced.", file=sys.stderr)
