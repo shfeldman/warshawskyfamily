@@ -1686,55 +1686,6 @@ roots.forEach(r => {
   treeEl.appendChild(li);
 });
 
-// ---- Branch filter chips ----
-const chipRow = document.getElementById('chip-row');
-let activeBranch = null;
-
-function makeChip(label, branchKey) {
-  const chip = document.createElement('button');
-  chip.type = 'button';
-  chip.className = 'chip';
-  chip.setAttribute('aria-pressed', 'false');
-  if (branchKey) chip.style.setProperty('--chip-color', BRANCH_HEX[branchKey]);
-  const dot = document.createElement('span');
-  dot.className = 'dot';
-  if (!branchKey) dot.style.background = 'var(--ink-soft)';
-  chip.appendChild(dot);
-  const txt = document.createElement('span');
-  txt.textContent = label;
-  chip.appendChild(txt);
-  chip.addEventListener('click', () => setBranchFilter(branchKey));
-  return chip;
-}
-
-const allChip = makeChip('All', null);
-allChip.setAttribute('aria-pressed', 'true');
-chipRow.appendChild(allChip);
-BRANCH_ORDER.forEach(b => chipRow.appendChild(makeChip(b, b)));
-
-function setBranchFilter(branchKey) {
-  activeBranch = branchKey;
-  Array.from(chipRow.children).forEach(chip => {
-    const label = chip.querySelector('span:last-child').textContent;
-    chip.setAttribute('aria-pressed', String(label === (branchKey || 'All')));
-  });
-  document.querySelectorAll('ul.tree > li.node').forEach(li => {
-    const show = !branchKey || li.dataset.branch === branchKey;
-    li.classList.toggle('hidden-by-filter', !show);
-    if (branchKey && show) {
-      // auto-expand the chosen branch fully
-      li.querySelectorAll('.node-row[aria-expanded]').forEach(row => setExpanded(row, true));
-      li.querySelectorAll('ul.children').forEach(ul => ul.hidden = false);
-      const ownRow = li.querySelector(':scope > .node-row');
-      if (ownRow && ownRow.hasAttribute('aria-expanded')) setExpanded(ownRow, true);
-      const ownUl = li.querySelector(':scope > ul.children');
-      if (ownUl) ownUl.hidden = false;
-    }
-  });
-  runSearch();
-  syncExplorerFilter(branchKey);
-}
-
 function syncExplorerFilter(branchKey) {
   if (!explorerBuilt) return;
   document.querySelectorAll('#explorer-svg rect, #explorer-svg text, #explorer-svg path').forEach(el => {
@@ -1861,7 +1812,7 @@ searchInput.addEventListener('input', runSearch);
 document.getElementById('print-btn').addEventListener('click', () => {
   searchInput.value = '';
   runSearch();
-  setBranchFilter(null);
+  document.querySelectorAll('li.node.hidden-by-filter').forEach(li => li.classList.remove('hidden-by-filter'));
   document.querySelectorAll('.node-row[aria-expanded]').forEach(row => setExpanded(row, true));
   document.querySelectorAll('ul.children').forEach(ul => ul.hidden = false);
   setTimeout(() => window.print(), 100);
