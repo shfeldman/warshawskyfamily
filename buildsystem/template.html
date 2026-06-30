@@ -1280,7 +1280,7 @@
     </div>
     <div class="gen-jump-bar list-only-toolbar" id="gen-jump-bar">
       <span style="font-size:0.75rem;font-weight:600;color:var(--ink-soft);align-self:center;">Jump to:</span>
-      <button class="gen-jump-btn" data-gen="A" type="button">Generation 1 (Founders' children)</button>
+      <button class="gen-jump-btn" data-gen="A" type="button">Generation 1</button>
       <button class="gen-jump-btn" data-gen="B" type="button">Generation 2</button>
       <button class="gen-jump-btn" data-gen="C" type="button">Generation 3</button>
       <button class="gen-jump-btn" data-gen="D" type="button">Generation 4</button>
@@ -2876,7 +2876,7 @@ function flashListCard(id) {
 
 // ---- Generation dividers in list view ----
 (function() {
-  const genLabels = { A: 'Generation 1', B: 'Generation 2', C: 'Generation 3', D: 'Generation 4' };
+  const genLabels = { B: 'Generation 2', C: 'Generation 3', D: 'Generation 4' };
   const treeEl2 = document.getElementById('tree');
   let lastGen = null;
   Array.from(treeEl2.children).forEach(li => {
