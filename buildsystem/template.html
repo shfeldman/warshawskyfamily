@@ -16,6 +16,7 @@
     --rule: #b8a165;
     --rule-soft: #d8cba0;
     --focus: #1a5fb4;
+    --dark-toggle-bg: #8a6d1f;
 
     --c-henry:  #c1440e;
     --c-dave:   #0d5c8c;
@@ -27,6 +28,111 @@
     --c-sylvia: #c2287d;
     --c-rudy:   #8a5a1e;
   }
+
+  /* ── Dark mode ── */
+  [data-theme="dark"] {
+    --paper: #1a1814;
+    --paper-deep: #111009;
+    --ink: #e8e0d0;
+    --ink-soft: #a09080;
+    --rule: #8a6d1f;
+    --rule-soft: #4a3d1a;
+    --focus: #6ea4f0;
+  }
+  [data-theme="dark"] body {
+    background: #1a1814;
+    background-image: repeating-linear-gradient(0deg, rgba(138,109,31,0.06) 0px, rgba(138,109,31,0.06) 1px, transparent 1px, transparent 28px);
+  }
+  [data-theme="dark"] .panel { background: #1a1814; }
+  [data-theme="dark"] .node-row { background: #211e18; }
+  [data-theme="dark"] .node-row:hover { background: #2a2620; }
+  [data-theme="dark"] .marriages { background: #1f1c15; }
+  [data-theme="dark"] #search { background: #2a2620; border-color: #4a3d1a; color: var(--ink); }
+  [data-theme="dark"] .about-section, [data-theme="dark"] .quiz-panel, [data-theme="dark"] .relate-panel { background: #211e18; }
+  [data-theme="dark"] .gen-divider { border-color: #4a3d1a; color: var(--ink-soft); }
+  [data-theme="dark"] .gen-indicator { background: #2a2620; border-color: #4a3d1a; color: var(--ink-soft); }
+
+  .dark-toggle {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: 1.5px solid var(--rule-soft);
+    border-radius: 20px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: var(--ink-soft);
+    font-family: inherit;
+    transition: background 0.15s, color 0.15s;
+  }
+  .dark-toggle:hover { background: var(--rule-soft); color: var(--ink); }
+
+  /* ── Branch color left border on list nodes ── */
+  ul.tree > li.node {
+    border-left: 4px solid var(--branch-color, var(--rule-soft));
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 0.5rem;
+  }
+
+  /* ── Generation dividers ── */
+  .gen-divider {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1.2rem 0 0.5rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .gen-divider::before, .gen-divider::after {
+    content: '';
+    flex: 1;
+    border-top: 1px solid var(--rule-soft);
+  }
+
+  /* ── Sticky generation indicator ── */
+  .gen-indicator {
+    position: fixed;
+    bottom: 1.2rem;
+    right: 1.2rem;
+    background: var(--paper-deep);
+    border: 1.5px solid var(--rule-soft);
+    border-radius: 8px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    z-index: 50;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .gen-indicator.visible { opacity: 1; }
+
+  /* ── Jump-to-generation toolbar ── */
+  .gen-jump-bar {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-top: 0.3rem;
+  }
+  .gen-jump-btn {
+    border: 1.5px solid var(--rule-soft);
+    border-radius: 6px;
+    background: none;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.78rem;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--ink-soft);
+    transition: background 0.15s, color 0.15s;
+  }
+  .gen-jump-btn:hover { background: var(--rule-soft); color: var(--ink); }
 
   * { box-sizing: border-box; }
 
@@ -47,6 +153,7 @@
     padding: 1.2rem 1rem 1.1rem;
     background: var(--paper-deep);
     border-bottom: 1px solid var(--rule-soft);
+    position: relative;
   }
 
   .founders-photo {
@@ -1030,6 +1137,7 @@
 
 <header class="letterhead">
   <img class="founders-photo" src="__FOUNDERS_PHOTO__" alt="Louis and Rose Warshawsky" onclick="openPhotoLightbox('founders','Louis &amp; Rose Warshawsky')">
+  <button class="dark-toggle" id="dark-toggle" type="button" aria-label="Toggle dark mode">☀️ Light</button>
   <h1>The Louis and Rose Warshawsky Family Circle</h1>
   <div class="double-rule"></div>
   <div class="ledger-stats">
@@ -1040,12 +1148,13 @@
   </div>
 </header>
 
+<div class="gen-indicator" id="gen-indicator"></div>
+
 <main>
   <div class="panel">
     <label for="search" class="sr-only" style="position:absolute;left:-9999px;">Search the family tree by name</label>
     <input type="search" id="search" placeholder="Search a name..." autocomplete="off" aria-describedby="search-status">
     <div id="search-status" role="status" aria-live="polite"></div>
-
   </div>
 
   <!-- View switcher: sits right below search, immediately above the active view -->
@@ -1057,6 +1166,13 @@
     <div class="toolbar list-only-toolbar">
       <button id="expand-all" type="button">Expand All</button>
       <button id="collapse-all" type="button">Collapse All</button>
+    </div>
+    <div class="gen-jump-bar list-only-toolbar" id="gen-jump-bar">
+      <span style="font-size:0.75rem;font-weight:600;color:var(--ink-soft);align-self:center;">Jump to:</span>
+      <button class="gen-jump-btn" data-gen="A" type="button">Generation 1 (Founders' children)</button>
+      <button class="gen-jump-btn" data-gen="B" type="button">Generation 2</button>
+      <button class="gen-jump-btn" data-gen="C" type="button">Generation 3</button>
+      <button class="gen-jump-btn" data-gen="D" type="button">Generation 4</button>
     </div>
   </div>
 
@@ -2453,8 +2569,8 @@ function zoomExplorerAt(point, factor) {
 }
 
 function selectExplorerNode(id) {
-  const detail = document.getElementById('explorer-detail');
   if (id === EXPLORER_ROOT_ID) {
+    const detail = document.getElementById('explorer-detail');
     detail.innerHTML = `
       <button class="ed-close" type="button" aria-label="Close">&times;</button>
       <div class="ed-name">${escapeHtml(EXPLORER_ROOT_NAME)}</div>
@@ -2465,24 +2581,12 @@ function selectExplorerNode(id) {
     detail.querySelector('.ed-close').addEventListener('click', hideExplorerDetail);
     return;
   }
-  const p = byId[id];
-  const parentInfo = p.parent ? `Child of ${byId[p.parent].name}` : `${p.branch} branch founder`;
-  detail.innerHTML = `
-    <button class="ed-close" type="button" aria-label="Close">&times;</button>
-    <div class="ed-name">${escapeHtml(p.name)}</div>
-    <div class="ed-meta">${escapeHtml(parentInfo)} &middot; ${escapeHtml(GEN_LABEL[p.generation] || '')} &middot; ${escapeHtml(p.branch)} branch</div>
-    ${p.partners && p.partners.length ? `<div class="ed-meta">Partner: ${escapeHtml(p.partners.join(' & '))}</div>` : ''}
-    <button class="ed-view-btn" type="button">View in list</button>
-  `;
-  detail.hidden = false;
-  detail.querySelector('.ed-close').addEventListener('click', hideExplorerDetail);
-  detail.querySelector('.ed-view-btn').addEventListener('click', () => {
-    switchToListView();
-    setTimeout(() => {
-      jumpToPerson(id);
-      flashListCard(id);
-    }, 150);
-  });
+  // Clicking a person in Tree Branch View jumps directly to their list view profile
+  switchToListView();
+  setTimeout(() => {
+    jumpToPerson(id);
+    flashListCard(id);
+  }, 150);
 }
 function hideExplorerDetail() {
   document.getElementById('explorer-detail').hidden = true;
@@ -2596,6 +2700,71 @@ function flashListCard(id) {
   if (byId[id]) {
     setTimeout(() => jumpToPerson(id), 150);
   }
+})();
+
+// ---- Dark mode toggle ----
+(function() {
+  const btn = document.getElementById('dark-toggle');
+  const saved = localStorage.getItem('wfc_theme');
+  if (saved === 'dark') { document.documentElement.dataset.theme = 'dark'; btn.textContent = '🌙 Dark'; }
+  btn.addEventListener('click', () => {
+    const isDark = document.documentElement.dataset.theme === 'dark';
+    if (isDark) {
+      delete document.documentElement.dataset.theme;
+      btn.textContent = '☀️ Light';
+      localStorage.setItem('wfc_theme', 'light');
+    } else {
+      document.documentElement.dataset.theme = 'dark';
+      btn.textContent = '🌙 Dark';
+      localStorage.setItem('wfc_theme', 'dark');
+    }
+  });
+})();
+
+// ---- Generation dividers in list view ----
+(function() {
+  const genLabels = { A: 'Generation 1 — Founders\' Children', B: 'Generation 2', C: 'Generation 3', D: 'Generation 4' };
+  const treeEl2 = document.getElementById('tree');
+  let lastGen = null;
+  Array.from(treeEl2.children).forEach(li => {
+    const gen = li.dataset && li.dataset.id && byId[li.dataset.id] ? byId[li.dataset.id].generation : null;
+    if (gen && gen !== lastGen) {
+      const divider = document.createElement('li');
+      divider.className = 'gen-divider';
+      divider.dataset.genMarker = gen;
+      divider.textContent = genLabels[gen] || ('Generation ' + gen);
+      treeEl2.insertBefore(divider, li);
+      lastGen = gen;
+    }
+  });
+})();
+
+// ---- Jump-to-generation buttons ----
+document.querySelectorAll('.gen-jump-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const gen = btn.dataset.gen;
+    const marker = document.querySelector('.gen-divider[data-gen-marker="' + gen + '"]');
+    if (marker) marker.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+
+// ---- Sticky generation indicator ----
+(function() {
+  const indicator = document.getElementById('gen-indicator');
+  const genNames = { A: 'Generation 1', B: 'Generation 2', C: 'Generation 3', D: 'Generation 4' };
+  let hideTimer;
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const gen = entry.target.dataset.genMarker;
+        indicator.textContent = genNames[gen] || gen;
+        indicator.classList.add('visible');
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(() => indicator.classList.remove('visible'), 2000);
+      }
+    });
+  }, { rootMargin: '-10% 0px -85% 0px' });
+  document.querySelectorAll('.gen-divider[data-gen-marker]').forEach(el => observer.observe(el));
 })();
 </script>
 
