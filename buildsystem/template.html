@@ -33,6 +33,7 @@
   body {
     margin: 0;
     background: var(--paper);
+    background: linear-gradient(160deg, #fdf8f0 0%, #f7f3ea 40%, #f3ede0 100%);
     background-image:
       repeating-linear-gradient(0deg, rgba(184,161,101,0.05) 0px, rgba(184,161,101,0.05) 1px, transparent 1px, transparent 28px);
     color: var(--ink);
@@ -146,14 +147,15 @@
     color: var(--chip-color, var(--ink));
     background: #fff;
     border-radius: 999px;
-    padding: 0.4rem 0.8rem;
-    font-size: 0.8rem;
-    font-weight: 600;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.82rem;
+    font-weight: 700;
     white-space: nowrap;
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    min-height: 36px;
+    min-height: 38px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
   }
   .chip .dot {
     width: 0.55rem; height: 0.55rem; border-radius: 50%;
@@ -234,7 +236,7 @@
   ul.children.level-D { --level-color: color-mix(in srgb, var(--branch-color) 58%, white); --level-width: 2px; }
   ul.children.level-E { --level-color: color-mix(in srgb, var(--branch-color) 42%, white); --level-width: 1.5px; }
 
-  li.node { position: relative; margin-bottom: 0.1rem; }
+  li.node { position: relative; margin-bottom: 0.1rem; border-radius: 6px; }
   li.node:has(> ul.children) { margin-top: 0.45rem; }
   li.node:first-child { margin-top: 0; }
 
@@ -268,6 +270,7 @@
     color: var(--ink);
     cursor: pointer;
     min-height: 44px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.07);
   }
   .node-row:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
   .node-row:active { background: rgba(184,161,101,0.18); }
@@ -582,16 +585,72 @@
   .quiz-panel {
     background: #fff;
     border: 1.5px solid var(--rule-soft);
-    border-radius: 8px;
-    padding: 0.9rem;
+    border-radius: 12px;
+    padding: 1.1rem;
     margin-top: 0.4rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.09);
   }
-  .quiz-score {
-    font-size: 0.8rem;
-    font-weight: 700;
+  .quiz-progress-bar-wrap {
+    background: var(--paper-deep);
+    border-radius: 999px;
+    height: 6px;
+    margin-bottom: 0.8rem;
+    overflow: hidden;
+  }
+  .quiz-progress-bar {
+    height: 100%;
+    background: var(--rule);
+    border-radius: 999px;
+    transition: width 0.3s ease;
+  }
+  .quiz-progress-label {
+    font-size: 0.72rem;
     color: var(--ink-soft);
-    margin-bottom: 0.6rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 0.5rem;
   }
+  .quiz-results {
+    text-align: center;
+    padding: 0.5rem 0;
+  }
+  .quiz-results .qr-score {
+    font-family: 'Lora', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+  }
+  .quiz-results .qr-stars {
+    font-size: 1.6rem;
+    margin-bottom: 0.7rem;
+  }
+  .quiz-results .qr-share-btn {
+    width: 100%;
+    padding: 0.65rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    border: none;
+    background: #8a6d1f;
+    color: #fff;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    min-height: 44px;
+    cursor: pointer;
+  }
+  .quiz-results .qr-share-btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .quiz-results .qr-again-btn {
+    width: 100%;
+    padding: 0.65rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    border: 1.5px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 8px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+  .quiz-results .qr-again-btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
   .quiz-question {
     text-align: center;
     margin-bottom: 0.7rem;
@@ -658,6 +717,88 @@
     flex: 1 1 100% !important;
     font-weight: 700;
     background: var(--paper-deep) !important;
+  }
+
+  .about-section {
+    margin-top: 1rem;
+    border: 1.5px solid var(--rule-soft);
+    border-radius: 10px;
+    background: #fff;
+    overflow: hidden;
+  }
+  .about-toggle-btn {
+    width: 100%;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    background: none;
+    border: none;
+    color: var(--ink);
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .about-toggle-btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .about-body {
+    padding: 0 1rem 1rem;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    border-top: 1px solid var(--rule-soft);
+  }
+  .about-body p { margin: 0.6rem 0 0; }
+  .about-body strong { color: var(--ink); }
+
+  .submit-update-link {
+    display: block;
+    text-decoration: none;
+    text-align: center;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.65rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border: none;
+    background: #8a6d1f;
+    color: #fff !important;
+    border-radius: 7px;
+    margin-bottom: 0.6rem;
+    min-height: 40px;
+    line-height: 1.6;
+  }
+  .submit-update-link:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+  .explorer-branch-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 0.5rem;
+  }
+  .explorer-branch-btn {
+    flex: 0 0 auto;
+    border: 1.5px solid var(--btn-color, var(--rule));
+    color: #fff;
+    background: var(--btn-color, var(--ink-soft));
+    border-radius: 999px;
+    padding: 0.3rem 0.65rem;
+    font-size: 0.74rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  }
+  .explorer-branch-btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .explorer-branch-btn:hover { filter: brightness(1.1); }
+
+  li.node.list-flash > .node-row {
+    animation: list-flash-anim 1.6s ease;
+  }
+  @keyframes list-flash-anim {
+    0% { background: #ffd866; }
+    100% { background: transparent; }
   }
 
   @media print {
@@ -819,11 +960,13 @@
     <button id="relate-toggle" type="button" class="relate-toggle-btn">How are two people related?</button>
     <button id="quiz-toggle" type="button" class="relate-toggle-btn quiz-toggle-btn">&#127922; Family Quiz</button>
     <div id="quiz-panel" class="quiz-panel" hidden>
-      <div class="quiz-score">Score: <span id="quiz-score">0</span> / <span id="quiz-total">0</span></div>
+      <div class="quiz-progress-label" id="quiz-progress-label">Question 1 of 25</div>
+      <div class="quiz-progress-bar-wrap"><div class="quiz-progress-bar" id="quiz-progress-bar" style="width:0%"></div></div>
       <div id="quiz-question"></div>
       <div id="quiz-options" class="quiz-options"></div>
       <div id="quiz-feedback" class="quiz-feedback"></div>
       <button id="quiz-next" type="button" class="quiz-next-btn" hidden>Next Question &rarr;</button>
+      <div id="quiz-results" class="quiz-results" hidden></div>
     </div>
     <div id="relate-panel" class="relate-panel" hidden>
       <div class="relate-input-wrap">
@@ -847,11 +990,25 @@
       <span class="swatch-key">Spotted something wrong or missing? Use "Submit a Correction or Addition" below.</span>
     </div>
 
-    <a id="submit-update-btn" href="https://forms.gle/aZ9qrLaibyCsm2Bc8" target="_blank" rel="noopener" class="print-btn-full" style="display:block;text-decoration:none;text-align:center;box-sizing:border-box;">&#128221; Submit a Correction or Addition</a>
+    <a id="submit-update-btn" href="https://forms.gle/aZ9qrLaibyCsm2Bc8" target="_blank" rel="noopener" class="submit-update-link">&#128221; Submit a Correction or Addition</a>
     <button id="print-btn" type="button" class="print-btn-full">Print / Save PDF</button>
+
+    <div class="about-section" id="about-section">
+      <button class="about-toggle-btn" id="about-toggle" type="button" aria-expanded="false" aria-controls="about-body">
+        <span>&#8505;&#65039; About this site</span>
+        <span id="about-arrow">&#9660;</span>
+      </button>
+      <div class="about-body" id="about-body" hidden>
+        <p><strong>The Louis and Rose Warshawsky Family Circle</strong> is a living record of the descendants of Louis and Rose Warshawsky and their nine children: Henry, Dave, Jack, Bessie, Saul, Milt, Evelyn, Sylvia, and Rudy.</p>
+        <p>This site is maintained by the family. If you spot something missing or incorrect, use the "Submit a Correction or Addition" button above &mdash; submissions are reviewed and folded in regularly.</p>
+        <p>Site built with love by the family, powered by Claude Code.</p>
+      </div>
+    </div>
   </div>
 
   <ul class="tree" id="tree" role="region" aria-label="Family tree"></ul>
+
+  <div id="explorer-branch-nav" class="explorer-branch-nav" hidden></div>
 
   <div id="explorer-wrap" class="explorer-wrap" hidden>
     <div class="explorer-controls">
@@ -1025,6 +1182,15 @@ function buildPartnersElement(person) {
   partnersEl.className = 'partners';
   if (!person.partners || !person.partners.length) return partnersEl;
 
+  // Add "Spouse:" / "Spouses:" label prefix
+  const labelSpan = document.createElement('span');
+  labelSpan.style.fontStyle = 'normal';
+  labelSpan.style.fontWeight = '600';
+  labelSpan.style.color = 'var(--ink-soft)';
+  labelSpan.style.marginRight = '0.2rem';
+  labelSpan.textContent = person.partners.length === 1 ? 'Spouse:' : 'Spouses:';
+  partnersEl.appendChild(labelSpan);
+
   person.partners.forEach((partnerName, idx) => {
     if (idx > 0) {
       const sep = document.createElement('span');
@@ -1104,6 +1270,7 @@ function buildNode(id, depth, siblingIndex, siblingCount) {
   const li = document.createElement('li');
   li.className = 'node gen-' + p.generation.toLowerCase();
   li.dataset.id = id;
+  li.dataset.personId = id;
   li.dataset.branch = p.branch;
   li.dataset.search = (p.name + ' ' + (p.partners||[]).join(' ')).toLowerCase();
 
@@ -1214,6 +1381,12 @@ function buildNode(id, depth, siblingIndex, siblingCount) {
     yearsEl.className = 'vitals-text';
     yearsEl.textContent = ' ' + initialYearsLabel;
     nameEl.insertAdjacentElement('afterend', yearsEl);
+  } else if (p.vitals && p.vitals.birthYear) {
+    // birth year from data layer (no full vitals block yet)
+    const byEl = document.createElement('span');
+    byEl.className = 'vitals-text';
+    byEl.textContent = ' b. ' + p.vitals.birthYear;
+    nameEl.insertAdjacentElement('afterend', byEl);
   }
 
   if (hasKids) {
@@ -1613,23 +1786,39 @@ function computeRelationship() {
   resultEl.innerHTML = html;
 }
 
-// ---- Quiz mode: Family Knowledge ----
+// ---- Quiz mode: 25-question game ----
+const QUIZ_TOTAL_QUESTIONS = 25;
 const quizToggle = document.getElementById('quiz-toggle');
 const quizPanel = document.getElementById('quiz-panel');
 const quizQuestionEl = document.getElementById('quiz-question');
 const quizOptionsEl = document.getElementById('quiz-options');
 const quizFeedbackEl = document.getElementById('quiz-feedback');
 const quizNextBtn = document.getElementById('quiz-next');
-const quizScoreEl = document.getElementById('quiz-score');
-const quizTotalEl = document.getElementById('quiz-total');
+const quizProgressLabel = document.getElementById('quiz-progress-label');
+const quizProgressBar = document.getElementById('quiz-progress-bar');
+const quizResultsEl = document.getElementById('quiz-results');
 
-let quizScore = 0, quizTotal = 0;
+let quizScore = 0, quizQuestionNum = 0;
 let currentQuiz = null;
 
 quizToggle.addEventListener('click', () => {
   quizPanel.hidden = !quizPanel.hidden;
-  if (!quizPanel.hidden && !currentQuiz) nextQuizQuestion();
+  if (!quizPanel.hidden && quizQuestionNum === 0) startQuiz();
 });
+
+function startQuiz() {
+  quizScore = 0;
+  quizQuestionNum = 0;
+  quizResultsEl.hidden = true;
+  quizQuestionEl.style.display = '';
+  quizOptionsEl.style.display = '';
+  nextQuizQuestion();
+}
+
+function updateQuizProgress() {
+  quizProgressLabel.textContent = `Question ${quizQuestionNum} of ${QUIZ_TOTAL_QUESTIONS}`;
+  quizProgressBar.style.width = ((quizQuestionNum - 1) / QUIZ_TOTAL_QUESTIONS * 100) + '%';
+}
 
 function pickQuizQuestion() {
   const allIds = PEOPLE_DATA.map(p => p.id);
@@ -1670,6 +1859,14 @@ function pickQuizQuestion() {
 }
 
 function nextQuizQuestion() {
+  if (quizQuestionNum >= QUIZ_TOTAL_QUESTIONS) {
+    showQuizResults();
+    return;
+  }
+
+  quizQuestionNum++;
+  updateQuizProgress();
+
   quizFeedbackEl.innerHTML = '';
   quizFeedbackEl.className = 'quiz-feedback';
   quizNextBtn.hidden = true;
@@ -1702,10 +1899,7 @@ function answerQuiz(chosenName, btnEl) {
   const { correctName, correctId, qtype, p } = currentQuiz;
   const isCorrect = chosenName === correctName;
 
-  quizTotal++;
   if (isCorrect) quizScore++;
-  quizScoreEl.textContent = quizScore;
-  quizTotalEl.textContent = quizTotal;
 
   Array.from(quizOptionsEl.children).forEach(btn => {
     btn.disabled = true;
@@ -1728,7 +1922,48 @@ function answerQuiz(chosenName, btnEl) {
     <div class="qf-headline">${isCorrect ? '\u2713 Correct!' : '\u2717 Not quite \u2014 the answer is ' + escapeHtml(correctName) + '.'}</div>
     <div class="quiz-context" style="margin-top:0.3rem;">${explanation}</div>
   `;
+
+  const isLast = quizQuestionNum >= QUIZ_TOTAL_QUESTIONS;
   quizNextBtn.hidden = false;
+  quizNextBtn.textContent = isLast ? 'See Results \u2192' : 'Next Question \u2192';
+}
+
+function showQuizResults() {
+  quizProgressBar.style.width = '100%';
+  quizProgressLabel.textContent = `Quiz complete!`;
+  quizQuestionEl.style.display = 'none';
+  quizOptionsEl.style.display = 'none';
+  quizFeedbackEl.innerHTML = '';
+  quizNextBtn.hidden = true;
+
+  let stars = '';
+  if (quizScore >= 23) stars = '\u2b50\u2b50\u2b50\u2b50\u2b50';
+  else if (quizScore >= 18) stars = '\u2b50\u2b50\u2b50\u2b50';
+  else if (quizScore >= 12) stars = '\u2b50\u2b50\u2b50';
+  else if (quizScore >= 6) stars = '\u2b50\u2b50';
+  else stars = '\u2b50';
+
+  const shareText = `I scored ${quizScore}/${QUIZ_TOTAL_QUESTIONS} on the Warshawsky Family Tree Quiz! \ud83c\udf33 Can you beat me? warshawskyfamily.com`;
+
+  quizResultsEl.hidden = false;
+  quizResultsEl.innerHTML = `
+    <div class="qr-score">You scored ${quizScore} out of ${QUIZ_TOTAL_QUESTIONS}!</div>
+    <div class="qr-stars">${stars}</div>
+    <button class="qr-share-btn" type="button" id="quiz-share-btn">\ud83d\udccb Copy shareable score</button>
+    <button class="qr-again-btn" type="button" id="quiz-again-btn">\ud83d\udd04 Play again</button>
+  `;
+
+  document.getElementById('quiz-share-btn').addEventListener('click', () => {
+    navigator.clipboard.writeText(shareText).then(() => {
+      const btn = document.getElementById('quiz-share-btn');
+      btn.textContent = '\u2713 Copied!';
+      setTimeout(() => { btn.textContent = '\ud83d\udccb Copy shareable score'; }, 2000);
+    }).catch(() => {
+      prompt('Copy this text:', shareText);
+    });
+  });
+
+  document.getElementById('quiz-again-btn').addEventListener('click', startQuiz);
 }
 
 quizNextBtn.addEventListener('click', nextQuizQuestion);
@@ -2080,7 +2315,10 @@ function selectExplorerNode(id) {
   detail.querySelector('.ed-close').addEventListener('click', hideExplorerDetail);
   detail.querySelector('.ed-view-btn').addEventListener('click', () => {
     switchToListView();
-    setTimeout(() => jumpToPerson(id), 150);
+    setTimeout(() => {
+      jumpToPerson(id);
+      flashListCard(id);
+    }, 150);
   });
 }
 function hideExplorerDetail() {
@@ -2097,10 +2335,12 @@ const viewToggle = document.getElementById('view-toggle');
 viewToggle.addEventListener('click', () => {
   const treeEl2 = document.getElementById('tree');
   const explorerWrap = document.getElementById('explorer-wrap');
+  const branchNav = document.getElementById('explorer-branch-nav');
   const showingExplorer = explorerWrap.hidden;
   const wasAlreadyBuilt = explorerBuilt;
   treeEl2.hidden = showingExplorer;
   explorerWrap.hidden = !showingExplorer;
+  if (branchNav) branchNav.hidden = !showingExplorer;
   viewToggle.textContent = showingExplorer ? '\uD83D\uDCCB List View' : '\uD83C\uDF33 Explorer View';
   if (showingExplorer) {
     buildExplorer();
@@ -2110,6 +2350,66 @@ viewToggle.addEventListener('click', () => {
 document.getElementById('explorer-zoom-in').addEventListener('click', () => zoomExplorerAt({x: document.getElementById('explorer-wrap').clientWidth/2, y: document.getElementById('explorer-wrap').clientHeight/2}, 1.25));
 document.getElementById('explorer-zoom-out').addEventListener('click', () => zoomExplorerAt({x: document.getElementById('explorer-wrap').clientWidth/2, y: document.getElementById('explorer-wrap').clientHeight/2}, 0.8));
 document.getElementById('explorer-fit').addEventListener('click', fitExplorerToScreen);
+
+// ---- List flash highlight ----
+function flashListCard(id) {
+  const li = document.querySelector('li[data-person-id="' + id + '"]');
+  if (!li) return;
+  li.classList.remove('list-flash');
+  void li.offsetWidth; // reflow to restart animation
+  li.classList.add('list-flash');
+  setTimeout(() => li.classList.remove('list-flash'), 1700);
+}
+
+// ---- About section toggle ----
+(function wireAboutSection() {
+  const btn = document.getElementById('about-toggle');
+  const body = document.getElementById('about-body');
+  const arrow = document.getElementById('about-arrow');
+  if (!btn || !body) return;
+  btn.addEventListener('click', () => {
+    const expanded = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!expanded));
+    body.hidden = expanded;
+    arrow.textContent = expanded ? '▼' : '▲';
+  });
+})();
+
+// ---- Explorer branch nav buttons ----
+(function buildBranchNav() {
+  const nav = document.getElementById('explorer-branch-nav');
+  if (!nav) return;
+  BRANCH_ORDER.forEach(branch => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'explorer-branch-btn';
+    btn.textContent = branch;
+    btn.style.setProperty('--btn-color', BRANCH_HEX[branch]);
+    btn.addEventListener('click', () => {
+      // Make sure explorer is visible
+      const explorerWrap = document.getElementById('explorer-wrap');
+      if (explorerWrap.hidden) {
+        document.getElementById('tree').hidden = true;
+        explorerWrap.hidden = false;
+        viewToggle.textContent = '📋 List View';
+        buildExplorer();
+      }
+      // Pan to that branch root
+      const rootPerson = roots.find(r => r.branch === branch);
+      if (rootPerson && explorerPositions[rootPerson.id]) {
+        const wrap = document.getElementById('explorer-wrap');
+        const w = wrap.clientWidth;
+        const h = wrap.clientHeight;
+        const pos = explorerPositions[rootPerson.id];
+        explorerScale = 1.0;
+        explorerTx = w / 2 - pos.x * NODE_SPACING_X * explorerScale;
+        explorerTy = h / 3 - pos.y * NODE_SPACING_Y * explorerScale;
+        applyExplorerTransform();
+      }
+    });
+    nav.appendChild(btn);
+  });
+})();
 
 // ---- Shared link on load: #person=ID ----
 (function checkSharedLink() {
