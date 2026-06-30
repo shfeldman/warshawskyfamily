@@ -29,7 +29,7 @@ except ImportError:
 INPUT  = Path(__file__).parent / "index.html"
 OUTPUT = Path(__file__).parent / "index.html"
 
-PBKDF2_ITERATIONS = 600_000
+PBKDF2_ITERATIONS = 200_000
 SALT_BYTES        = 32
 IV_BYTES          = 16
 
@@ -155,111 +155,86 @@ GATE_HTML = """\
 
 <script>
 const ENCRYPTED = __ENCRYPTED_PAYLOAD__;
-const STORAGE_KEY = 'wfc_session';
+const STORAGE_KEY = 'wfc_pwd';
 
-async function unlock() {
-  const pwd = document.getElementById('pwd').value;
-  if (!pwd) return;
-  document.querySelector('button').textContent = 'Unlocking…';
-  try {
-    const { ct, salt, iv } = ENCRYPTED;
-    const html = await decrypt(ct, salt, iv, pwd);
-    if (html) {
-      if (document.getElementById('remember').checked) {
-        const exp = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ ct, salt, iv, exp }));
-      }
-      render(html);
-    } else {
-      showError();
-    }
-  } catch(e) {
-    showError();
-  }
-}
-
-function showError() {
-  document.querySelector('button').textContent = 'Enter Family Tree';
-  document.getElementById('err').style.display = 'block';
-  document.getElementById('pwd').focus();
-}
-
-async function decrypt(ct, salt, iv, pwd) {
-  if (!pwd) {
-    // try stored key
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return null;
-    try {
-      const data = JSON.parse(stored);
-      return decrypt(data.ct, data.salt, data.iv, null);
-    } catch(e) { return null; }
-  }
-  try {
-    const enc  = new TextEncoder();
-    const saltBytes = hexToBytes(salt);
-    const ivBytes   = hexToBytes(iv);
-    const keyMaterial = await crypto.subtle.importKey(
-      'raw', enc.encode(pwd), { name: 'PBKDF2' }, false, ['deriveKey']
-    );
-    const key = await crypto.subtle.deriveKey(
-      { name: 'PBKDF2', salt: saltBytes, iterations: 600000, hash: 'SHA-256' },
-      keyMaterial,
-      { name: 'AES-CBC', length: 256 },
-      false,
-      ['decrypt']
-    );
-    const ctBytes = hexToBytes(ct);
-    const plain = await crypto.subtle.decrypt({ name: 'AES-CBC', iv: ivBytes }, key, ctBytes);
-    const text = new TextDecoder().decode(plain);
-    // Basic sanity check
-    if (text.includes('<html') || text.includes('<!DOCTYPE')) return text;
-    return null;
-  } catch(e) {
-    return null;
-  }
-}
-
+// ── Core decrypt ──────────────────────────────────────────────────────────
 function hexToBytes(hex) {
-  const bytes = new Uint8Array(hex.length / 2);
-  for (let i = 0; i < hex.length; i += 2)
-    bytes[i/2] = parseInt(hex.substr(i, 2), 16);
-  return bytes;
+  const b = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2) b[i/2] = parseInt(hex.substr(i,2),16);
+  return b;
 }
 
+async function tryDecrypt(pwd) {
+  const { ct, salt, iv } = ENCRYPTED;
+  const enc = new TextEncoder();
+  const mat = await crypto.subtle.importKey('raw', enc.encode(pwd), {name:'PBKDF2'}, false, ['deriveKey']);
+  const key = await crypto.subtle.deriveKey(
+    {name:'PBKDF2', salt:hexToBytes(salt), iterations:200000, hash:'SHA-256'},
+    mat, {name:'AES-CBC',length:256}, false, ['decrypt']
+  );
+  const plain = await crypto.subtle.decrypt({name:'AES-CBC',iv:hexToBytes(iv)}, key, hexToBytes(ct));
+  const text = new TextDecoder().decode(plain);
+  if (text.includes('<!DOCTYPE') || text.includes('<html')) return text;
+  return null;
+}
+
+// ── Render decrypted page ─────────────────────────────────────────────────
 function render(html) {
   document.open();
   document.write(html);
   document.close();
 }
 
-document.getElementById('pwd').addEventListener('keydown', e => {
-  if (e.key === 'Enter') unlock();
-});
+// ── Show loading overlay immediately (before slow PBKDF2) ────────────────
+function showLoading() {
+  document.body.innerHTML = '<div style="font-family:Georgia,serif;display:flex;align-items:center;justify-content:center;min-height:100vh;font-size:1.2rem;color:#8a6d1f;">Opening family tree…</div>';
+}
 
-// Check remembered session
+// ── Unlock from typed password ────────────────────────────────────────────
+async function unlock() {
+  const pwd = document.getElementById('pwd').value.trim();
+  if (!pwd) return;
+  showLoading();
+  try {
+    const html = await tryDecrypt(pwd);
+    if (html) {
+      const remember = document.getElementById('remember') && document.getElementById('remember').checked;
+      if (remember) {
+        const exp = Date.now() + 30*24*60*60*1000;
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify({pwd, exp})); } catch(e){}
+      }
+      render(html);
+    } else {
+      location.reload(); // wrong password — restore gate
+    }
+  } catch(e) {
+    location.reload();
+  }
+}
+
+document.getElementById('pwd').addEventListener('keydown', e => { if(e.key==='Enter') unlock(); });
+document.querySelector('button').addEventListener('click', unlock);
+
+// ── Remember-me: stored password ─────────────────────────────────────────
 (function() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const { ct, salt, iv, exp } = JSON.parse(saved);
-      if (!exp || Date.now() < exp) {
-        decrypt(ct, salt, iv).then(html => { if (html) render(html); }).catch(() => {});
-      } else {
-        localStorage.removeItem(STORAGE_KEY);
-      }
-    }
+    if (!saved) return;
+    const {pwd, exp} = JSON.parse(saved);
+    if (exp && Date.now() > exp) { localStorage.removeItem(STORAGE_KEY); return; }
+    showLoading();
+    tryDecrypt(pwd).then(html => { if(html) render(html); else { localStorage.removeItem(STORAGE_KEY); location.reload(); }}).catch(() => location.reload());
   } catch(e) {}
 })();
 
-// Secret URL bypass: #open:PASSWORD — auto-fills and submits
-// Uses hash so it never touches the server or CDN cache
+// ── URL bypass: bookmark https://warshawskyfamily.com#open:PASSWORD ───────
 (function() {
-  const hash = window.location.hash; // e.g. "#open:LouisRoseWarshawsky"
-  const bypass = hash.startsWith('#open:') ? hash.slice(6) : null;
-  if (bypass) {
-    document.getElementById('pwd').value = bypass;
-    unlock();
-  }
+  const hash = window.location.hash;
+  if (!hash.startsWith('#open:')) return;
+  const bypass = decodeURIComponent(hash.slice(6));
+  if (!bypass) return;
+  showLoading();
+  tryDecrypt(bypass).then(html => { if(html) render(html); else location.reload(); }).catch(() => location.reload());
 })();
 </script>
 </body>
