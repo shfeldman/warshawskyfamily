@@ -1582,7 +1582,8 @@ function buildNode(id, depth, siblingIndex, siblingCount) {
   meta.className = 'meta-row';
   const genChip = document.createElement('span');
   genChip.className = 'gen-chip';
-  genChip.textContent = p.generation;
+  const GEN_NUM = {A:'1',B:'2',C:'3',D:'4',E:'5'};
+  genChip.textContent = 'Gen. ' + (GEN_NUM[p.generation] || p.generation);
   genChip.title = GEN_LABEL[p.generation] || '';
   meta.appendChild(genChip);
 
@@ -2692,8 +2693,31 @@ function flashListCard(id) {
 document.querySelectorAll('.gen-jump-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const gen = btn.dataset.gen;
-    const marker = document.querySelector('.gen-divider[data-gen-marker="' + gen + '"]');
-    if (marker) marker.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (gen === 'A') {
+      // Gen 1 — just scroll to top of tree
+      const marker = document.querySelector('.gen-divider[data-gen-marker="A"]');
+      if (marker) { marker.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+      document.getElementById('tree').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    // For deeper generations, expand parent levels first then scroll
+    const cls = 'gen-' + gen.toLowerCase();
+    // Expand all rows needed to reveal this generation
+    document.querySelectorAll('li.node.' + cls).forEach(li => {
+      let cur = li.parentElement;
+      while (cur && cur.id !== 'tree') {
+        if (cur.classList.contains('children')) { cur.hidden = false; }
+        if (cur.parentElement) {
+          const row = cur.parentElement.querySelector(':scope > .node-row[aria-expanded]');
+          if (row) setExpanded(row, true);
+        }
+        cur = cur.parentElement;
+      }
+    });
+    setTimeout(() => {
+      const first = document.querySelector('li.node.' + cls);
+      if (first) first.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
   });
 });
 
