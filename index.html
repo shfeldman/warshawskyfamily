@@ -377,27 +377,6 @@
     cursor: help;
   }
 
-  .share-link-btn {
-    position: relative;
-    font-size: 0.78rem;
-    opacity: 0.55;
-    cursor: pointer;
-    padding: 0.15rem 0.3rem;
-    border-radius: 4px;
-    margin-left: auto;
-  }
-  .share-link-btn:hover, .share-link-btn:focus-visible { opacity: 1; background: var(--paper-deep); outline: 2px solid var(--focus); }
-  .share-link-btn.copied::after {
-    content: "Copied!";
-    position: absolute;
-    background: var(--ink);
-    color: var(--paper);
-    font-size: 0.68rem;
-    padding: 0.2rem 0.5rem;
-    border-radius: 5px;
-    margin-left: 0.3rem;
-    white-space: nowrap;
-  }
 
   .vitals-text {
     font-size: 0.78rem;
@@ -940,30 +919,6 @@ function escapeHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-function copyPersonLink(id, btnEl) {
-  const url = location.href.split('#')[0] + '#person=' + encodeURIComponent(id);
-  const showCopied = () => {
-    btnEl.classList.add('copied');
-    setTimeout(() => btnEl.classList.remove('copied'), 1500);
-  };
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(url).then(showCopied).catch(() => fallbackCopy(url, showCopied));
-  } else {
-    fallbackCopy(url, showCopied);
-  }
-}
-
-function fallbackCopy(text, onDone) {
-  const ta = document.createElement('textarea');
-  ta.value = text;
-  ta.style.position = 'fixed';
-  ta.style.left = '-9999px';
-  document.body.appendChild(ta);
-  ta.select();
-  try { document.execCommand('copy'); } catch (e) {}
-  document.body.removeChild(ta);
-  if (onDone) onDone();
-}
 
 function jumpToPerson(id) {
   const li = document.querySelector('li[data-id="' + id + '"]');
@@ -1236,25 +1191,6 @@ function buildNode(id, depth, siblingIndex, siblingCount) {
     ord.title = 'Listed as the ' + ordinalSuffix(siblingIndex + 1) + ' of ' + siblingCount + ' children in the original document — not confirmed as actual birth order';
     meta.appendChild(ord);
   }
-  const shareBtn = document.createElement('span');
-  shareBtn.className = 'share-link-btn';
-  shareBtn.textContent = '\uD83D\uDD17';
-  shareBtn.title = 'Copy a direct link to ' + p.name;
-  shareBtn.setAttribute('role', 'button');
-  shareBtn.setAttribute('tabindex', '0');
-  shareBtn.setAttribute('aria-label', 'Copy a direct link to ' + p.name);
-  shareBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    copyPersonLink(p.id, shareBtn);
-  });
-  shareBtn.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      e.stopPropagation();
-      copyPersonLink(p.id, shareBtn);
-    }
-  });
-  meta.appendChild(shareBtn);
   wrap.appendChild(meta);
 
   const breadcrumb = document.createElement('div');
