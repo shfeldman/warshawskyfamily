@@ -2851,6 +2851,24 @@ function flashListCard(id) {
         }).join('')}
       </div>
       ${topNames.length ? `<div class="stats-sub"><h4>Most Common First Names</h4>${topNames.map(([n,c])=>`<div class="stats-bar-row"><span class="stats-bar-label">${escapeHtml(n)}</span><div class="stats-bar-track"><div class="stats-bar-fill" style="width:${Math.round(c/topNames[0][1]*100)}%"></div></div><span class="stats-bar-count">${c}</span></div>`).join('')}</div>` : ''}
+      ${(()=>{
+        const lastFreq = {};
+        descendants.forEach(p => {
+          const parts = p.name.replace(/"[^"]*"\s*/g,'').trim().split(/\s+/);
+          if (parts.length >= 2) {
+            const last = parts[parts.length-1];
+            lastFreq[last] = (lastFreq[last]||0) + 1;
+          }
+        });
+        const sorted = Object.entries(lastFreq).sort((a,b)=>b[1]-a[1]);
+        const top = sorted.slice(0,5);
+        const bottom = sorted.filter(([,c])=>c===1).slice(0,5);
+        const maxL = top[0] ? top[0][1] : 1;
+        return top.length ? `
+          <div class="stats-sub"><h4>Most Common Last Names</h4>${top.map(([n,c])=>`<div class="stats-bar-row"><span class="stats-bar-label">${escapeHtml(n)}</span><div class="stats-bar-track"><div class="stats-bar-fill" style="width:${Math.round(c/maxL*100)}%"></div></div><span class="stats-bar-count">${c}</span></div>`).join('')}</div>
+          ${bottom.length ? `<div class="stats-sub"><h4>Rarest Last Names</h4><p style="font-size:0.8rem;color:var(--ink-soft);margin:0">${bottom.map(([n])=>escapeHtml(n)).join(', ')}</p></div>` : ''}
+        ` : '';
+      })()}
     `;
   }
 })();
