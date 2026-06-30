@@ -426,6 +426,29 @@
     color: var(--ink-soft);
     font-weight: 400;
   }
+  .dob-text {
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    font-style: normal;
+    display: block;
+    margin-top: 0.05rem;
+  }
+  .hebrew-name {
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    font-style: italic;
+    direction: ltr;
+    display: block;
+    margin-top: 0.05rem;
+  }
+  .hebrew-name-value {
+    direction: rtl;
+    display: inline-block;
+    font-size: 0.85rem;
+    font-style: normal;
+    margin-left: 0.25rem;
+    vertical-align: middle;
+  }
   .marriage-text {
     font-size: 0.74rem;
     color: var(--ink-soft);
@@ -1211,6 +1234,13 @@ function vitalsLabel(v) {
   return yearPart;
 }
 
+function formatDOB(dateStr) {
+  if (!dateStr) return '';
+  const [y, m, d] = dateStr.split('-');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `b. ${months[parseInt(m,10)-1]} ${parseInt(d,10)}, ${y}`;
+}
+
 function marriageLabel(v) {
   if (v.dateMarried && v.dateMarriageEnd) return `m. ${v.dateMarried}\u2013${v.dateMarriageEnd}`;
   if (v.dateMarried) return `m. ${v.dateMarried}`;
@@ -1442,11 +1472,31 @@ function buildNode(id, depth, siblingIndex, siblingCount) {
     yearsEl.textContent = ' ' + initialYearsLabel;
     nameEl.insertAdjacentElement('afterend', yearsEl);
   } else if (p.vitals && p.vitals.birthYear) {
-    // birth year from data layer (no full vitals block yet)
     const byEl = document.createElement('span');
     byEl.className = 'vitals-text';
     byEl.textContent = ' b. ' + p.vitals.birthYear;
     nameEl.insertAdjacentElement('afterend', byEl);
+  }
+
+  // Date of birth (full date)
+  if (p.vitals && p.vitals.dateOfBirth) {
+    const dobEl = document.createElement('span');
+    dobEl.className = 'dob-text';
+    dobEl.textContent = formatDOB(p.vitals.dateOfBirth);
+    wrap.insertBefore(dobEl, wrap.querySelector('.marriages') || wrap.querySelector('.meta-row'));
+  }
+
+  // Hebrew name
+  if (p.vitals && p.vitals.hebrewName) {
+    const hebEl = document.createElement('span');
+    hebEl.className = 'hebrew-name';
+    const hebLabel = document.createTextNode('Hebrew name: ');
+    const hebVal = document.createElement('span');
+    hebVal.className = 'hebrew-name-value';
+    hebVal.textContent = p.vitals.hebrewName;
+    hebEl.appendChild(hebLabel);
+    hebEl.appendChild(hebVal);
+    wrap.insertBefore(hebEl, wrap.querySelector('.marriages') || wrap.querySelector('.meta-row'));
   }
 
   if (hasKids) {

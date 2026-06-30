@@ -1261,27 +1261,36 @@
   },
   {
     "id": "sabine",
-    "name": "Sabine",
+    "name": "Sabine Hava Feldman",
     "partners": [],
     "generation": "D",
     "branch": "Sylvia",
-    "parent": "shane"
+    "parent": "shane",
+    "vitals": {
+      "dateOfBirth": "2005-04-01"
+    }
   },
   {
     "id": "elliott",
-    "name": "Elliott",
+    "name": "Elliott Tibbitt Feldman",
     "partners": [],
     "generation": "D",
     "branch": "Sylvia",
-    "parent": "shane"
+    "parent": "shane",
+    "vitals": {
+      "dateOfBirth": "2008-06-15"
+    }
   },
   {
     "id": "lily_shane",
-    "name": "Lily",
+    "name": "Lily Marie Tibbitt",
     "partners": [],
     "generation": "D",
     "branch": "Sylvia",
-    "parent": "shane"
+    "parent": "shane",
+    "vitals": {
+      "dateOfBirth": "2017-04-28"
+    }
   },
   {
     "id": "alec",
