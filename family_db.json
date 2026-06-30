@@ -99,9 +99,9 @@
   },
   {
     "id": "rudy",
-    "name": "Rudy",
+    "name": "Rudy Warshawsky",
     "partners": [
-      "Maxine"
+      "Maxine Warshawsky"
     ],
     "generation": "A",
     "branch": "Rudy",
@@ -1118,9 +1118,9 @@
   },
   {
     "id": "sidney",
-    "name": "Sidney",
+    "name": "Sidney \"Sid\" Feldman",
     "partners": [
-      "Bonnie"
+      "Bonnie Feldman"
     ],
     "generation": "B",
     "branch": "Sylvia",
@@ -1144,7 +1144,7 @@
   },
   {
     "id": "carol_sue",
-    "name": "Carol Sue",
+    "name": "Carol Sue Feldman",
     "partners": [],
     "generation": "B",
     "branch": "Sylvia",
@@ -1152,7 +1152,7 @@
   },
   {
     "id": "craig_sylvia",
-    "name": "Craig",
+    "name": "Craig Feldman",
     "partners": [
       "Laura"
     ],
@@ -1162,7 +1162,7 @@
   },
   {
     "id": "aurea_casas",
-    "name": "Aurea Casas",
+    "name": "Aurea Casas Apostol",
     "partners": [
       "Andre Apostol"
     ],
@@ -1172,7 +1172,7 @@
   },
   {
     "id": "seth_sidney",
-    "name": "Seth",
+    "name": "Seth Feldman",
     "partners": [],
     "generation": "C",
     "branch": "Sylvia",
@@ -1193,7 +1193,7 @@
   },
   {
     "id": "shane",
-    "name": "Shane",
+    "name": "Shane Feldman",
     "partners": [
       "Julie Tibbitt"
     ],
@@ -1213,7 +1213,7 @@
   },
   {
     "id": "lena",
-    "name": "Lena",
+    "name": "Lena Limperopulos",
     "partners": [
       "Brian Limperopulos"
     ],
@@ -1223,9 +1223,9 @@
   },
   {
     "id": "brad",
-    "name": "Brad",
+    "name": "Brad Feldman",
     "partners": [
-      "Bailey"
+      "Bailey Feldman"
     ],
     "generation": "C",
     "branch": "Sylvia",
@@ -1233,7 +1233,7 @@
   },
   {
     "id": "jen",
-    "name": "Jen",
+    "name": "Jennifer \"Jen\" Munro",
     "partners": [
       "Rob Munro"
     ],
@@ -1243,9 +1243,9 @@
   },
   {
     "id": "david_sylvia",
-    "name": "David",
+    "name": "David Apostol",
     "partners": [
-      "Nikki"
+      "Nikki Apostol"
     ],
     "generation": "C",
     "branch": "Sylvia",
@@ -1253,7 +1253,7 @@
   },
   {
     "id": "gus",
-    "name": "Gus",
+    "name": "Gus McAndrew",
     "partners": [],
     "generation": "D",
     "branch": "Sylvia",
@@ -1326,7 +1326,7 @@
   },
   {
     "id": "isadora",
-    "name": "Isadora",
+    "name": "Isadora Feldman",
     "partners": [],
     "generation": "D",
     "branch": "Sylvia",
@@ -1334,7 +1334,7 @@
   },
   {
     "id": "juniper_jane",
-    "name": "Juniper Jane",
+    "name": "Juniper Jane Feldman",
     "partners": [],
     "generation": "D",
     "branch": "Sylvia",
@@ -1342,7 +1342,7 @@
   },
   {
     "id": "etta_mae",
-    "name": "Etta Mae",
+    "name": "Etta Mae Feldman",
     "partners": [],
     "generation": "D",
     "branch": "Sylvia",
@@ -1350,7 +1350,7 @@
   },
   {
     "id": "cami",
-    "name": "Cami",
+    "name": "Cami Munro",
     "partners": [],
     "generation": "D",
     "branch": "Sylvia",
@@ -1358,7 +1358,7 @@
   },
   {
     "id": "lucy_jen",
-    "name": "Lucy",
+    "name": "Lucy Apostol",
     "partners": [],
     "generation": "D",
     "branch": "Sylvia",
@@ -1366,7 +1366,7 @@
   },
   {
     "id": "jude",
-    "name": "Jude",
+    "name": "Jude Apostol",
     "partners": [],
     "generation": "D",
     "branch": "Sylvia",
@@ -1374,7 +1374,7 @@
   },
   {
     "id": "sadie",
-    "name": "Sadie",
+    "name": "Sadie Apostol",
     "partners": [],
     "generation": "D",
     "branch": "Sylvia",
