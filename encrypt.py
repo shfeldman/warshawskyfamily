@@ -251,10 +251,11 @@ document.getElementById('pwd').addEventListener('keydown', e => {
   } catch(e) {}
 })();
 
-// Secret URL bypass: ?open=PASSWORD — auto-fills and submits
+// Secret URL bypass: #open:PASSWORD — auto-fills and submits
+// Uses hash so it never touches the server or CDN cache
 (function() {
-  const params = new URLSearchParams(window.location.search);
-  const bypass = params.get('open');
+  const hash = window.location.hash; // e.g. "#open:LouisRoseWarshawsky"
+  const bypass = hash.startsWith('#open:') ? hash.slice(6) : null;
   if (bypass) {
     document.getElementById('pwd').value = bypass;
     unlock();
