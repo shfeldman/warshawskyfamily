@@ -833,7 +833,7 @@
     </div>
 
     <button id="relate-toggle" type="button" class="relate-toggle-btn">How are two people related?</button>
-    <button id="quiz-toggle" type="button" class="relate-toggle-btn quiz-toggle-btn">&#127922; Quiz: How Are We Related?</button>
+    <button id="quiz-toggle" type="button" class="relate-toggle-btn quiz-toggle-btn">&#127922; Family Quiz</button>
     <div id="quiz-panel" class="quiz-panel" hidden>
       <div class="quiz-score">Score: <span id="quiz-score">0</span> / <span id="quiz-total">0</span></div>
       <div id="quiz-question"></div>
@@ -1670,7 +1670,7 @@ function computeRelationship() {
   resultEl.innerHTML = html;
 }
 
-// ---- Quiz mode: How Are We Related? ----
+// ---- Quiz mode: Family Knowledge ----
 const quizToggle = document.getElementById('quiz-toggle');
 const quizPanel = document.getElementById('quiz-panel');
 const quizQuestionEl = document.getElementById('quiz-question');
@@ -1688,37 +1688,42 @@ quizToggle.addEventListener('click', () => {
   if (!quizPanel.hidden && !currentQuiz) nextQuizQuestion();
 });
 
-function pickRandomPair() {
-  const ids = PEOPLE_DATA.map(p => p.id);
-  let idA = ids[Math.floor(Math.random() * ids.length)];
-  let idB = ids[Math.floor(Math.random() * ids.length)];
-  let guard = 0;
-  while (idB === idA && guard++ < 20) {
-    idB = ids[Math.floor(Math.random() * ids.length)];
-  }
-  return [idA, idB];
-}
+function pickQuizQuestion() {
+  const allIds = PEOPLE_DATA.map(p => p.id);
+  for (let attempt = 0; attempt < 60; attempt++) {
+    const id = allIds[Math.floor(Math.random() * allIds.length)];
+    const p = byId[id];
+    const kids = childrenOf[id] || [];
+    const siblings = p.parent ? (childrenOf[p.parent] || []).filter(s => s !== id) : [];
 
-function generateDistractors(m, n, correctLabel) {
-  const near = [];
-  const tryAdd = (mm, nn) => {
-    if (mm < 0 || nn < mm) return;
-    const lbl = relationLabel(mm, nn);
-    if (lbl !== correctLabel && !near.includes(lbl)) near.push(lbl);
-  };
-  tryAdd(m - 1, n); tryAdd(m + 1, n); tryAdd(m, n - 1); tryAdd(m, n + 1);
-  tryAdd(m - 1, n - 1); tryAdd(m + 1, n + 1); tryAdd(m, n + 2);
-  if (near.length < 3) {
-    const pool = ['Siblings', '1st Cousins', '2nd Cousins', 'Parent / Child', 'Grandparent / Grandchild',
-                  'Aunt/Uncle & Niece/Nephew', '3rd Cousins', '1st Cousins, Once Removed', 'Great-Grandparent / Great-Grandchild'];
-    pool.forEach(p => { if (p !== correctLabel && !near.includes(p)) near.push(p); });
+    const types = [];
+    if (p.parent) types.push('parent');
+    if (siblings.length > 0) types.push('sibling');
+    if (kids.length > 0) types.push('child');
+    if (types.length === 0) continue;
+
+    const qtype = types[Math.floor(Math.random() * types.length)];
+    let correctId, prompt;
+
+    if (qtype === 'parent') {
+      correctId = p.parent;
+      prompt = `Who is <strong>${escapeHtml(p.name)}</strong>'s parent?`;
+    } else if (qtype === 'sibling') {
+      correctId = siblings[Math.floor(Math.random() * siblings.length)];
+      prompt = `Who is a sibling of <strong>${escapeHtml(p.name)}</strong>?`;
+    } else {
+      correctId = kids[Math.floor(Math.random() * kids.length)];
+      prompt = `Who is a child of <strong>${escapeHtml(p.name)}</strong>?`;
+    }
+
+    const correctName = byId[correctId].name;
+    const distPool = allIds.filter(d => d !== id && d !== correctId);
+    const distractors = distPool.sort(() => Math.random() - 0.5).slice(0, 3).map(d => byId[d].name);
+    const options = [correctName, ...distractors].sort(() => Math.random() - 0.5);
+
+    return { id, qtype, correctId, correctName, prompt, options, p };
   }
-  const shuffled = near.slice();
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled.slice(0, 3);
+  return null;
 }
 
 function nextQuizQuestion() {
@@ -1726,45 +1731,33 @@ function nextQuizQuestion() {
   quizFeedbackEl.className = 'quiz-feedback';
   quizNextBtn.hidden = true;
 
-  const [idA, idB] = pickRandomPair();
-  const { lcaId, depthA, depthB } = findLCA(idA, idB);
-  const m = Math.min(depthA, depthB), n = Math.max(depthA, depthB);
-  const correctLabel = relationLabel(m, n);
-  const distractors = generateDistractors(m, n, correctLabel);
-  const options = [correctLabel, ...distractors];
-  for (let i = options.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [options[i], options[j]] = [options[j], options[i]];
-  }
+  const q = pickQuizQuestion();
+  if (!q) return;
+  currentQuiz = q;
 
-  currentQuiz = { idA, idB, lcaId, depthA, depthB, correctLabel };
-
-  const pA = byId[idA], pB = byId[idB];
   quizQuestionEl.innerHTML = `
-    <div class="quiz-names">
-      <span class="quiz-dot" style="background:${BRANCH_HEX[pA.branch]}"></span>${escapeHtml(pA.name)}
-      &nbsp;&amp;&nbsp;
-      <span class="quiz-dot" style="background:${BRANCH_HEX[pB.branch]}"></span>${escapeHtml(pB.name)}
+    <div class="quiz-names" style="font-size:1rem;">
+      <span class="quiz-dot" style="background:${BRANCH_HEX[q.p.branch]}"></span>
+      ${q.prompt}
     </div>
-    <div class="quiz-context">${escapeHtml(pA.branch)} branch &nbsp;&middot;&nbsp; ${escapeHtml(pB.branch)} branch</div>
-    <div class="quiz-prompt">How are they related?</div>
+    <div class="quiz-context">${escapeHtml(q.p.branch)} branch</div>
   `;
 
   quizOptionsEl.innerHTML = '';
-  options.forEach(label => {
+  q.options.forEach(name => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'quiz-option-btn';
-    btn.textContent = label;
-    btn.addEventListener('click', () => answerQuiz(label, btn));
+    btn.textContent = name;
+    btn.addEventListener('click', () => answerQuiz(name, btn));
     quizOptionsEl.appendChild(btn);
   });
 }
 
-function answerQuiz(chosenLabel, btnEl) {
+function answerQuiz(chosenName, btnEl) {
   if (!currentQuiz) return;
-  const { idA, idB, lcaId, correctLabel } = currentQuiz;
-  const isCorrect = chosenLabel === correctLabel;
+  const { correctName, correctId, qtype, p } = currentQuiz;
+  const isCorrect = chosenName === correctName;
 
   quizTotal++;
   if (isCorrect) quizScore++;
@@ -1773,17 +1766,24 @@ function answerQuiz(chosenLabel, btnEl) {
 
   Array.from(quizOptionsEl.children).forEach(btn => {
     btn.disabled = true;
-    if (btn.textContent === correctLabel) btn.classList.add('correct');
+    if (btn.textContent === correctName) btn.classList.add('correct');
     else if (btn === btnEl) btn.classList.add('incorrect');
   });
 
-  const pathA = pathNames(idA, lcaId);
-  const pathB = pathNames(idB, lcaId);
+  const correct = byId[correctId];
+  let explanation = '';
+  if (qtype === 'parent') {
+    explanation = `${escapeHtml(correct.name)} is ${escapeHtml(p.name)}'s parent (${escapeHtml(correct.branch)} branch).`;
+  } else if (qtype === 'sibling') {
+    explanation = `${escapeHtml(correct.name)} and ${escapeHtml(p.name)} are both children of ${escapeHtml(byId[p.parent].name)}.`;
+  } else {
+    explanation = `${escapeHtml(correct.name)} is a child of ${escapeHtml(p.name)} (${escapeHtml(correct.branch)} branch).`;
+  }
+
   quizFeedbackEl.className = 'quiz-feedback ' + (isCorrect ? 'correct' : 'incorrect');
   quizFeedbackEl.innerHTML = `
-    <div class="qf-headline">${isCorrect ? '\u2713 Correct!' : '\u2717 Not quite \u2014 the answer is ' + escapeHtml(correctLabel) + '.'}</div>
-    <div class="relate-path">${pathA.map((n,i)=> i===pathA.length-1 ? `<span class="lca-name">${escapeHtml(n)}</span>` : escapeHtml(n)).join(' \u2192 ')}</div>
-    <div class="relate-path">${pathB.map((n,i)=> i===pathB.length-1 ? `<span class="lca-name">${escapeHtml(n)}</span>` : escapeHtml(n)).join(' \u2192 ')}</div>
+    <div class="qf-headline">${isCorrect ? '\u2713 Correct!' : '\u2717 Not quite \u2014 the answer is ' + escapeHtml(correctName) + '.'}</div>
+    <div class="quiz-context" style="margin-top:0.3rem;">${explanation}</div>
   `;
   quizNextBtn.hidden = false;
 }
