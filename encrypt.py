@@ -223,27 +223,14 @@ async function tryDecrypt(pwd) {
 }
 
 // ── Render decrypted page ─────────────────────────────────────────────────
-// document.write() is blocked by Chrome after page load — instead we parse
-// the HTML, replace head/body, then re-create each <script> so they execute.
+// Use a full-screen iframe with srcdoc so the browser treats the decrypted
+// HTML as a fresh page — all scripts execute normally, no conflicts.
 function render(html) {
-  const parser = new DOMParser();
-  const newDoc = parser.parseFromString(html, 'text/html');
-  document.head.innerHTML = newDoc.head.innerHTML;
-  document.body.innerHTML = newDoc.body.innerHTML;
-  // innerHTML doesn't run scripts — re-create them so they execute in order
-  const scripts = Array.from(document.body.querySelectorAll('script'));
-  function runNext(i) {
-    if (i >= scripts.length) return;
-    const old = scripts[i];
-    const s = document.createElement('script');
-    Array.from(old.attributes).forEach(a => s.setAttribute(a.name, a.value));
-    s.textContent = old.textContent;
-    old.parentNode.replaceChild(s, old);
-    // if script has src, wait for it to load before running the next one
-    if (s.src) { s.onload = s.onerror = () => runNext(i + 1); }
-    else { runNext(i + 1); }
-  }
-  runNext(0);
+  const iframe = document.createElement('iframe');
+  iframe.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;border:none;z-index:999999;';
+  iframe.srcdoc = html;
+  document.body.style.overflow = 'hidden';
+  document.body.appendChild(iframe);
 }
 
 // ── Show loading overlay immediately (before slow PBKDF2) ────────────────
