@@ -157,33 +157,6 @@ GATE_HTML = """\
 const ENCRYPTED = __ENCRYPTED_PAYLOAD__;
 const STORAGE_KEY = 'wfc_session';
 
-// Secret URL bypass: ?open=PASSWORD skips the gate entirely
-(function() {
-  const params = new URLSearchParams(window.location.search);
-  const bypass = params.get('open');
-  if (bypass) {
-    decrypt(ENCRYPTED.ct, ENCRYPTED.salt, ENCRYPTED.iv, bypass).then(html => {
-      if (html) render(html);
-    }).catch(() => {});
-    return;
-  }
-})();
-
-// Check remembered session
-(function() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const { ct, salt, iv, exp } = JSON.parse(saved);
-      if (!exp || Date.now() < exp) {
-        decrypt(ct, salt, iv).then(html => { if (html) render(html); }).catch(() => {});
-      } else {
-        localStorage.removeItem(STORAGE_KEY);
-      }
-    }
-  } catch(e) {}
-})();
-
 async function unlock() {
   const pwd = document.getElementById('pwd').value;
   if (!pwd) return;
@@ -262,6 +235,33 @@ function render(html) {
 document.getElementById('pwd').addEventListener('keydown', e => {
   if (e.key === 'Enter') unlock();
 });
+
+// Secret URL bypass: ?open=PASSWORD skips the gate entirely
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const bypass = params.get('open');
+  if (bypass) {
+    decrypt(ENCRYPTED.ct, ENCRYPTED.salt, ENCRYPTED.iv, bypass).then(html => {
+      if (html) render(html);
+    }).catch(() => {});
+    return;
+  }
+})();
+
+// Check remembered session
+(function() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const { ct, salt, iv, exp } = JSON.parse(saved);
+      if (!exp || Date.now() < exp) {
+        decrypt(ct, salt, iv).then(html => { if (html) render(html); }).catch(() => {});
+      } else {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    }
+  } catch(e) {}
+})();
 </script>
 </body>
 </html>
