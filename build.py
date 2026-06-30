@@ -54,7 +54,7 @@ def load_and_encode_photo(filepath: Path, label: str) -> str:
             encoded = base64.b64encode(f.read()).decode("ascii")
         ext = filepath.suffix.lower().lstrip(".")
         mime = "image/jpeg" if ext in ("jpg", "jpeg") else f"image/{ext}"
-        return f"{mime};base64,{encoded}"
+        return f"data:{mime};base64,{encoded}"
 
 
 def resolve_photo(value: str, label: str) -> str:
