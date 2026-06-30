@@ -124,21 +124,12 @@
     position: relative;
     margin-top: 0.4rem;
   }
-  .chip-row-wrap::after {
-    content: "";
-    position: absolute;
-    right: 0; top: 0; bottom: 0;
-    width: 28px;
-    background: linear-gradient(to right, transparent, var(--paper));
-    pointer-events: none;
-  }
 
   .chip-row {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.4rem;
-    overflow-x: auto;
     padding: 0.2rem 0.1rem 0.3rem;
-    -webkit-overflow-scrolling: touch;
   }
 
   .chip {
@@ -147,14 +138,14 @@
     color: var(--chip-color, var(--ink));
     background: #fff;
     border-radius: 999px;
-    padding: 0.45rem 0.9rem;
-    font-size: 0.82rem;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.78rem;
     font-weight: 700;
     white-space: nowrap;
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    min-height: 38px;
+    gap: 0.3rem;
+    min-height: 34px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.08);
   }
   .chip .dot {
@@ -457,14 +448,14 @@
 
   .photo-thumb {
     flex: 0 0 auto;
-    width: 1.6rem;
-    height: 1.6rem;
+    width: 3.5rem;
+    height: 3.5rem;
     border-radius: 50%;
     overflow: hidden;
     position: relative;
-    border: 1.5px solid #fff;
-    box-shadow: 0 0 0 1.5px var(--level-color, var(--branch-color, var(--ink-soft)));
-    margin-top: 0.05rem;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px var(--level-color, var(--branch-color, var(--ink-soft)));
+    margin-top: 0.1rem;
     cursor: pointer;
   }
   .photo-thumb img {
@@ -1270,7 +1261,7 @@ function makePhotoThumb(id, displayName, vitals, sizeClass) {
   img.src = vitals.photo;
   img.alt = '';
   wrap.appendChild(img);
-  applyCropTransform(img, vitals, sizeClass === 'photo-thumb-sm' ? 20 : 26);
+  applyCropTransform(img, vitals, sizeClass === 'photo-thumb-sm' ? 20 : 56);
   const open = (e) => { e.stopPropagation(); openPhotoLightbox(id, displayName); };
   wrap.addEventListener('click', open);
   wrap.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(e); } });
