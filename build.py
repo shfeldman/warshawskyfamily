@@ -97,6 +97,12 @@ def main():
     with open(TEMPLATE) as f:
         template = f.read()
 
+    # Resolve founders photo for the header
+    founders = next((p for p in people if p.get("id") == "founders"), None)
+    founders_photo = ""
+    if founders and founders.get("vitals", {}).get("photo"):
+        founders_photo = resolve_photo(founders["vitals"]["photo"], "founders")
+
     people_json = json.dumps(people, separators=(",", ":"))
 
     # Compute stats for the header
@@ -106,6 +112,7 @@ def main():
     build_date = date.today().strftime("%B %-d, %Y")
 
     output = template.replace("__PEOPLE_DATA_JSON__", people_json)
+    output = output.replace("__FOUNDERS_PHOTO__", founders_photo)
     output = output.replace("__BUILD_DATE__", build_date)
     output = output.replace("__TOTAL_PERSONS__", str(total_persons))
     output = output.replace("__DESCENDANT_COUNT__", str(len(descendants)))

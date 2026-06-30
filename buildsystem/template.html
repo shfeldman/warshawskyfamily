@@ -43,17 +43,21 @@
 
   header.letterhead {
     text-align: center;
-    padding: 1.6rem 1rem 1.1rem;
+    padding: 1.2rem 1rem 1.1rem;
     background: var(--paper-deep);
     border-bottom: 1px solid var(--rule-soft);
   }
 
-  .eyebrow {
-    font-size: 0.68rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    margin: 0 0 0.4rem;
+  .founders-photo {
+    display: block;
+    margin: 0 auto 0.7rem;
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center top;
+    border: 3px solid #8a6d1f;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
   }
 
   h1 {
@@ -801,7 +805,7 @@
 <body>
 
 <header class="letterhead">
-  <p class="eyebrow">Family Record &middot; Established by descent from Louis &amp; Rose</p>
+  <img class="founders-photo" src="__FOUNDERS_PHOTO__" alt="Louis and Rose Warshawsky">
   <h1>The Louis and Rose Warshawsky Family Circle</h1>
   <div class="double-rule"></div>
   <div class="ledger-stats">
