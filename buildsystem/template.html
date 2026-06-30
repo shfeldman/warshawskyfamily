@@ -1,0 +1,2495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Louis and Rose Warshawsky Family Circle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f7f3ea;
+    --paper-deep: #efe8d8;
+    --ink: #23262b;
+    --ink-soft: #5b5650;
+    --rule: #b8a165;
+    --rule-soft: #d8cba0;
+    --focus: #1a5fb4;
+
+    --c-henry:  #c1440e;
+    --c-dave:   #0d5c8c;
+    --c-jack:   #1f7a4d;
+    --c-bessie: #8a3f8c;
+    --c-saul:   #6a4fb5;
+    --c-milt:   #b8860b;
+    --c-evelyn: #1f9489;
+    --c-sylvia: #c2287d;
+    --c-rudy:   #8a5a1e;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    background-image:
+      repeating-linear-gradient(0deg, rgba(184,161,101,0.05) 0px, rgba(184,161,101,0.05) 1px, transparent 1px, transparent 28px);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.4;
+    padding-bottom: 3rem;
+  }
+
+  header.letterhead {
+    text-align: center;
+    padding: 1.6rem 1rem 1.1rem;
+    background: var(--paper-deep);
+    border-bottom: 1px solid var(--rule-soft);
+  }
+
+  .eyebrow {
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 0 0 0.4rem;
+  }
+
+  h1 {
+    font-family: 'Lora', serif;
+    font-weight: 600;
+    font-size: 1.35rem;
+    margin: 0 0 0.5rem;
+    line-height: 1.3;
+  }
+
+  .double-rule {
+    width: 130px;
+    margin: 0.5rem auto 0.7rem;
+    border-top: 3px double var(--rule);
+  }
+
+  .ledger-stats {
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  .ledger-stats strong { color: var(--ink); }
+
+  main {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+
+  .panel {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: var(--paper);
+    padding: 0.7rem 0 0.5rem;
+    box-shadow: 0 4px 8px -4px rgba(35,38,43,0.12);
+  }
+
+  #search {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 1.5px solid var(--rule-soft);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--ink);
+    font-family: inherit;
+  }
+  #search:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 1px;
+  }
+
+  #search-status {
+    font-size: 0.76rem;
+    color: var(--ink-soft);
+    margin: 0.3rem 0.1rem 0;
+    min-height: 1.1rem;
+  }
+
+  .chip-row-wrap {
+    position: relative;
+    margin-top: 0.4rem;
+  }
+  .chip-row-wrap::after {
+    content: "";
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 28px;
+    background: linear-gradient(to right, transparent, var(--paper));
+    pointer-events: none;
+  }
+
+  .chip-row {
+    display: flex;
+    gap: 0.4rem;
+    overflow-x: auto;
+    padding: 0.2rem 0.1rem 0.3rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .chip {
+    flex: 0 0 auto;
+    border: 1.5px solid var(--chip-color, var(--rule));
+    color: var(--chip-color, var(--ink));
+    background: #fff;
+    border-radius: 999px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 36px;
+  }
+  .chip .dot {
+    width: 0.55rem; height: 0.55rem; border-radius: 50%;
+    background: var(--chip-color);
+    display: inline-block;
+  }
+  .chip[aria-pressed="true"] {
+    background: var(--chip-color);
+    color: #fff;
+  }
+  .chip[aria-pressed="true"] .dot { background: #fff; }
+  .chip:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+  .below-panel {
+    padding-top: 0.6rem;
+  }
+
+  .toolbar {
+    display: flex;
+    gap: 0.5rem;
+    margin: 0 0 0.5rem;
+  }
+  .toolbar button {
+    flex: 1 1 auto;
+    padding: 0.6rem 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1.5px solid var(--ink-soft);
+    background: #fff;
+    color: var(--ink);
+    border-radius: 7px;
+    min-height: 40px;
+  }
+  .toolbar button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+  .print-btn-full {
+    width: 100%;
+    padding: 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1.5px solid var(--ink-soft);
+    background: #fff;
+    color: var(--ink);
+    border-radius: 7px;
+    margin-bottom: 0.6rem;
+    min-height: 40px;
+  }
+  .print-btn-full:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+  .legend-note {
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    margin: 0.5rem 0.1rem 0.8rem;
+    display: flex;
+    gap: 0.9rem;
+    flex-wrap: wrap;
+  }
+  .legend-note .swatch-key { display: inline-flex; align-items: center; gap: 0.3rem; }
+  .legend-note .ring { width: 0.65rem; height: 0.65rem; border-radius: 50%; border: 2px dashed var(--ink-soft); display: inline-block; }
+  .legend-note .q { font-weight: 700; color: var(--ink-soft); }
+
+  /* TREE */
+  ul.tree, ul.children {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  ul.tree { padding-top: 0.4rem; }
+
+  ul.children {
+    margin-left: 0.55rem;
+    padding-left: 1.15rem;
+    border-left-style: solid;
+    border-left-width: var(--level-width, 2.5px);
+    border-left-color: var(--level-color, var(--branch-color, var(--rule-soft)));
+  }
+  ul.children.level-B { --level-color: var(--branch-color); --level-width: 3.2px; }
+  ul.children.level-C { --level-color: color-mix(in srgb, var(--branch-color) 78%, white); --level-width: 2.5px; }
+  ul.children.level-D { --level-color: color-mix(in srgb, var(--branch-color) 58%, white); --level-width: 2px; }
+  ul.children.level-E { --level-color: color-mix(in srgb, var(--branch-color) 42%, white); --level-width: 1.5px; }
+
+  li.node { position: relative; margin-bottom: 0.1rem; }
+  li.node:has(> ul.children) { margin-top: 0.45rem; }
+  li.node:first-child { margin-top: 0; }
+
+  li.node::before {
+    content: "";
+    position: absolute;
+    left: -1.15rem;
+    top: 1.05rem;
+    width: 0.95rem;
+    height: var(--level-width, 2.5px);
+    background: var(--level-color, var(--branch-color, var(--rule-soft)));
+  }
+  ul.tree > li.node::before { display: none; }
+
+  li.node.gen-b > .node-row { background: color-mix(in srgb, var(--branch-color) 5%, var(--paper)); }
+  li.node.gen-c > .node-row { background: color-mix(in srgb, var(--branch-color) 9%, var(--paper)); }
+  li.node.gen-d > .node-row { background: color-mix(in srgb, var(--branch-color) 13%, var(--paper)); }
+  li.node.gen-e > .node-row { background: color-mix(in srgb, var(--branch-color) 17%, var(--paper)); }
+
+  .node-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.45rem;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 0.55rem 0.45rem;
+    border-radius: 6px;
+    font-family: inherit;
+    color: var(--ink);
+    cursor: pointer;
+    min-height: 44px;
+  }
+  .node-row:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
+  .node-row:active { background: rgba(184,161,101,0.18); }
+  div.node-row { cursor: default; }
+
+  .caret {
+    flex: 0 0 auto;
+    width: 1.2rem;
+    text-align: center;
+    color: #fff;
+    background: var(--branch-color, var(--ink-soft));
+    border-radius: 4px;
+    font-size: 0.72rem;
+    line-height: 1.5;
+    margin-top: 0.15rem;
+    font-weight: 700;
+  }
+  .leaf-marker {
+    flex: 0 0 auto;
+    width: 1.2rem;
+    text-align: center;
+    color: var(--ink-soft);
+    opacity: 0.45;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    margin-top: 0.15rem;
+  }
+
+  .child-count {
+    font-size: 0.66rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+  .child-count.no-children {
+    font-weight: 400;
+    font-style: italic;
+    opacity: 0.7;
+  }
+
+  .dot {
+    flex: 0 0 auto;
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 50%;
+    background: var(--level-color, var(--branch-color, var(--ink-soft)));
+    margin-top: 0.35rem;
+  }
+
+  .label-wrap { flex: 1 1 auto; min-width: 0; }
+
+  .gen-a .name { font-family: 'Lora', serif; font-weight: 600; font-size: 1.05rem; }
+  .name {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .name mark { background: #ffd866; color: inherit; border-radius: 3px; padding: 0 2px; }
+
+  .partners {
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.15rem;
+  }
+  .partner-unit {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .partner-sep { font-style: italic; }
+  .partner-name mark { background: #ffd866; color: var(--ink); border-radius: 3px; padding: 0 2px; }
+
+  .photo-thumb-sm {
+    width: 1.15rem;
+    height: 1.15rem;
+    margin-top: 0;
+  }
+
+  .partners > .vitals-panel-holder {
+    flex-basis: 100%;
+    width: 100%;
+  }
+
+  .meta-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.2rem;
+    flex-wrap: wrap;
+  }
+
+  .gen-chip {
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: var(--ink-soft);
+    border: 1px solid var(--level-color, var(--rule-soft));
+    background: color-mix(in srgb, var(--level-color, var(--rule-soft)) 16%, white);
+    border-radius: 4px;
+    padding: 0.05rem 0.32rem;
+    letter-spacing: 0.03em;
+    cursor: help;
+  }
+
+  .ordinal-chip {
+    font-size: 0.66rem;
+    font-weight: 400;
+    color: var(--ink-soft);
+    opacity: 0.75;
+    padding: 0;
+    cursor: help;
+  }
+
+  .share-link-btn {
+    position: relative;
+    font-size: 0.78rem;
+    opacity: 0.55;
+    cursor: pointer;
+    padding: 0.15rem 0.3rem;
+    border-radius: 4px;
+    margin-left: auto;
+  }
+  .share-link-btn:hover, .share-link-btn:focus-visible { opacity: 1; background: var(--paper-deep); outline: 2px solid var(--focus); }
+  .share-link-btn.copied::after {
+    content: "Copied!";
+    position: absolute;
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 0.68rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 5px;
+    margin-left: 0.3rem;
+    white-space: nowrap;
+  }
+
+  .edit-vitals-btn {
+    position: relative;
+    font-size: 0.78rem;
+    opacity: 0.55;
+    cursor: pointer;
+    padding: 0.15rem 0.3rem;
+    border-radius: 4px;
+  }
+  .edit-vitals-btn:hover, .edit-vitals-btn:focus-visible { opacity: 1; background: var(--paper-deep); outline: 2px solid var(--focus); }
+
+  .vitals-text {
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    font-weight: 400;
+  }
+  .marriage-text {
+    font-size: 0.74rem;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  .photo-thumb {
+    flex: 0 0 auto;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+    border: 1.5px solid #fff;
+    box-shadow: 0 0 0 1.5px var(--level-color, var(--branch-color, var(--ink-soft)));
+    margin-top: 0.05rem;
+    cursor: pointer;
+  }
+  .photo-thumb img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transform-origin: center center;
+  }
+  .photo-thumb:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+  .lightbox-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 16, 10, 0.82);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.2rem;
+  }
+  .lightbox-card {
+    background: var(--paper);
+    border-radius: 12px;
+    padding: 1rem;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  }
+  .lightbox-card .lb-name {
+    font-family: 'Lora', serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.6rem;
+  }
+  .lightbox-photo-full {
+    max-width: min(80vw, 420px);
+    max-height: 55vh;
+    border-radius: 8px;
+    display: block;
+    margin: 0 auto 0.8rem;
+    object-fit: contain;
+  }
+  .lb-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+  .lb-actions button {
+    padding: 0.55rem 0.9rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    border-radius: 7px;
+    min-height: 40px;
+  }
+  .lb-recenter { background: var(--ink); color: var(--paper); border: 1.5px solid var(--ink); }
+  .lb-close { background: #fff; color: var(--ink); border: 1.5px solid var(--rule-soft); }
+
+  .crop-editor-frame {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+    margin: 0 auto 0.9rem;
+    border: 2px solid var(--rule);
+    touch-action: none;
+    cursor: grab;
+    background: var(--paper-deep);
+  }
+  .crop-editor-frame:active { cursor: grabbing; }
+  .crop-editor-frame img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transform-origin: center center;
+    pointer-events: none;
+  }
+  .crop-zoom-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    max-width: 260px;
+    margin: 0 auto 0.8rem;
+  }
+  .crop-zoom-row input[type="range"] { flex: 1 1 auto; }
+  .crop-hint {
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    margin-bottom: 0.7rem;
+  }
+
+  .vitals-panel {
+    background: #fff;
+    border: 1.5px solid var(--rule-soft);
+    border-radius: 8px;
+    padding: 0.7rem 0.8rem;
+    margin: 0.3rem 0 0.4rem;
+    font-size: 0.82rem;
+  }
+  .vitals-panel .vp-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .vitals-panel label {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin-bottom: 0.15rem;
+  }
+  .vitals-panel input[type="text"] {
+    width: 100%;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.85rem;
+    border: 1.5px solid var(--rule-soft);
+    border-radius: 6px;
+    font-family: inherit;
+  }
+  .vitals-panel input[type="text"]:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
+  .vp-field { flex: 1 1 0; }
+  .vp-photo-row { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem; }
+  .vp-photo-preview {
+    width: 3rem; height: 3rem; border-radius: 50%; object-fit: cover;
+    border: 1.5px solid var(--rule-soft); background: var(--paper-deep);
+  }
+  .vp-actions { display: flex; gap: 0.5rem; }
+  .vp-actions button {
+    flex: 1 1 auto;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: 6px;
+    min-height: 40px;
+  }
+  .vp-save { background: var(--ink); color: var(--paper); border: 1.5px solid var(--ink); }
+  .vp-cancel { background: #fff; color: var(--ink); border: 1.5px solid var(--rule-soft); }
+  .vp-remove-photo { background: #fff; color: #8a2a23; border: 1.5px solid #d8b9b5; font-size: 0.72rem !important; flex: 0 0 auto !important; padding: 0.3rem 0.6rem !important; }
+  .vp-note { font-size: 0.68rem; color: var(--ink-soft); opacity: 0.8; margin-top: 0.3rem; }
+  li.node.jump-highlight > .node-row { animation: jump-flash 1.8s ease; }
+  @keyframes jump-flash {
+    0%, 100% { box-shadow: none; }
+    15% { box-shadow: 0 0 0 3px #ffd866; }
+  }
+
+  .flag-assumed {
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    font-weight: 700;
+    cursor: help;
+  }
+  .flag-unplaced {
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: #8a5a1e;
+    border: 1.5px dashed #8a5a1e;
+    border-radius: 4px;
+    padding: 0.02rem 0.3rem;
+  }
+
+  .breadcrumb {
+    font-size: 0.7rem;
+    color: var(--branch-color, var(--ink-soft));
+    margin: 0.15rem 0.4rem 0;
+    opacity: 0.85;
+  }
+
+  li.node.hidden-by-search { display: none; }
+  li.node.hidden-by-filter { display: none; }
+
+  .no-results {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--ink-soft);
+    display: none;
+  }
+
+  footer {
+    text-align: center;
+    font-size: 0.74rem;
+    color: var(--ink-soft);
+    padding: 1.6rem 1rem 0.4rem;
+  }
+
+  .relate-toggle-btn {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0.55rem 0.6rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border: 1.5px solid var(--rule);
+    background: var(--paper-deep);
+    color: var(--ink);
+    border-radius: 7px;
+    font-family: 'Lora', serif;
+  }
+  .relate-toggle-btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+  .relate-panel {
+    background: #fff;
+    border: 1.5px solid var(--rule-soft);
+    border-radius: 8px;
+    padding: 0.8rem;
+    margin-top: 0.4rem;
+  }
+  .relate-input-wrap { position: relative; margin-bottom: 0.7rem; }
+  .relate-label { display: block; font-size: 0.72rem; color: var(--ink-soft); margin-bottom: 0.2rem; font-weight: 600; }
+  .relate-input-wrap input {
+    width: 100%;
+    padding: 0.6rem 0.7rem;
+    font-size: 0.92rem;
+    border: 1.5px solid var(--rule-soft);
+    border-radius: 7px;
+    font-family: inherit;
+  }
+  .relate-input-wrap input:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
+  .relate-dropdown {
+    position: absolute;
+    left: 0; right: 0; top: 100%;
+    background: #fff;
+    border: 1.5px solid var(--rule-soft);
+    border-radius: 7px;
+    margin-top: 0.2rem;
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 40;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+  }
+  .relate-option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.5rem 0.7rem;
+    border: none;
+    background: none;
+    font-family: inherit;
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--paper-deep);
+    cursor: pointer;
+  }
+  .relate-option:last-child { border-bottom: none; }
+  .relate-option:hover, .relate-option:focus-visible { background: var(--paper-deep); }
+  .relate-option .ro-context { display: block; font-size: 0.72rem; color: var(--ink-soft); font-style: italic; }
+
+  .relate-result {
+    font-size: 0.9rem;
+    padding-top: 0.3rem;
+  }
+  .relate-result .rr-headline {
+    font-weight: 700;
+    font-family: 'Lora', serif;
+    font-size: 1.02rem;
+    margin-bottom: 0.5rem;
+  }
+  .relate-path { font-size: 0.8rem; color: var(--ink-soft); margin: 0.2rem 0; line-height: 1.5; }
+  .relate-path .lca-name { font-weight: 700; color: var(--ink); }
+  .relate-caveat { font-size: 0.72rem; color: #8a5a1e; margin-top: 0.4rem; }
+
+  .quiz-toggle-btn { margin-top: 0.5rem; }
+
+  .quiz-panel {
+    background: #fff;
+    border: 1.5px solid var(--rule-soft);
+    border-radius: 8px;
+    padding: 0.9rem;
+    margin-top: 0.4rem;
+  }
+  .quiz-score {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--ink-soft);
+    margin-bottom: 0.6rem;
+  }
+  .quiz-question {
+    text-align: center;
+    margin-bottom: 0.7rem;
+  }
+  .quiz-names {
+    font-family: 'Lora', serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+  .quiz-names .quiz-dot {
+    display: inline-block;
+    width: 0.6rem; height: 0.6rem;
+    border-radius: 50%;
+    margin-right: 0.3rem;
+  }
+  .quiz-context { font-size: 0.74rem; color: var(--ink-soft); margin-top: 0.2rem; }
+  .quiz-prompt { font-size: 0.85rem; color: var(--ink-soft); margin-top: 0.5rem; }
+
+  .quiz-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+  .quiz-option-btn {
+    padding: 0.65rem 0.5rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    border: 1.5px solid var(--rule-soft);
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 7px;
+    min-height: 44px;
+  }
+  .quiz-option-btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .quiz-option-btn.correct { background: #d7ecd9; border-color: #3d8b53; color: #1f5c30; }
+  .quiz-option-btn.incorrect { background: #f6dede; border-color: #b5453d; color: #7a2a23; }
+  .quiz-option-btn:disabled { opacity: 0.85; }
+
+  .quiz-feedback {
+    font-size: 0.84rem;
+    margin-top: 0.7rem;
+    line-height: 1.5;
+  }
+  .quiz-feedback .qf-headline { font-weight: 700; margin-bottom: 0.3rem; }
+  .quiz-feedback.correct .qf-headline { color: #1f5c30; }
+  .quiz-feedback.incorrect .qf-headline { color: #7a2a23; }
+
+  .quiz-next-btn {
+    width: 100%;
+    margin-top: 0.7rem;
+    padding: 0.6rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border: 1.5px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 7px;
+    min-height: 44px;
+  }
+  .quiz-next-btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+  .view-toggle-btn {
+    flex: 1 1 100% !important;
+    font-weight: 700;
+    background: var(--paper-deep) !important;
+  }
+
+  @media print {
+    .panel, header .eyebrow, footer { }
+    #search, .chip-row-wrap, .toolbar, #relate-toggle, #relate-panel, .legend-note, #search-status, .print-btn-full, #back-to-top,
+    #quiz-toggle, #quiz-panel, #explorer-wrap, .edit-vitals-btn, .vitals-panel, .share-link-btn {
+      display: none !important;
+    }
+    ul.children[hidden] { display: block !important; }
+    body { background: white !important; }
+    li.node.hidden-by-filter, li.node.hidden-by-search { display: list-item !important; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  #back-to-top {
+    position: fixed;
+    bottom: 1.1rem;
+    right: 1.1rem;
+    z-index: 50;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: 999px;
+    padding: 0.6rem 1rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+    cursor: pointer;
+  }
+  #back-to-top:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+  .explorer-wrap {
+    position: relative;
+    width: 100%;
+    height: 72vh;
+    min-height: 420px;
+    background: #fff;
+    border: 1.5px solid var(--rule-soft);
+    border-radius: 10px;
+    overflow: hidden;
+    touch-action: none;
+    margin-top: 0.5rem;
+  }
+  #explorer-svg {
+    display: block;
+    cursor: grab;
+  }
+  #explorer-svg:active { cursor: grabbing; }
+
+  .explorer-controls {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .explorer-controls button {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 8px;
+    border: 1.5px solid var(--rule-soft);
+    background: #fff;
+    color: var(--ink);
+    font-size: 1.1rem;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  }
+  .explorer-controls button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+  .explorer-hint {
+    position: absolute;
+    bottom: 0.4rem;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 0.68rem;
+    color: var(--ink-soft);
+    background: rgba(255,255,255,0.85);
+    margin: 0;
+    padding: 0.2rem 0;
+    pointer-events: none;
+  }
+
+  .explorer-detail {
+    position: absolute;
+    left: 0.6rem;
+    right: 0.6rem;
+    bottom: 0.6rem;
+    z-index: 15;
+    background: #fff;
+    border: 1.5px solid var(--rule-soft);
+    border-radius: 10px;
+    padding: 0.7rem 0.8rem;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+  }
+  .explorer-detail .ed-name { font-family: 'Lora', serif; font-weight: 600; font-size: 1.05rem; }
+  .explorer-detail .ed-meta { font-size: 0.78rem; color: var(--ink-soft); margin-top: 0.2rem; }
+  .explorer-detail .ed-view-btn {
+    margin-top: 0.5rem;
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border: 1.5px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 7px;
+    min-height: 40px;
+  }
+  .explorer-detail .ed-close {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    background: none;
+    border: none;
+    padding: 0.2rem 0.4rem;
+  }
+</style>
+</head>
+<body>
+
+<header class="letterhead">
+  <p class="eyebrow">Family Record &middot; Established by descent from Louis &amp; Rose</p>
+  <h1>The Louis and Rose Warshawsky Family Circle</h1>
+  <div class="double-rule"></div>
+  <div class="ledger-stats">
+    As of June 26, 2023 (always subject to edit) &nbsp;&middot;&nbsp;
+    <strong>246</strong> total persons &nbsp;&middot;&nbsp;
+    <strong>166</strong> direct descendants &nbsp;&middot;&nbsp;
+    <strong>80</strong> partners
+  </div>
+</header>
+
+<main>
+  <div class="panel">
+    <label for="search" class="sr-only" style="position:absolute;left:-9999px;">Search the family tree by name</label>
+    <input type="search" id="search" placeholder="Search a name..." autocomplete="off" aria-describedby="search-status">
+    <div id="search-status" role="status" aria-live="polite"></div>
+
+    <div class="chip-row-wrap">
+      <div class="chip-row" id="chip-row" role="group" aria-label="Filter by branch"></div>
+    </div>
+  </div>
+
+  <div class="below-panel">
+    <div class="toolbar">
+      <button id="expand-all" type="button">Expand All</button>
+      <button id="collapse-all" type="button">Collapse All</button>
+    </div>
+    <div class="toolbar">
+      <button id="view-toggle" type="button" class="view-toggle-btn">&#127795; Explorer View</button>
+    </div>
+
+    <button id="relate-toggle" type="button" class="relate-toggle-btn">How are two people related?</button>
+    <button id="quiz-toggle" type="button" class="relate-toggle-btn quiz-toggle-btn">&#127922; Quiz: How Are We Related?</button>
+    <div id="quiz-panel" class="quiz-panel" hidden>
+      <div class="quiz-score">Score: <span id="quiz-score">0</span> / <span id="quiz-total">0</span></div>
+      <div id="quiz-question"></div>
+      <div id="quiz-options" class="quiz-options"></div>
+      <div id="quiz-feedback" class="quiz-feedback"></div>
+      <button id="quiz-next" type="button" class="quiz-next-btn" hidden>Next Question &rarr;</button>
+    </div>
+    <div id="relate-panel" class="relate-panel" hidden>
+      <div class="relate-input-wrap">
+        <label class="relate-label" for="relate-a">Person 1</label>
+        <input type="text" id="relate-a" autocomplete="off" placeholder="Start typing a name...">
+        <div class="relate-dropdown" id="relate-a-dropdown" hidden></div>
+      </div>
+      <div class="relate-input-wrap">
+        <label class="relate-label" for="relate-b">Person 2</label>
+        <input type="text" id="relate-b" autocomplete="off" placeholder="Start typing a name...">
+        <div class="relate-dropdown" id="relate-b-dropdown" hidden></div>
+      </div>
+      <div id="relate-result" class="relate-result"></div>
+    </div>
+
+    <div class="legend-note">
+      <span class="swatch-key"><b>A</b>=Sibling &nbsp;<b>B</b>=1st cousin &nbsp;<b>C</b>=2nd cousin &nbsp;<b>D</b>=3rd cousin &nbsp;<b>E</b>=4th cousin</span>
+      <span class="swatch-key"><span class="q">*</span> inferred, not explicitly confirmed</span>
+      <span class="swatch-key"><span class="flag-unplaced" style="padding:0 0.25rem;">?</span> branch known, exact parent unconfirmed</span>
+      <span class="swatch-key"><span class="ordinal-chip" style="padding:0;">2nd child</span> order as listed in document, not confirmed birth order</span>
+      <span class="swatch-key">&#x270F;&#xFE0F; tap to add a photo, birth/death year, or marriage dates (saved on this device only)</span>
+    </div>
+
+    <button id="print-btn" type="button" class="print-btn-full">Print / Save PDF</button>
+  </div>
+
+  <ul class="tree" id="tree" role="region" aria-label="Family tree"></ul>
+
+  <div id="explorer-wrap" class="explorer-wrap" hidden>
+    <div class="explorer-controls">
+      <button id="explorer-zoom-in" type="button" aria-label="Zoom in">+</button>
+      <button id="explorer-zoom-out" type="button" aria-label="Zoom out">&minus;</button>
+      <button id="explorer-fit" type="button" aria-label="Fit to screen">&#9974;</button>
+    </div>
+    <svg id="explorer-svg" width="100%" height="100%"></svg>
+    <div id="explorer-detail" class="explorer-detail" hidden></div>
+    <p class="explorer-hint">Drag to pan &middot; pinch or scroll to zoom &middot; tap a person for details</p>
+  </div>
+
+  <p class="no-results" id="no-results">No names match your search.</p>
+</main>
+
+<button id="back-to-top" type="button" aria-label="Scroll back to top" hidden>&uarr; Top</button>
+
+<footer>
+  Lineage reconstructed from the original document's color-coding and layout, verified generation by generation with the family historian.
+</footer>
+
+<script>const PEOPLE_DATA = __PEOPLE_DATA_JSON__;</script>
+<script>
+const BRANCH_COLOR = {
+  Henry: 'var(--c-henry)', Dave: 'var(--c-dave)', Jack: 'var(--c-jack)',
+  Bessie: 'var(--c-bessie)', Saul: 'var(--c-saul)', Milt: 'var(--c-milt)',
+  Evelyn: 'var(--c-evelyn)', Sylvia: 'var(--c-sylvia)', Rudy: 'var(--c-rudy)'
+};
+const BRANCH_HEX = {
+  Henry: '#c1440e', Dave: '#0d5c8c', Jack: '#1f7a4d',
+  Bessie: '#8a3f8c', Saul: '#6a4fb5', Milt: '#b8860b',
+  Evelyn: '#1f9489', Sylvia: '#c2287d', Rudy: '#8a5a1e'
+};
+const GEN_LABEL = {
+  A: 'Sibling', B: '1st Cousin', C: '2nd Cousin', D: '3rd Cousin', E: '4th Cousin'
+};
+const BRANCH_ORDER = ['Henry','Dave','Jack','Bessie','Saul','Milt','Evelyn','Sylvia','Rudy'];
+
+const byId = {};
+const childrenOf = {};
+PEOPLE_DATA.forEach(p => {
+  byId[p.id] = p;
+  childrenOf[p.id] = childrenOf[p.id] || [];
+});
+PEOPLE_DATA.forEach(p => {
+  if (p.parent) {
+    childrenOf[p.parent] = childrenOf[p.parent] || [];
+    childrenOf[p.parent].push(p.id);
+  }
+});
+
+function ancestryPath(id) {
+  const path = [];
+  let cur = byId[id];
+  while (cur && cur.parent) {
+    cur = byId[cur.parent];
+    if (cur) path.unshift(cur.name);
+  }
+  return path;
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function copyPersonLink(id, btnEl) {
+  const url = location.href.split('#')[0] + '#person=' + encodeURIComponent(id);
+  const showCopied = () => {
+    btnEl.classList.add('copied');
+    setTimeout(() => btnEl.classList.remove('copied'), 1500);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(showCopied).catch(() => fallbackCopy(url, showCopied));
+  } else {
+    fallbackCopy(url, showCopied);
+  }
+}
+
+function fallbackCopy(text, onDone) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); } catch (e) {}
+  document.body.removeChild(ta);
+  if (onDone) onDone();
+}
+
+function jumpToPerson(id) {
+  const li = document.querySelector('li[data-id="' + id + '"]');
+  if (!li) return false;
+  // expand every ancestor so the target is visible
+  let ancestorUl = li.parentElement;
+  while (ancestorUl && ancestorUl.classList.contains('children')) {
+    ancestorUl.hidden = false;
+    const parentLi = ancestorUl.closest('li.node');
+    if (parentLi) {
+      const parentRow = parentLi.querySelector(':scope > .node-row');
+      if (parentRow && parentRow.hasAttribute('aria-expanded')) setExpanded(parentRow, true);
+    }
+    ancestorUl = parentLi ? parentLi.parentElement : null;
+  }
+  li.classList.add('jump-highlight');
+  setTimeout(() => li.classList.remove('jump-highlight'), 1900);
+  li.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  return true;
+}
+
+function ordinalSuffix(n) {
+  const s = ['th','st','nd','rd'];
+  const v = n % 100;
+  return n + (s[(v-20)%10] || s[v] || s[0]);
+}
+
+function setExpanded(row, expanded) {
+  row.setAttribute('aria-expanded', String(expanded));
+  const caret = row.querySelector('.caret');
+  if (caret) caret.textContent = expanded ? '\u25BE' : '\u25B8';
+}
+
+// ---- Vitals (year born/deceased, marriage dates, photo) ----
+// Stored locally in this browser only (no server/backend exists for this static file).
+const VITALS_PREFIX = 'wfc-vitals-';
+const vitalsStore = {};
+function loadVitalsFromStorage(id) {
+  try {
+    const raw = localStorage.getItem(VITALS_PREFIX + id);
+    if (raw) vitalsStore[id] = JSON.parse(raw);
+  } catch (e) { /* localStorage unavailable; vitals just won't persist */ }
+}
+PEOPLE_DATA.forEach(p => {
+  loadVitalsFromStorage(p.id);
+  (p.partners || []).forEach((_, idx) => loadVitalsFromStorage(p.id + '__p' + idx));
+});
+
+function getVitals(id) {
+  return vitalsStore[id] || {};
+}
+
+function saveVitals(id, data) {
+  vitalsStore[id] = data;
+  try { localStorage.setItem(VITALS_PREFIX + id, JSON.stringify(data)); } catch (e) { /* storage full or unavailable */ }
+}
+
+function resizeImageFile(file, maxDim, callback) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > height && width > maxDim) { height = Math.round(height * maxDim / width); width = maxDim; }
+      else if (height > maxDim) { width = Math.round(width * maxDim / height); height = maxDim; }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      callback(canvas.toDataURL('image/jpeg', 0.85));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ---- Photo crop (pan/zoom) ----
+// Pan is stored as pixel offsets relative to a fixed reference frame size (the crop
+// editor's frame), then scaled proportionally whenever rendered at a different size
+// (e.g. the small ~26px row thumbnail) so the same crop looks consistent everywhere.
+const CROP_REFERENCE_FRAME = 220;
+
+function applyCropTransform(imgEl, vitals, renderedPx) {
+  const zoom = vitals.photoZoom || 1;
+  const panX = vitals.photoPanX || 0;
+  const panY = vitals.photoPanY || 0;
+  const ratio = renderedPx / CROP_REFERENCE_FRAME;
+  imgEl.style.transform = `translate(${panX * ratio}px, ${panY * ratio}px) scale(${zoom})`;
+}
+
+function partnerId(personId, index) {
+  return personId + '__p' + index;
+}
+
+function makePhotoThumb(id, displayName, vitals, sizeClass) {
+  const wrap = document.createElement('span');
+  wrap.className = 'photo-thumb' + (sizeClass ? ' ' + sizeClass : '');
+  wrap.setAttribute('role', 'button');
+  wrap.setAttribute('tabindex', '0');
+  wrap.title = 'View photo';
+  wrap.setAttribute('aria-label', 'View photo of ' + displayName);
+  const img = document.createElement('img');
+  img.src = vitals.photo;
+  img.alt = '';
+  wrap.appendChild(img);
+  applyCropTransform(img, vitals, sizeClass === 'photo-thumb-sm' ? 20 : 26);
+  const open = (e) => { e.stopPropagation(); openPhotoLightbox(id, displayName); };
+  wrap.addEventListener('click', open);
+  wrap.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(e); } });
+  return wrap;
+}
+
+function vitalsLabel(v) {
+  let yearPart = '';
+  if (v.yearBorn && v.yearDeceased) yearPart = `(${v.yearBorn}\u2013${v.yearDeceased})`;
+  else if (v.yearBorn) yearPart = `(b. ${v.yearBorn})`;
+  else if (v.yearDeceased) yearPart = `(d. ${v.yearDeceased})`;
+  return yearPart;
+}
+
+function marriageLabel(v) {
+  if (v.dateMarried && v.dateMarriageEnd) return `m. ${v.dateMarried}\u2013${v.dateMarriageEnd}`;
+  if (v.dateMarried) return `m. ${v.dateMarried}`;
+  return '';
+}
+
+function renderVitalsPanel(id, displayName, container, opts) {
+  opts = opts || {};
+  const v = getVitals(id);
+  const panel = document.createElement('div');
+  panel.className = 'vitals-panel';
+  panel.innerHTML = `
+    <div class="vp-photo-row">
+      <img class="vp-photo-preview" src="${v.photo || ''}" style="${v.photo ? '' : 'display:none;'}">
+      <input type="file" accept="image/*" class="vp-photo-input">
+      ${v.photo ? '<button type="button" class="vp-remove-photo">Remove photo</button>' : ''}
+    </div>
+    <div class="vp-row">
+      <div class="vp-field"><label>Year Born</label><input type="text" class="vp-yearBorn" inputmode="numeric" placeholder="e.g. 1920" value="${escapeHtml(v.yearBorn || '')}"></div>
+      <div class="vp-field"><label>Year Deceased</label><input type="text" class="vp-yearDeceased" inputmode="numeric" placeholder="leave blank if living" value="${escapeHtml(v.yearDeceased || '')}"></div>
+    </div>
+    ${opts.showMarriage ? `
+    <div class="vp-row">
+      <div class="vp-field"><label>Date Married</label><input type="text" class="vp-dateMarried" placeholder="e.g. 1950" value="${escapeHtml(v.dateMarried || '')}"></div>
+      <div class="vp-field"><label>Marriage Ended</label><input type="text" class="vp-dateMarriageEnd" placeholder="if divorced/widowed" value="${escapeHtml(v.dateMarriageEnd || '')}"></div>
+    </div>` : ''}
+    <div class="vp-actions">
+      <button type="button" class="vp-cancel">Cancel</button>
+      <button type="button" class="vp-save">Save</button>
+    </div>
+    <div class="vp-note">Saved on this device/browser only \u2014 not synced or shared with anyone else.</div>
+  `;
+  container.appendChild(panel);
+
+  let pendingPhoto = v.photo || null;
+  let pendingCropReset = false;
+  const photoInput = panel.querySelector('.vp-photo-input');
+  const photoPreview = panel.querySelector('.vp-photo-preview');
+  photoInput.addEventListener('change', () => {
+    const file = photoInput.files[0];
+    if (!file) return;
+    resizeImageFile(file, 640, (dataUrl) => {
+      pendingPhoto = dataUrl;
+      photoPreview.src = dataUrl;
+      photoPreview.style.display = '';
+      pendingCropReset = true;
+    });
+  });
+  const removeBtn = panel.querySelector('.vp-remove-photo');
+  if (removeBtn) {
+    removeBtn.addEventListener('click', () => {
+      pendingPhoto = null;
+      pendingCropReset = true;
+      photoPreview.style.display = 'none';
+      photoPreview.src = '';
+    });
+  }
+  panel.querySelector('.vp-cancel').addEventListener('click', () => panel.remove());
+  panel.querySelector('.vp-save').addEventListener('click', () => {
+    const dateMarriedEl = panel.querySelector('.vp-dateMarried');
+    const dateMarriageEndEl = panel.querySelector('.vp-dateMarriageEnd');
+    const newVitals = {
+      yearBorn: panel.querySelector('.vp-yearBorn').value.trim(),
+      yearDeceased: panel.querySelector('.vp-yearDeceased').value.trim(),
+      dateMarried: dateMarriedEl ? dateMarriedEl.value.trim() : (v.dateMarried || ''),
+      dateMarriageEnd: dateMarriageEndEl ? dateMarriageEndEl.value.trim() : (v.dateMarriageEnd || ''),
+      photo: pendingPhoto,
+      photoZoom: pendingCropReset ? 1 : (v.photoZoom || 1),
+      photoPanX: pendingCropReset ? 0 : (v.photoPanX || 0),
+      photoPanY: pendingCropReset ? 0 : (v.photoPanY || 0),
+    };
+    saveVitals(id, newVitals);
+    panel.remove();
+    if (opts.onSaved) opts.onSaved();
+  });
+}
+
+function buildPartnersElement(person) {
+  const partnersEl = document.createElement('div');
+  partnersEl.className = 'partners';
+  if (!person.partners || !person.partners.length) return partnersEl;
+
+  person.partners.forEach((partnerName, idx) => {
+    if (idx > 0) {
+      const sep = document.createElement('span');
+      sep.className = 'partner-sep';
+      sep.textContent = ' & ';
+      partnersEl.appendChild(sep);
+    }
+    const pid = partnerId(person.id, idx);
+    const pv = getVitals(pid);
+
+    const unit = document.createElement('span');
+    unit.className = 'partner-unit';
+
+    if (pv.photo) {
+      unit.appendChild(makePhotoThumb(pid, partnerName, pv, 'photo-thumb-sm'));
+    }
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'partner-name';
+    nameSpan.dataset.original = partnerName;
+    nameSpan.textContent = partnerName;
+    unit.appendChild(nameSpan);
+
+    const yLabel = vitalsLabel(pv);
+    if (yLabel) {
+      const yEl = document.createElement('span');
+      yEl.className = 'vitals-text';
+      yEl.textContent = ' ' + yLabel;
+      unit.appendChild(yEl);
+    }
+    const mLabel = marriageLabel(pv);
+    if (mLabel) {
+      const mEl = document.createElement('span');
+      mEl.className = 'marriage-text';
+      mEl.textContent = '  (' + mLabel + ')';
+      unit.appendChild(mEl);
+    }
+
+    const editBtn = document.createElement('span');
+    editBtn.className = 'edit-vitals-btn';
+    editBtn.textContent = '\u270F\uFE0F';
+    editBtn.title = 'Add photo or info for ' + partnerName;
+    editBtn.setAttribute('role', 'button');
+    editBtn.setAttribute('tabindex', '0');
+    editBtn.setAttribute('aria-label', 'Edit details for ' + partnerName);
+    const openEdit = (e) => {
+      e.stopPropagation();
+      const already = partnersEl.querySelector(':scope > .vitals-panel[data-for="' + pid + '"]');
+      if (already) { already.remove(); return; }
+      const otherOpen = partnersEl.querySelector(':scope > .vitals-panel');
+      if (otherOpen) otherOpen.remove();
+      const panelHolder = document.createElement('div');
+      panelHolder.className = 'vitals-panel-holder';
+      partnersEl.appendChild(panelHolder);
+      renderVitalsPanel(pid, partnerName, panelHolder, {
+        showMarriage: true,
+        onSaved: () => refreshPartners(person.id),
+      });
+      panelHolder.firstElementChild && panelHolder.firstElementChild.setAttribute('data-for', pid);
+    };
+    editBtn.addEventListener('click', openEdit);
+    editBtn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openEdit(e); } });
+    unit.appendChild(editBtn);
+
+    partnersEl.appendChild(unit);
+  });
+
+  return partnersEl;
+}
+
+function refreshPartners(personId) {
+  const li = document.querySelector('li[data-id="' + personId + '"]');
+  if (!li) return;
+  const row = li.querySelector(':scope > .node-row');
+  const oldPartnersEl = row.querySelector('.partners');
+  const p = byId[personId];
+  const freshPartnersEl = buildPartnersElement(p);
+  if (oldPartnersEl) oldPartnersEl.replaceWith(freshPartnersEl);
+}
+
+function refreshPersonRow(id) {
+  const li = document.querySelector('li[data-id="' + id + '"]');
+  if (!li) return;
+  const row = li.querySelector(':scope > .node-row');
+  const v = getVitals(id);
+  const p = byId[id];
+
+  const existingPhotoEl = row.querySelector(':scope > .photo-thumb');
+  const existingDotEl = row.querySelector(':scope > .dot');
+  if (v.photo) {
+    const freshThumb = makePhotoThumb(id, p.name, v);
+    (existingPhotoEl || existingDotEl).replaceWith(freshThumb);
+  } else if (existingPhotoEl) {
+    const newDot = document.createElement('span');
+    newDot.className = 'dot';
+    existingPhotoEl.replaceWith(newDot);
+  }
+
+  let yearsEl = row.querySelector('.name + .vitals-text');
+  const label = vitalsLabel(v);
+  if (label) {
+    if (!yearsEl) {
+      yearsEl = document.createElement('span');
+      yearsEl.className = 'vitals-text';
+      row.querySelector('.name').insertAdjacentElement('afterend', yearsEl);
+    }
+    yearsEl.textContent = ' ' + label;
+  } else if (yearsEl) {
+    yearsEl.remove();
+  }
+}
+
+// ---- Photo lightbox + recenter/crop editor ----
+function closeLightbox() {
+  const existing = document.querySelector('.lightbox-overlay');
+  if (existing) existing.remove();
+}
+
+function openPhotoLightbox(personId, displayName) {
+  closeLightbox();
+  const v = getVitals(personId);
+  if (!v.photo) return;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'lightbox-overlay';
+  overlay.innerHTML = `
+    <div class="lightbox-card">
+      <div class="lb-name">${escapeHtml(displayName)}</div>
+      <img class="lightbox-photo-full" src="${v.photo}" alt="">
+      <div class="lb-actions">
+        <button type="button" class="lb-close">Close</button>
+        <button type="button" class="lb-recenter">Recenter Photo</button>
+      </div>
+    </div>
+  `;
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeLightbox(); });
+  overlay.querySelector('.lb-close').addEventListener('click', closeLightbox);
+  overlay.querySelector('.lb-recenter').addEventListener('click', () => openCropEditor(personId, displayName));
+  document.body.appendChild(overlay);
+}
+
+function openCropEditor(personId, displayName) {
+  closeLightbox();
+  const v = getVitals(personId);
+  if (!v.photo) return;
+
+  let zoom = v.photoZoom || 1;
+  let panX = v.photoPanX || 0;
+  let panY = v.photoPanY || 0;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'lightbox-overlay';
+  overlay.innerHTML = `
+    <div class="lightbox-card">
+      <div class="lb-name">Recenter ${escapeHtml(displayName)}'s photo</div>
+      <div class="crop-editor-frame">
+        <img class="crop-editor-img" src="${v.photo}" alt="">
+      </div>
+      <div class="crop-hint">Drag the photo to reposition &middot; use the slider to zoom</div>
+      <div class="crop-zoom-row">
+        <span style="font-size:0.75rem;">&minus;</span>
+        <input type="range" class="crop-zoom-slider" min="1" max="3" step="0.05" value="${zoom}">
+        <span style="font-size:0.75rem;">+</span>
+      </div>
+      <div class="lb-actions">
+        <button type="button" class="lb-close vp-cancel-crop">Cancel</button>
+        <button type="button" class="lb-recenter vp-save-crop">Save</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const frame = overlay.querySelector('.crop-editor-frame');
+  const img = overlay.querySelector('.crop-editor-img');
+  const slider = overlay.querySelector('.crop-zoom-slider');
+
+  function render() {
+    img.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+  }
+  render();
+
+  // clamp pan so the image can't be dragged far enough to reveal empty space
+  function clamp() {
+    const maxOffset = CROP_REFERENCE_FRAME * (zoom - 1) / 2;
+    panX = Math.max(-maxOffset, Math.min(maxOffset, panX));
+    panY = Math.max(-maxOffset, Math.min(maxOffset, panY));
+  }
+
+  let dragging = false, startX = 0, startY = 0, startPanX = 0, startPanY = 0;
+  frame.addEventListener('pointerdown', (e) => {
+    dragging = true;
+    try { frame.setPointerCapture(e.pointerId); } catch (err) { /* synthetic or unsupported pointer, ignore */ }
+    startX = e.clientX; startY = e.clientY;
+    startPanX = panX; startPanY = panY;
+  });
+  frame.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    panX = startPanX + (e.clientX - startX);
+    panY = startPanY + (e.clientY - startY);
+    clamp();
+    render();
+  });
+  const endDrag = () => { dragging = false; };
+  frame.addEventListener('pointerup', endDrag);
+  frame.addEventListener('pointercancel', endDrag);
+  frame.addEventListener('pointerleave', endDrag);
+
+  slider.addEventListener('input', () => {
+    zoom = parseFloat(slider.value);
+    clamp();
+    render();
+  });
+
+  overlay.querySelector('.vp-cancel-crop').addEventListener('click', () => openPhotoLightbox(personId, displayName));
+  overlay.querySelector('.vp-save-crop').addEventListener('click', () => {
+    const updated = Object.assign({}, getVitals(personId), { photoZoom: zoom, photoPanX: panX, photoPanY: panY });
+    saveVitals(personId, updated);
+    refreshAfterVitalsChange(personId);
+    closeLightbox();
+  });
+}
+
+function refreshAfterVitalsChange(id) {
+  if (byId[id]) {
+    refreshPersonRow(id);
+  } else {
+    // partner pseudo-ids look like `${ownerPersonId}__p${index}`
+    refreshPartners(id.split('__p')[0]);
+  }
+}
+
+
+function buildNode(id, depth, siblingIndex, siblingCount) {
+  const p = byId[id];
+  const kids = childrenOf[id] || [];
+  const hasKids = kids.length > 0;
+
+  const li = document.createElement('li');
+  li.className = 'node gen-' + p.generation.toLowerCase();
+  li.dataset.id = id;
+  li.dataset.branch = p.branch;
+  li.dataset.search = (p.name + ' ' + (p.partners||[]).join(' ')).toLowerCase();
+
+  const row = document.createElement(hasKids ? 'button' : 'div');
+  row.className = 'node-row' + (p.generation === 'A' ? ' gen-a' : '');
+  if (hasKids) {
+    row.setAttribute('aria-expanded', depth === 0 ? 'false' : 'false');
+    row.setAttribute('aria-controls', 'kids-' + id);
+  }
+
+  const caret = document.createElement('span');
+  if (hasKids) {
+    caret.className = 'caret';
+    caret.textContent = '\u25B8';
+    caret.setAttribute('aria-hidden', 'true');
+  } else {
+    caret.className = 'leaf-marker';
+    caret.textContent = '\u2014';
+    caret.setAttribute('aria-hidden', 'true');
+    caret.title = 'No children recorded';
+  }
+  row.appendChild(caret);
+
+  const dot = document.createElement('span');
+  dot.className = 'dot';
+  row.appendChild(dot);
+
+
+  const wrap = document.createElement('span');
+  wrap.className = 'label-wrap';
+
+  const nameLine = document.createElement('div');
+  nameLine.style.display = 'flex';
+  nameLine.style.alignItems = 'baseline';
+  nameLine.style.gap = '0.35rem';
+  nameLine.style.flexWrap = 'wrap';
+
+  const nameEl = document.createElement('span');
+  nameEl.className = 'name';
+  nameEl.dataset.original = p.name;
+  nameEl.textContent = p.name;
+  nameLine.appendChild(nameEl);
+
+  if (hasKids) {
+    const countEl = document.createElement('span');
+    countEl.className = 'child-count';
+    countEl.textContent = kids.length + (kids.length === 1 ? ' child' : ' children');
+    nameLine.appendChild(countEl);
+  } else {
+    const noKidsEl = document.createElement('span');
+    noKidsEl.className = 'child-count no-children';
+    noKidsEl.textContent = 'no children listed';
+    nameLine.appendChild(noKidsEl);
+  }
+  wrap.appendChild(nameLine);
+
+  wrap.appendChild(buildPartnersElement(p));
+
+  const meta = document.createElement('div');
+  meta.className = 'meta-row';
+  const genChip = document.createElement('span');
+  genChip.className = 'gen-chip';
+  genChip.textContent = p.generation;
+  genChip.title = GEN_LABEL[p.generation] || '';
+  meta.appendChild(genChip);
+
+  if (p.confidence === 'assumed_order' || p.confidence === 'assumed_gap') {
+    const flag = document.createElement('span');
+    flag.className = 'flag-assumed';
+    flag.textContent = '*';
+    flag.title = 'Inferred from list order or spacing in the original document, not explicitly confirmed';
+    meta.appendChild(flag);
+  }
+  if (p.confidence === 'unplaced') {
+    const flag = document.createElement('span');
+    flag.className = 'flag-unplaced';
+    flag.textContent = '?';
+    flag.title = 'Belongs to this branch by position in the document, but exact parent is unconfirmed';
+    meta.appendChild(flag);
+  }
+  if (p.generation !== 'A' && siblingCount > 1) {
+    const ord = document.createElement('span');
+    ord.className = 'ordinal-chip';
+    ord.textContent = ordinalSuffix(siblingIndex + 1) + ' child';
+    ord.title = 'Listed as the ' + ordinalSuffix(siblingIndex + 1) + ' of ' + siblingCount + ' children in the original document — not confirmed as actual birth order';
+    meta.appendChild(ord);
+  }
+  const shareBtn = document.createElement('span');
+  shareBtn.className = 'share-link-btn';
+  shareBtn.textContent = '\uD83D\uDD17';
+  shareBtn.title = 'Copy a direct link to ' + p.name;
+  shareBtn.setAttribute('role', 'button');
+  shareBtn.setAttribute('tabindex', '0');
+  shareBtn.setAttribute('aria-label', 'Copy a direct link to ' + p.name);
+  shareBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    copyPersonLink(p.id, shareBtn);
+  });
+  shareBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      e.stopPropagation();
+      copyPersonLink(p.id, shareBtn);
+    }
+  });
+  meta.appendChild(shareBtn);
+
+  const editBtn = document.createElement('span');
+  editBtn.className = 'edit-vitals-btn';
+  editBtn.textContent = '\uD83D\uDD17'.length ? '\u270F\uFE0F' : '\u270F\uFE0F';
+  editBtn.title = 'Add photo, birth/death year, or marriage dates for ' + p.name;
+  editBtn.setAttribute('role', 'button');
+  editBtn.setAttribute('tabindex', '0');
+  editBtn.setAttribute('aria-label', 'Edit details for ' + p.name);
+  const openVitalsEditor = (e) => {
+    e.stopPropagation();
+    const existing = wrap.querySelector(':scope > .vitals-panel');
+    if (existing) { existing.remove(); return; }
+    renderVitalsPanel(p.id, p.name, wrap, { showMarriage: false, onSaved: () => refreshPersonRow(p.id) });
+  };
+  editBtn.addEventListener('click', openVitalsEditor);
+  editBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openVitalsEditor(e); }
+  });
+  meta.appendChild(editBtn);
+  wrap.appendChild(meta);
+
+  const breadcrumb = document.createElement('div');
+  breadcrumb.className = 'breadcrumb';
+  breadcrumb.style.display = 'none';
+  wrap.appendChild(breadcrumb);
+
+  row.appendChild(wrap);
+  li.appendChild(row);
+
+  // apply any vitals already saved from a previous visit (own photo / years)
+  // partner photos, years, and marriage dates are already included via buildPartnersElement above
+  const existingVitals = getVitals(p.id);
+  if (existingVitals.photo) {
+    const photoEl = makePhotoThumb(p.id, p.name, existingVitals);
+    dot.replaceWith(photoEl);
+  }
+  const initialYearsLabel = vitalsLabel(existingVitals);
+  if (initialYearsLabel) {
+    const yearsEl = document.createElement('span');
+    yearsEl.className = 'vitals-text';
+    yearsEl.textContent = ' ' + initialYearsLabel;
+    nameEl.insertAdjacentElement('afterend', yearsEl);
+  }
+
+  if (hasKids) {
+    const childUl = document.createElement('ul');
+    const firstChildGen = byId[kids[0]].generation;
+    childUl.className = 'children level-' + firstChildGen;
+    childUl.id = 'kids-' + id;
+    childUl.hidden = true;
+    kids.forEach((kid, idx) => childUl.appendChild(buildNode(kid, depth + 1, idx, kids.length)));
+    li.appendChild(childUl);
+
+    row.addEventListener('click', () => {
+      const expanded = row.getAttribute('aria-expanded') === 'true';
+      setExpanded(row, !expanded);
+      childUl.hidden = expanded;
+    });
+  }
+
+  return li;
+}
+
+const treeEl = document.getElementById('tree');
+const roots = PEOPLE_DATA.filter(p => p.generation === 'A');
+roots.sort((a,b) => BRANCH_ORDER.indexOf(a.branch) - BRANCH_ORDER.indexOf(b.branch));
+roots.forEach(r => {
+  const li = buildNode(r.id, 0, 0, 1);
+  li.style.setProperty('--branch-color', BRANCH_COLOR[r.branch]);
+  treeEl.appendChild(li);
+});
+
+// ---- Branch filter chips ----
+const chipRow = document.getElementById('chip-row');
+let activeBranch = null;
+
+function makeChip(label, branchKey) {
+  const chip = document.createElement('button');
+  chip.type = 'button';
+  chip.className = 'chip';
+  chip.setAttribute('aria-pressed', 'false');
+  if (branchKey) chip.style.setProperty('--chip-color', BRANCH_HEX[branchKey]);
+  const dot = document.createElement('span');
+  dot.className = 'dot';
+  if (!branchKey) dot.style.background = 'var(--ink-soft)';
+  chip.appendChild(dot);
+  const txt = document.createElement('span');
+  txt.textContent = label;
+  chip.appendChild(txt);
+  chip.addEventListener('click', () => setBranchFilter(branchKey));
+  return chip;
+}
+
+const allChip = makeChip('All', null);
+allChip.setAttribute('aria-pressed', 'true');
+chipRow.appendChild(allChip);
+BRANCH_ORDER.forEach(b => chipRow.appendChild(makeChip(b, b)));
+
+function setBranchFilter(branchKey) {
+  activeBranch = branchKey;
+  Array.from(chipRow.children).forEach(chip => {
+    const label = chip.querySelector('span:last-child').textContent;
+    chip.setAttribute('aria-pressed', String(label === (branchKey || 'All')));
+  });
+  document.querySelectorAll('ul.tree > li.node').forEach(li => {
+    const show = !branchKey || li.dataset.branch === branchKey;
+    li.classList.toggle('hidden-by-filter', !show);
+    if (branchKey && show) {
+      // auto-expand the chosen branch fully
+      li.querySelectorAll('.node-row[aria-expanded]').forEach(row => setExpanded(row, true));
+      li.querySelectorAll('ul.children').forEach(ul => ul.hidden = false);
+      const ownRow = li.querySelector(':scope > .node-row');
+      if (ownRow && ownRow.hasAttribute('aria-expanded')) setExpanded(ownRow, true);
+      const ownUl = li.querySelector(':scope > ul.children');
+      if (ownUl) ownUl.hidden = false;
+    }
+  });
+  runSearch();
+  syncExplorerFilter(branchKey);
+}
+
+function syncExplorerFilter(branchKey) {
+  if (!explorerBuilt) return;
+  document.querySelectorAll('#explorer-svg circle, #explorer-svg text, #explorer-svg path').forEach(el => {
+    const match = !branchKey || el.dataset.branch === branchKey || el.dataset.branch === '__apex__';
+    el.style.opacity = match ? '1' : '0.08';
+  });
+  if (branchKey) {
+    const rootPerson = roots.find(r => r.branch === branchKey);
+    if (rootPerson && explorerPositions[rootPerson.id]) {
+      const wrap = document.getElementById('explorer-wrap');
+      const w = wrap.clientWidth;
+      const pos = explorerPositions[rootPerson.id];
+      explorerTx = w / 2 - pos.x * NODE_SPACING_X * explorerScale;
+      explorerTy = 30 - pos.y * NODE_SPACING_Y * explorerScale;
+      applyExplorerTransform();
+    }
+  }
+}
+
+// ---- Expand / Collapse all ----
+document.getElementById('expand-all').addEventListener('click', () => {
+  document.querySelectorAll('.node-row[aria-expanded]').forEach(row => setExpanded(row, true));
+  document.querySelectorAll('ul.children').forEach(ul => ul.hidden = false);
+});
+document.getElementById('collapse-all').addEventListener('click', () => {
+  document.querySelectorAll('.node-row[aria-expanded]').forEach(row => setExpanded(row, false));
+  document.querySelectorAll('ul.children').forEach(ul => ul.hidden = true);
+});
+
+// ---- Search ----
+const searchInput = document.getElementById('search');
+const searchStatus = document.getElementById('search-status');
+const noResults = document.getElementById('no-results');
+
+function highlight(el, query) {
+  const original = el.dataset.original;
+  if (!original) return;
+  if (!query) { el.textContent = original; return; }
+  const re = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'ig');
+  el.innerHTML = escapeHtml(original).replace(re, m => `<mark>${m}</mark>`);
+}
+
+function runSearch() {
+  const query = searchInput.value.trim().toLowerCase();
+  const allLis = document.querySelectorAll('li.node');
+
+  // Pass 1: find direct matches
+  const matchedIds = new Set();
+  if (query) {
+    allLis.forEach(li => {
+      if (li.dataset.search.includes(query)) matchedIds.add(li.dataset.id);
+    });
+  }
+
+  // Pass 2: collect every ancestor id of every match, so they stay visible too
+  const keepVisible = new Set(matchedIds);
+  matchedIds.forEach(id => {
+    let cur = byId[id];
+    while (cur && cur.parent) {
+      keepVisible.add(cur.parent);
+      cur = byId[cur.parent];
+    }
+  });
+
+  let visibleCount = 0;
+
+  allLis.forEach(li => {
+    const id = li.dataset.id;
+    const isMatch = matchedIds.has(id);
+    const shouldShow = !query || keepVisible.has(id);
+    li.classList.toggle('hidden-by-search', !shouldShow);
+
+    const nameEl = li.querySelector(':scope > .node-row .name');
+    const partnerNameEls = li.querySelectorAll(':scope > .node-row .partner-name');
+    const breadcrumb = li.querySelector(':scope > .node-row .breadcrumb');
+
+    // Only highlight text on actual matches, not ancestors shown just for context
+    if (nameEl) highlight(nameEl, isMatch ? query : '');
+    partnerNameEls.forEach(el => highlight(el, isMatch ? query : ''));
+
+    if (query && isMatch && !li.classList.contains('hidden-by-filter')) {
+      visibleCount++;
+      // expand this node's own children container if present, and all ancestors
+      const ownUl = li.querySelector(':scope > ul.children');
+      if (ownUl) {
+        ownUl.hidden = false;
+        const ownRow = li.querySelector(':scope > .node-row');
+        if (ownRow && ownRow.hasAttribute('aria-expanded')) setExpanded(ownRow, true);
+      }
+      let ancestorUl = li.parentElement;
+      while (ancestorUl && ancestorUl.classList.contains('children')) {
+        ancestorUl.hidden = false;
+        const parentLi = ancestorUl.closest('li.node');
+        if (parentLi) {
+          const parentRow = parentLi.querySelector(':scope > .node-row');
+          if (parentRow && parentRow.hasAttribute('aria-expanded')) setExpanded(parentRow, true);
+        }
+        ancestorUl = parentLi ? parentLi.parentElement : null;
+      }
+      if (breadcrumb) {
+        const path = ancestryPath(id);
+        if (path.length) {
+          breadcrumb.textContent = path.join(' \u203A ') + ' \u203A';
+          breadcrumb.style.display = 'block';
+        }
+      }
+    } else if (breadcrumb) {
+      breadcrumb.style.display = 'none';
+    }
+  });
+
+  if (query) {
+    searchStatus.textContent = visibleCount === 0 ? 'No matches found.' : `${visibleCount} match${visibleCount===1?'':'es'} found.`;
+    noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+  } else {
+    searchStatus.textContent = '';
+    noResults.style.display = 'none';
+  }
+}
+
+searchInput.addEventListener('input', runSearch);
+
+// ---- Print ----
+document.getElementById('print-btn').addEventListener('click', () => {
+  searchInput.value = '';
+  runSearch();
+  setBranchFilter(null);
+  document.querySelectorAll('.node-row[aria-expanded]').forEach(row => setExpanded(row, true));
+  document.querySelectorAll('ul.children').forEach(ul => ul.hidden = false);
+  setTimeout(() => window.print(), 100);
+});
+
+// ---- Relationship finder ----
+const VIRTUAL_ROOT = '__louis_and_rose__';
+const VIRTUAL_ROOT_NAME = 'Louis & Rose';
+
+function ancestorChain(id) {
+  // [id, parent, grandparent, ..., founding sibling, VIRTUAL_ROOT]
+  const chain = [id];
+  let cur = byId[id];
+  while (cur && cur.parent) {
+    chain.push(cur.parent);
+    cur = byId[cur.parent];
+  }
+  chain.push(VIRTUAL_ROOT);
+  return chain;
+}
+
+function findLCA(idA, idB) {
+  const chainA = ancestorChain(idA);
+  const chainB = ancestorChain(idB);
+  const indexInB = new Map(chainB.map((id, i) => [id, i]));
+  for (let i = 0; i < chainA.length; i++) {
+    if (indexInB.has(chainA[i])) {
+      return { lcaId: chainA[i], depthA: i, depthB: indexInB.get(chainA[i]) };
+    }
+  }
+  return null; // should not happen, virtual root always matches
+}
+
+function nameOf(id) {
+  return id === VIRTUAL_ROOT ? VIRTUAL_ROOT_NAME : byId[id].name;
+}
+
+function greatPrefix(n) {
+  return n > 0 ? 'great-'.repeat(n) : '';
+}
+
+function directLineageLabel(n) {
+  if (n === 1) return { up: 'parent', down: 'child' };
+  return { up: greatPrefix(n - 2) + 'grandparent', down: greatPrefix(n - 2) + 'grandchild' };
+}
+
+function auntUncleLabel(n) {
+  return { up: greatPrefix(n - 2) + 'aunt/uncle', down: greatPrefix(n - 2) + 'niece/nephew' };
+}
+
+function cousinLabel(m, n) {
+  const degree = m - 1;
+  const removed = n - m;
+  let label = ordinalSuffix(degree) + ' cousins';
+  if (removed > 0) label += `, ${removed} time${removed>1?'s':''} removed`;
+  return label;
+}
+
+function titleCase(s) {
+  return s.split(/([\s\/-])/).map(part => /[\s\/-]/.test(part) ? part : (part.charAt(0).toUpperCase() + part.slice(1))).join('');
+}
+
+function relationLabel(m, n) {
+  if (m === 0 && n === 0) return 'Same Person';
+  if (m === 0) {
+    const { up, down } = directLineageLabel(n);
+    return titleCase(up) + ' / ' + titleCase(down);
+  }
+  if (m === 1 && n === 1) return 'Siblings';
+  if (m === 1) {
+    const { up, down } = auntUncleLabel(n);
+    return titleCase(up) + ' & ' + titleCase(down);
+  }
+  return titleCase(cousinLabel(m, n));
+}
+
+function pathNames(id, lcaId) {
+  const names = [];
+  let cur = id;
+  while (true) {
+    names.push(nameOf(cur));
+    if (cur === lcaId) break;
+    cur = (cur === VIRTUAL_ROOT) ? null : (byId[cur].parent || VIRTUAL_ROOT);
+    if (!cur) break;
+  }
+  return names;
+}
+
+function describeRelationship(idA, idB) {
+  const nameA = nameOf(idA), nameB = nameOf(idB);
+  if (idA === idB) {
+    return { headline: 'That\u2019s the same person!', pathA: [nameA], pathB: [nameB], lca: nameA };
+  }
+  const { lcaId, depthA, depthB } = findLCA(idA, idB);
+  const m = Math.min(depthA, depthB);
+  const n = Math.max(depthA, depthB);
+  let headline;
+
+  if (m === 0) {
+    const { up, down } = directLineageLabel(n);
+    headline = (depthA === 0)
+      ? `${nameA} is ${nameB}\u2019s ${up} &mdash; ${nameB} is ${nameA}\u2019s ${down}.`
+      : `${nameB} is ${nameA}\u2019s ${up} &mdash; ${nameA} is ${nameB}\u2019s ${down}.`;
+  } else if (m === 1 && n === 1) {
+    headline = `${nameA} and ${nameB} are siblings.`;
+  } else if (m === 1) {
+    const { up, down } = auntUncleLabel(n);
+    headline = (depthA < depthB)
+      ? `${nameA} is ${nameB}\u2019s ${up} &mdash; ${nameB} is ${nameA}\u2019s ${down}.`
+      : `${nameB} is ${nameA}\u2019s ${up} &mdash; ${nameA} is ${nameB}\u2019s ${down}.`;
+  } else {
+    headline = `${nameA} and ${nameB} are ${cousinLabel(m, n)}.`;
+  }
+
+  const caveats = [];
+  [idA, idB].forEach(id => {
+    if (id !== VIRTUAL_ROOT && byId[id].confidence) caveats.push(nameOf(id));
+  });
+
+  return {
+    headline,
+    pathA: pathNames(idA, lcaId),
+    pathB: pathNames(idB, lcaId),
+    lca: nameOf(lcaId),
+    viaFounders: lcaId === VIRTUAL_ROOT,
+    caveats
+  };
+}
+
+// ---- Relationship finder UI wiring ----
+const relateToggle = document.getElementById('relate-toggle');
+const relatePanel = document.getElementById('relate-panel');
+relateToggle.addEventListener('click', () => { relatePanel.hidden = !relatePanel.hidden; });
+
+function personContext(p) {
+  const parentName = p.parent ? byId[p.parent].name : null;
+  return parentName ? `child of ${parentName} \u2022 ${p.branch} branch` : `${p.branch} branch founder`;
+}
+
+function wireRelateInput(inputId, dropdownId, onSelect) {
+  const input = document.getElementById(inputId);
+  const dropdown = document.getElementById(dropdownId);
+  let selectedId = null;
+
+  input.addEventListener('input', () => {
+    selectedId = null;
+    onSelect(null);
+    const q = input.value.trim().toLowerCase();
+    dropdown.innerHTML = '';
+    if (!q) { dropdown.hidden = true; return; }
+    const matches = PEOPLE_DATA.filter(p => p.name.toLowerCase().includes(q)).slice(0, 8);
+    if (!matches.length) { dropdown.hidden = true; return; }
+    matches.forEach(p => {
+      const opt = document.createElement('button');
+      opt.type = 'button';
+      opt.className = 'relate-option';
+      opt.innerHTML = `${escapeHtml(p.name)}<span class="ro-context">${escapeHtml(personContext(p))}</span>`;
+      opt.addEventListener('click', () => {
+        input.value = p.name;
+        selectedId = p.id;
+        dropdown.hidden = true;
+        onSelect(p.id);
+      });
+      dropdown.appendChild(opt);
+    });
+    dropdown.hidden = false;
+  });
+  input.addEventListener('blur', () => setTimeout(() => { dropdown.hidden = true; }, 150));
+  return () => selectedId;
+}
+
+let relateA = null, relateB = null;
+const getA = wireRelateInput('relate-a', 'relate-a-dropdown', (id) => { relateA = id; computeRelationship(); });
+const getB = wireRelateInput('relate-b', 'relate-b-dropdown', (id) => { relateB = id; computeRelationship(); });
+
+function computeRelationship() {
+  const resultEl = document.getElementById('relate-result');
+  if (!relateA || !relateB) { resultEl.innerHTML = ''; return; }
+  const r = describeRelationship(relateA, relateB);
+  let html = `<div class="rr-headline">${r.headline}</div>`;
+  if (r.pathA && r.pathA.length > 1) {
+    html += `<div class="relate-path">${r.pathA.map((n,i)=> i===r.pathA.length-1 ? `<span class="lca-name">${escapeHtml(n)}</span>` : escapeHtml(n)).join(' \u2192 ')}</div>`;
+    html += `<div class="relate-path">${r.pathB.map((n,i)=> i===r.pathB.length-1 ? `<span class="lca-name">${escapeHtml(n)}</span>` : escapeHtml(n)).join(' \u2192 ')}</div>`;
+  }
+  if (r.viaFounders) {
+    html += `<div class="relate-path">Common ancestor shown as <span class="lca-name">Louis &amp; Rose</span> &mdash; the founders this whole circle is named for.</div>`;
+  }
+  if (r.caveats && r.caveats.length) {
+    html += `<div class="relate-caveat">Note: ${r.caveats.join(' and ')}'s exact placement in the tree is unconfirmed (see "Needs Review"), so this relationship is a best estimate.</div>`;
+  }
+  resultEl.innerHTML = html;
+}
+
+// ---- Quiz mode: How Are We Related? ----
+const quizToggle = document.getElementById('quiz-toggle');
+const quizPanel = document.getElementById('quiz-panel');
+const quizQuestionEl = document.getElementById('quiz-question');
+const quizOptionsEl = document.getElementById('quiz-options');
+const quizFeedbackEl = document.getElementById('quiz-feedback');
+const quizNextBtn = document.getElementById('quiz-next');
+const quizScoreEl = document.getElementById('quiz-score');
+const quizTotalEl = document.getElementById('quiz-total');
+
+let quizScore = 0, quizTotal = 0;
+let currentQuiz = null;
+
+quizToggle.addEventListener('click', () => {
+  quizPanel.hidden = !quizPanel.hidden;
+  if (!quizPanel.hidden && !currentQuiz) nextQuizQuestion();
+});
+
+function pickRandomPair() {
+  const ids = PEOPLE_DATA.map(p => p.id);
+  let idA = ids[Math.floor(Math.random() * ids.length)];
+  let idB = ids[Math.floor(Math.random() * ids.length)];
+  let guard = 0;
+  while (idB === idA && guard++ < 20) {
+    idB = ids[Math.floor(Math.random() * ids.length)];
+  }
+  return [idA, idB];
+}
+
+function generateDistractors(m, n, correctLabel) {
+  const near = [];
+  const tryAdd = (mm, nn) => {
+    if (mm < 0 || nn < mm) return;
+    const lbl = relationLabel(mm, nn);
+    if (lbl !== correctLabel && !near.includes(lbl)) near.push(lbl);
+  };
+  tryAdd(m - 1, n); tryAdd(m + 1, n); tryAdd(m, n - 1); tryAdd(m, n + 1);
+  tryAdd(m - 1, n - 1); tryAdd(m + 1, n + 1); tryAdd(m, n + 2);
+  if (near.length < 3) {
+    const pool = ['Siblings', '1st Cousins', '2nd Cousins', 'Parent / Child', 'Grandparent / Grandchild',
+                  'Aunt/Uncle & Niece/Nephew', '3rd Cousins', '1st Cousins, Once Removed', 'Great-Grandparent / Great-Grandchild'];
+    pool.forEach(p => { if (p !== correctLabel && !near.includes(p)) near.push(p); });
+  }
+  const shuffled = near.slice();
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.slice(0, 3);
+}
+
+function nextQuizQuestion() {
+  quizFeedbackEl.innerHTML = '';
+  quizFeedbackEl.className = 'quiz-feedback';
+  quizNextBtn.hidden = true;
+
+  const [idA, idB] = pickRandomPair();
+  const { lcaId, depthA, depthB } = findLCA(idA, idB);
+  const m = Math.min(depthA, depthB), n = Math.max(depthA, depthB);
+  const correctLabel = relationLabel(m, n);
+  const distractors = generateDistractors(m, n, correctLabel);
+  const options = [correctLabel, ...distractors];
+  for (let i = options.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [options[i], options[j]] = [options[j], options[i]];
+  }
+
+  currentQuiz = { idA, idB, lcaId, depthA, depthB, correctLabel };
+
+  const pA = byId[idA], pB = byId[idB];
+  quizQuestionEl.innerHTML = `
+    <div class="quiz-names">
+      <span class="quiz-dot" style="background:${BRANCH_HEX[pA.branch]}"></span>${escapeHtml(pA.name)}
+      &nbsp;&amp;&nbsp;
+      <span class="quiz-dot" style="background:${BRANCH_HEX[pB.branch]}"></span>${escapeHtml(pB.name)}
+    </div>
+    <div class="quiz-context">${escapeHtml(pA.branch)} branch &nbsp;&middot;&nbsp; ${escapeHtml(pB.branch)} branch</div>
+    <div class="quiz-prompt">How are they related?</div>
+  `;
+
+  quizOptionsEl.innerHTML = '';
+  options.forEach(label => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'quiz-option-btn';
+    btn.textContent = label;
+    btn.addEventListener('click', () => answerQuiz(label, btn));
+    quizOptionsEl.appendChild(btn);
+  });
+}
+
+function answerQuiz(chosenLabel, btnEl) {
+  if (!currentQuiz) return;
+  const { idA, idB, lcaId, correctLabel } = currentQuiz;
+  const isCorrect = chosenLabel === correctLabel;
+
+  quizTotal++;
+  if (isCorrect) quizScore++;
+  quizScoreEl.textContent = quizScore;
+  quizTotalEl.textContent = quizTotal;
+
+  Array.from(quizOptionsEl.children).forEach(btn => {
+    btn.disabled = true;
+    if (btn.textContent === correctLabel) btn.classList.add('correct');
+    else if (btn === btnEl) btn.classList.add('incorrect');
+  });
+
+  const pathA = pathNames(idA, lcaId);
+  const pathB = pathNames(idB, lcaId);
+  quizFeedbackEl.className = 'quiz-feedback ' + (isCorrect ? 'correct' : 'incorrect');
+  quizFeedbackEl.innerHTML = `
+    <div class="qf-headline">${isCorrect ? '\u2713 Correct!' : '\u2717 Not quite \u2014 the answer is ' + escapeHtml(correctLabel) + '.'}</div>
+    <div class="relate-path">${pathA.map((n,i)=> i===pathA.length-1 ? `<span class="lca-name">${escapeHtml(n)}</span>` : escapeHtml(n)).join(' \u2192 ')}</div>
+    <div class="relate-path">${pathB.map((n,i)=> i===pathB.length-1 ? `<span class="lca-name">${escapeHtml(n)}</span>` : escapeHtml(n)).join(' \u2192 ')}</div>
+  `;
+  quizNextBtn.hidden = false;
+}
+
+quizNextBtn.addEventListener('click', nextQuizQuestion);
+
+// ---- Back to top ----
+const backToTop = document.getElementById('back-to-top');
+window.addEventListener('scroll', () => {
+  backToTop.hidden = window.scrollY < 600;
+});
+backToTop.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// ---- Explorer view: visual branching diagram ----
+const GEN_DEPTH = { A: 0, B: 1, C: 2, D: 3, E: 4 };
+const LEVEL_TINT = { A: 0, B: 0, C: 22, D: 42, E: 58 }; // % white mixed in, by depth
+const NODE_SPACING_X = 46;
+const NODE_SPACING_Y = 92;
+
+function lighten(hex, pct) {
+  return `color-mix(in srgb, ${hex} ${100 - pct}%, white)`;
+}
+
+let explorerBuilt = false;
+let explorerPositions = {};
+let explorerViewBox = { x: 0, y: 0, w: 100, h: 100 };
+let explorerScale = 1, explorerTx = 0, explorerTy = 0;
+
+const EXPLORER_ROOT_ID = '__louis_rose_explorer__';
+const EXPLORER_ROOT_NAME = 'Louis & Rose Warshawsky';
+
+function computeExplorerLayout() {
+  const positions = {};
+  let nextX = 0;
+  function layout(id, depth) {
+    const kids = childrenOf[id] || [];
+    if (kids.length === 0) {
+      const x = nextX++;
+      positions[id] = { x, y: depth };
+      return x;
+    }
+    const childXs = kids.map(k => layout(k, depth + 1));
+    const x = (Math.min(...childXs) + Math.max(...childXs)) / 2;
+    positions[id] = { x, y: depth };
+    return x;
+  }
+  // shift the 9 branch roots down one level to make room for Louis & Rose above them
+  const rootXs = roots.map(r => { const x = layout(r.id, 1); nextX += 1; return x; });
+  const apexX = (Math.min(...rootXs) + Math.max(...rootXs)) / 2;
+  positions[EXPLORER_ROOT_ID] = { x: apexX, y: 0 };
+  return positions;
+}
+
+function buildExplorer() {
+  if (explorerBuilt) return;
+  explorerBuilt = true;
+  explorerPositions = computeExplorerLayout();
+
+  const svg = document.getElementById('explorer-svg');
+  const ns = 'http://www.w3.org/2000/svg';
+  const g = document.createElementNS(ns, 'g');
+  g.setAttribute('id', 'explorer-viewport');
+  svg.appendChild(g);
+
+  const edgesG = document.createElementNS(ns, 'g');
+  const nodesG = document.createElementNS(ns, 'g');
+  g.appendChild(edgesG);
+  g.appendChild(nodesG);
+
+  let maxX = 0, maxY = 0;
+  PEOPLE_DATA.forEach(p => {
+    const pos = explorerPositions[p.id];
+    if (!pos) return;
+    maxX = Math.max(maxX, pos.x);
+    maxY = Math.max(maxY, pos.y);
+
+    const px = pos.x * NODE_SPACING_X;
+    const py = pos.y * NODE_SPACING_Y + 30;
+    const branchHex = BRANCH_HEX[p.branch];
+    const tint = LEVEL_TINT[p.generation] || 0;
+    const color = tint === 0 ? branchHex : lighten(branchHex, tint);
+
+    if (p.parent) {
+      const ppos = explorerPositions[p.parent];
+      if (ppos) {
+        const ppx = ppos.x * NODE_SPACING_X;
+        const ppy = ppos.y * NODE_SPACING_Y + 30;
+        const path = document.createElementNS(ns, 'path');
+        const midY = (ppy + py) / 2;
+        path.setAttribute('d', `M ${ppx} ${ppy} C ${ppx} ${midY}, ${px} ${midY}, ${px} ${py}`);
+        path.setAttribute('fill', 'none');
+        path.setAttribute('stroke', color);
+        path.setAttribute('stroke-width', Math.max(1.2, 3.2 - GEN_DEPTH[p.generation] * 0.45));
+        path.dataset.branch = p.branch;
+        edgesG.appendChild(path);
+      }
+    }
+
+    const circle = document.createElementNS(ns, 'circle');
+    circle.setAttribute('cx', px);
+    circle.setAttribute('cy', py);
+    circle.setAttribute('r', p.generation === 'A' ? 7 : 5);
+    circle.setAttribute('fill', color);
+    circle.setAttribute('stroke', '#fff');
+    circle.setAttribute('stroke-width', 1.2);
+    circle.dataset.id = p.id;
+    circle.dataset.branch = p.branch;
+    circle.style.cursor = 'pointer';
+    circle.addEventListener('click', (e) => { e.stopPropagation(); selectExplorerNode(p.id); });
+    nodesG.appendChild(circle);
+
+    const label = document.createElementNS(ns, 'text');
+    label.setAttribute('x', px);
+    label.setAttribute('y', py - 10);
+    label.setAttribute('text-anchor', 'middle');
+    label.setAttribute('font-size', p.generation === 'A' ? 11 : 8.5);
+    label.setAttribute('font-family', 'Inter, sans-serif');
+    label.setAttribute('font-weight', p.generation === 'A' ? 700 : 500);
+    label.setAttribute('fill', '#23262b');
+    label.style.pointerEvents = 'none';
+    label.dataset.branch = p.branch;
+    label.textContent = p.name;
+    nodesG.appendChild(label);
+  });
+
+  explorerViewBox = { minX: -NODE_SPACING_X, minY: 0, maxX: maxX * NODE_SPACING_X + NODE_SPACING_X, maxY: maxY * NODE_SPACING_Y + 80 };
+
+  // ---- Louis & Rose: the apex connecting all 9 branches ----
+  const apexPos = explorerPositions[EXPLORER_ROOT_ID];
+  const apexPx = apexPos.x * NODE_SPACING_X;
+  const apexPy = apexPos.y * NODE_SPACING_Y + 30;
+  const trunkColor = '#8a6d1f';
+
+  roots.forEach(r => {
+    const rpos = explorerPositions[r.id];
+    const rpx = rpos.x * NODE_SPACING_X;
+    const rpy = rpos.y * NODE_SPACING_Y + 30;
+    const path = document.createElementNS(ns, 'path');
+    const midY = (apexPy + rpy) / 2;
+    path.setAttribute('d', `M ${apexPx} ${apexPy} C ${apexPx} ${midY}, ${rpx} ${midY}, ${rpx} ${rpy}`);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', trunkColor);
+    path.setAttribute('stroke-width', 3.6);
+    path.dataset.branch = '__apex__';
+    edgesG.appendChild(path);
+  });
+
+  const apexCircle = document.createElementNS(ns, 'circle');
+  apexCircle.setAttribute('cx', apexPx);
+  apexCircle.setAttribute('cy', apexPy);
+  apexCircle.setAttribute('r', 9);
+  apexCircle.setAttribute('fill', trunkColor);
+  apexCircle.setAttribute('stroke', '#fff');
+  apexCircle.setAttribute('stroke-width', 1.5);
+  apexCircle.dataset.id = EXPLORER_ROOT_ID;
+  apexCircle.dataset.branch = '__apex__';
+  apexCircle.style.cursor = 'pointer';
+  apexCircle.addEventListener('click', (e) => { e.stopPropagation(); selectExplorerNode(EXPLORER_ROOT_ID); });
+  nodesG.appendChild(apexCircle);
+
+  const apexLabel = document.createElementNS(ns, 'text');
+  apexLabel.setAttribute('x', apexPx);
+  apexLabel.setAttribute('y', apexPy - 13);
+  apexLabel.setAttribute('text-anchor', 'middle');
+  apexLabel.setAttribute('font-size', 12);
+  apexLabel.setAttribute('font-family', "'Lora', serif");
+  apexLabel.setAttribute('font-weight', 700);
+  apexLabel.setAttribute('fill', '#23262b');
+  apexLabel.style.pointerEvents = 'none';
+  apexLabel.dataset.branch = '__apex__';
+  apexLabel.textContent = 'Louis & Rose';
+  nodesG.appendChild(apexLabel);
+
+  wireExplorerPanZoom(svg, g);
+  initialExplorerView();
+}
+
+function applyExplorerTransform() {
+  const g = document.getElementById('explorer-viewport');
+  if (g) g.setAttribute('transform', `translate(${explorerTx},${explorerTy}) scale(${explorerScale})`);
+}
+
+function fitExplorerToScreen() {
+  const wrap = document.getElementById('explorer-wrap');
+  const w = wrap.clientWidth, h = wrap.clientHeight - 30;
+  const bw = explorerViewBox.maxX - explorerViewBox.minX;
+  const bh = explorerViewBox.maxY - explorerViewBox.minY;
+  const scale = Math.min(w / bw, h / bh, 1.4) * 0.94;
+  explorerScale = scale;
+  explorerTx = (w - bw * scale) / 2 - explorerViewBox.minX * scale;
+  explorerTy = 20 - explorerViewBox.minY * scale;
+  applyExplorerTransform();
+}
+
+function initialExplorerView() {
+  const wrap = document.getElementById('explorer-wrap');
+  const w = wrap.clientWidth;
+  const apexPos = explorerPositions[EXPLORER_ROOT_ID];
+  const scale = 0.9;
+  explorerScale = scale;
+  explorerTx = w / 2 - apexPos.x * NODE_SPACING_X * scale;
+  explorerTy = 30 - apexPos.y * NODE_SPACING_Y * scale;
+  applyExplorerTransform();
+}
+
+function wireExplorerPanZoom(svg, g) {
+  const pointers = new Map();
+  let lastMid = null, lastDist = null;
+
+  svg.addEventListener('pointerdown', (e) => {
+    try { svg.setPointerCapture(e.pointerId); } catch (err) { /* synthetic or unsupported pointer, ignore */ }
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  });
+
+  svg.addEventListener('pointermove', (e) => {
+    if (!pointers.has(e.pointerId)) return;
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    const pts = Array.from(pointers.values());
+
+    if (pts.length === 1) {
+      explorerTx += e.movementX || 0;
+      explorerTy += e.movementY || 0;
+      applyExplorerTransform();
+    } else if (pts.length >= 2) {
+      const [p1, p2] = pts;
+      const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+      const mid = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+      if (lastDist) {
+        const delta = dist / lastDist;
+        zoomExplorerAt(mid, delta);
+      }
+      lastDist = dist;
+      lastMid = mid;
+    }
+  });
+
+  function clearPointer(e) {
+    pointers.delete(e.pointerId);
+    if (pointers.size < 2) { lastDist = null; lastMid = null; }
+  }
+  svg.addEventListener('pointerup', clearPointer);
+  svg.addEventListener('pointercancel', clearPointer);
+  svg.addEventListener('pointerleave', clearPointer);
+
+  svg.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const rect = svg.getBoundingClientRect();
+    const mid = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    zoomExplorerAt(mid, e.deltaY < 0 ? 1.1 : 0.9);
+  }, { passive: false });
+
+  svg.addEventListener('click', () => { hideExplorerDetail(); });
+}
+
+function zoomExplorerAt(point, factor) {
+  const newScale = Math.min(Math.max(explorerScale * factor, 0.15), 4);
+  const ratio = newScale / explorerScale;
+  explorerTx = point.x - (point.x - explorerTx) * ratio;
+  explorerTy = point.y - (point.y - explorerTy) * ratio;
+  explorerScale = newScale;
+  applyExplorerTransform();
+}
+
+function selectExplorerNode(id) {
+  const detail = document.getElementById('explorer-detail');
+  if (id === EXPLORER_ROOT_ID) {
+    detail.innerHTML = `
+      <button class="ed-close" type="button" aria-label="Close">&times;</button>
+      <div class="ed-name">${escapeHtml(EXPLORER_ROOT_NAME)}</div>
+      <div class="ed-meta">Founders of this family circle &middot; ${escapeHtml(String(roots.length))} children</div>
+      <div class="ed-meta">${escapeHtml(roots.map(r => r.name).join(', '))}</div>
+    `;
+    detail.hidden = false;
+    detail.querySelector('.ed-close').addEventListener('click', hideExplorerDetail);
+    return;
+  }
+  const p = byId[id];
+  const parentInfo = p.parent ? `Child of ${byId[p.parent].name}` : `${p.branch} branch founder`;
+  detail.innerHTML = `
+    <button class="ed-close" type="button" aria-label="Close">&times;</button>
+    <div class="ed-name">${escapeHtml(p.name)}</div>
+    <div class="ed-meta">${escapeHtml(parentInfo)} &middot; ${escapeHtml(GEN_LABEL[p.generation] || '')} &middot; ${escapeHtml(p.branch)} branch</div>
+    ${p.partners && p.partners.length ? `<div class="ed-meta">Partner: ${escapeHtml(p.partners.join(' & '))}</div>` : ''}
+    <button class="ed-view-btn" type="button">View in list</button>
+  `;
+  detail.hidden = false;
+  detail.querySelector('.ed-close').addEventListener('click', hideExplorerDetail);
+  detail.querySelector('.ed-view-btn').addEventListener('click', () => {
+    switchToListView();
+    setTimeout(() => jumpToPerson(id), 150);
+  });
+}
+function hideExplorerDetail() {
+  document.getElementById('explorer-detail').hidden = true;
+}
+
+function switchToListView() {
+  document.getElementById('tree').hidden = false;
+  document.getElementById('explorer-wrap').hidden = true;
+  viewToggle.textContent = '\uD83C\uDF33 Explorer View';
+}
+
+const viewToggle = document.getElementById('view-toggle');
+viewToggle.addEventListener('click', () => {
+  const treeEl2 = document.getElementById('tree');
+  const explorerWrap = document.getElementById('explorer-wrap');
+  const showingExplorer = explorerWrap.hidden;
+  const wasAlreadyBuilt = explorerBuilt;
+  treeEl2.hidden = showingExplorer;
+  explorerWrap.hidden = !showingExplorer;
+  viewToggle.textContent = showingExplorer ? '\uD83D\uDCCB List View' : '\uD83C\uDF33 Explorer View';
+  if (showingExplorer) {
+    buildExplorer();
+    if (!wasAlreadyBuilt) setTimeout(initialExplorerView, 50);
+  }
+});
+document.getElementById('explorer-zoom-in').addEventListener('click', () => zoomExplorerAt({x: document.getElementById('explorer-wrap').clientWidth/2, y: document.getElementById('explorer-wrap').clientHeight/2}, 1.25));
+document.getElementById('explorer-zoom-out').addEventListener('click', () => zoomExplorerAt({x: document.getElementById('explorer-wrap').clientWidth/2, y: document.getElementById('explorer-wrap').clientHeight/2}, 0.8));
+document.getElementById('explorer-fit').addEventListener('click', fitExplorerToScreen);
+
+// ---- Shared link on load: #person=ID ----
+(function checkSharedLink() {
+  const m = location.hash.match(/person=([^&]+)/);
+  if (!m) return;
+  const id = decodeURIComponent(m[1]);
+  if (byId[id]) {
+    setTimeout(() => jumpToPerson(id), 150);
+  }
+})();
+</script>
+
+</body>
+</html>
