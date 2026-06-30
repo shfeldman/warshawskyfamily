@@ -2598,13 +2598,12 @@ function switchToListView() {
   const branchNav = document.getElementById('explorer-branch-nav');
   const listBtn = document.getElementById('view-list-btn');
   const treeBtn = document.getElementById('view-tree-btn');
-  const listToolbar = document.querySelector('.list-only-toolbar');
   treeEl2.hidden = false;
   explorerWrap.hidden = true;
   if (branchNav) branchNav.hidden = true;
   listBtn.classList.add('active');
   treeBtn.classList.remove('active');
-  if (listToolbar) listToolbar.classList.remove('hidden-toolbar');
+  document.querySelectorAll('.list-only-toolbar').forEach(el => el.classList.remove('hidden-toolbar'));
 }
 
 function switchToTreeBranchView() {
@@ -2613,14 +2612,13 @@ function switchToTreeBranchView() {
   const branchNav = document.getElementById('explorer-branch-nav');
   const listBtn = document.getElementById('view-list-btn');
   const treeBtn = document.getElementById('view-tree-btn');
-  const listToolbar = document.querySelector('.list-only-toolbar');
   const wasAlreadyBuilt = explorerBuilt;
   treeEl2.hidden = true;
   explorerWrap.hidden = false;
   if (branchNav) branchNav.hidden = false;
   treeBtn.classList.add('active');
   listBtn.classList.remove('active');
-  if (listToolbar) listToolbar.classList.add('hidden-toolbar');
+  document.querySelectorAll('.list-only-toolbar').forEach(el => el.classList.add('hidden-toolbar'));
   buildExplorer();
   if (!wasAlreadyBuilt) setTimeout(initialExplorerView, 50);
 }
