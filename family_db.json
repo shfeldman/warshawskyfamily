@@ -1199,7 +1199,16 @@
     ],
     "generation": "C",
     "branch": "Sylvia",
-    "parent": "paul"
+    "parent": "paul",
+    "vitals": {
+      "dateOfBirth": "1977-11-27"
+    },
+    "partnerVitals": {
+      "0": {
+        "dateMarried": "2003-08-25",
+        "dateOfBirth": "1977-07-31"
+      }
+    }
   },
   {
     "id": "michelle_mimi",
