@@ -2881,11 +2881,11 @@ function flashListCard(id) {
   let lastGen = null;
   Array.from(treeEl2.children).forEach(li => {
     const gen = li.dataset && li.dataset.id && byId[li.dataset.id] ? byId[li.dataset.id].generation : null;
-    if (gen && gen !== lastGen) {
+    if (gen && gen !== lastGen && genLabels[gen]) {
       const divider = document.createElement('li');
       divider.className = 'gen-divider';
       divider.dataset.genMarker = gen;
-      divider.textContent = genLabels[gen] || ('Generation ' + gen);
+      divider.textContent = genLabels[gen];
       treeEl2.insertBefore(divider, li);
       lastGen = gen;
     }
