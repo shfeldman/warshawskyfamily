@@ -1011,6 +1011,117 @@
     100% { background: transparent; }
   }
 
+  /* ── Mobile responsive ── */
+  @media (max-width: 640px) {
+    main { padding: 0.5rem; }
+
+    header.letterhead { padding: 0.9rem 0.75rem 0.8rem; }
+    .founders-photo { width: 72px; height: 72px; }
+    h1 { font-size: 1.1rem; }
+    .dark-toggle { top: 0.6rem; right: 0.6rem; font-size: 0.72rem; padding: 0.25rem 0.5rem; }
+
+    .panel { padding: 0.5rem 0 0.4rem; }
+    #search { font-size: 0.95rem; padding: 0.6rem 0.75rem; }
+
+    .view-switcher-bar { padding: 0 0.25rem 0.4rem; gap: 0.35rem; }
+    .view-switch-btn { font-size: 0.82rem; padding: 0.55rem 0.5rem; }
+    .toolbar button { font-size: 0.75rem; padding: 0.4rem 0.6rem; min-height: 36px; }
+    .gen-jump-bar { gap: 0.25rem; }
+    .gen-jump-btn { font-size: 0.7rem; padding: 0.2rem 0.45rem; }
+
+    .photo-thumb { width: 4.5rem; height: 4.5rem; }
+
+    .node-row { gap: 0.3rem; padding: 0.45rem 0.3rem; }
+    .name { font-size: 0.95rem; }
+    .gen-a .name { font-size: 1rem; }
+    .marriages { padding: 0.35rem 0.5rem; }
+    .marriage-block { padding: 0.3rem 0; }
+
+    ul.children { margin-left: 0.3rem; padding-left: 0.75rem; }
+
+    .gen-divider { font-size: 0.65rem; margin: 0.9rem 0 0.35rem; }
+
+    .below-panel { padding: 0 0.25rem; }
+    .relate-toggle-btn { font-size: 0.85rem; }
+    .gen-indicator { bottom: 0.6rem; right: 0.6rem; font-size: 0.7rem; }
+
+    .stats-grid { grid-template-columns: 1fr 1fr !important; gap: 0.5rem !important; }
+  }
+
+  /* ── Family stats section ── */
+  .stats-section {
+    margin-top: 1rem;
+    border: 1.5px solid var(--rule-soft);
+    border-radius: 10px;
+    background: #fff;
+    overflow: hidden;
+  }
+  [data-theme="dark"] .stats-section { background: #211e18; }
+  .stats-toggle-btn {
+    width: 100%;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--ink);
+    font-family: inherit;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .stats-toggle-btn:hover { background: var(--paper-deep); }
+  .stats-body { padding: 0.75rem 1rem 1rem; }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  .stat-card {
+    background: var(--paper-deep);
+    border-radius: 8px;
+    padding: 0.7rem 0.85rem;
+    text-align: center;
+  }
+  [data-theme="dark"] .stat-card { background: #2a2620; }
+  .stat-card .stat-num {
+    font-family: 'Lora', serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--rule);
+    display: block;
+  }
+  .stat-card .stat-label {
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    display: block;
+    margin-top: 0.15rem;
+  }
+  .stats-sub { margin-top: 0.75rem; }
+  .stats-sub h4 {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin: 0 0 0.4rem;
+  }
+  .stats-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.3rem;
+    font-size: 0.78rem;
+  }
+  .stats-bar-label { flex: 0 0 80px; color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stats-bar-track { flex: 1; background: var(--paper-deep); border-radius: 4px; height: 10px; }
+  [data-theme="dark"] .stats-bar-track { background: #2a2620; }
+  .stats-bar-fill { height: 100%; border-radius: 4px; background: var(--branch-color, var(--rule)); transition: width 0.4s ease; }
+  .stats-bar-count { flex: 0 0 28px; text-align: right; font-weight: 600; color: var(--ink); }
+
   @media print {
     .panel, header .eyebrow, footer { }
     #search, .chip-row-wrap, .toolbar, #relate-toggle, #relate-panel, .legend-note, #search-status, .print-btn-full, #back-to-top,
@@ -1231,6 +1342,14 @@
 
     <a id="submit-update-btn" href="https://forms.gle/aZ9qrLaibyCsm2Bc8" target="_blank" rel="noopener" class="submit-update-link">&#128221; Submit a Correction or Addition</a>
     <button id="print-btn" type="button" class="print-btn-full">Print / Save PDF</button>
+
+    <div class="stats-section" id="stats-section">
+      <button class="stats-toggle-btn" id="stats-toggle" type="button" aria-expanded="false" aria-controls="stats-body">
+        <span>📊 Family Stats</span>
+        <span id="stats-arrow">&#9660;</span>
+      </button>
+      <div class="stats-body" id="stats-body" hidden></div>
+    </div>
 
     <div class="about-section" id="about-section">
       <button class="about-toggle-btn" id="about-toggle" type="button" aria-expanded="false" aria-controls="about-body">
@@ -1733,11 +1852,13 @@ function runSearch() {
   const query = searchInput.value.trim().toLowerCase();
   const allLis = document.querySelectorAll('li.node');
 
-  // Pass 1: find direct matches
+  // Pass 1: find direct matches — token-based fuzzy (all tokens must appear)
   const matchedIds = new Set();
   if (query) {
+    const tokens = query.split(/\s+/).filter(Boolean);
     allLis.forEach(li => {
-      if (li.dataset.search.includes(query)) matchedIds.add(li.dataset.id);
+      const hay = li.dataset.search;
+      if (tokens.every(tok => hay.includes(tok))) matchedIds.add(li.dataset.id);
     });
   }
 
@@ -2649,6 +2770,88 @@ function flashListCard(id) {
   const id = decodeURIComponent(m[1]);
   if (byId[id]) {
     setTimeout(() => jumpToPerson(id), 150);
+  }
+})();
+
+// ---- Family Stats ----
+(function() {
+  const toggle = document.getElementById('stats-toggle');
+  const body = document.getElementById('stats-body');
+  const arrow = document.getElementById('stats-arrow');
+  let built = false;
+
+  toggle.addEventListener('click', () => {
+    const open = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!open));
+    body.hidden = open;
+    arrow.textContent = open ? '▼' : '▲';
+    if (!open && !built) { buildStats(); built = true; }
+  });
+
+  function buildStats() {
+    const people = PEOPLE_DATA.filter(p => p.id !== 'founders');
+    const descendants = people.filter(p => p.generation && p.generation !== 'founders');
+    const withPhoto = people.filter(p => p.vitals && p.vitals.photo).length;
+    const withDOB = people.filter(p => p.vitals && p.vitals.dateOfBirth).length;
+    const marriages = people.reduce((n, p) => n + (p.partners ? p.partners.length : 0), 0);
+
+    // Per-branch counts (descendants only)
+    const branchCounts = {};
+    BRANCH_ORDER.forEach(b => branchCounts[b] = 0);
+    descendants.forEach(p => { if (branchCounts[p.branch] !== undefined) branchCounts[p.branch]++; });
+    const maxBranch = Math.max(...Object.values(branchCounts));
+
+    // Per-generation counts
+    const genCounts = {A:0,B:0,C:0,D:0};
+    descendants.forEach(p => { if (genCounts[p.generation] !== undefined) genCounts[p.generation]++; });
+
+    // Most common first names
+    const nameFreq = {};
+    descendants.forEach(p => {
+      const first = p.name.replace(/"[^"]*"\s*/g,'').split(/\s+/)[0];
+      nameFreq[first] = (nameFreq[first]||0) + 1;
+    });
+    const topNames = Object.entries(nameFreq).filter(([,n])=>n>1).sort((a,b)=>b[1]-a[1]).slice(0,5);
+
+    // Biggest family (most children)
+    let biggestParent = null, biggestCount = 0;
+    people.forEach(p => {
+      const n = (childrenOf[p.id]||[]).length;
+      if (n > biggestCount) { biggestCount = n; biggestParent = p; }
+    });
+
+    body.innerHTML = `
+      <div class="stats-grid">
+        <div class="stat-card"><span class="stat-num">${descendants.length}</span><span class="stat-label">Total People</span></div>
+        <div class="stat-card"><span class="stat-num">${marriages}</span><span class="stat-label">Marriages Recorded</span></div>
+        <div class="stat-card"><span class="stat-num">${withPhoto}</span><span class="stat-label">Photos Uploaded</span></div>
+        <div class="stat-card"><span class="stat-num">${withDOB}</span><span class="stat-label">Birthdays Known</span></div>
+        <div class="stat-card"><span class="stat-num">${biggestCount}</span><span class="stat-label">Most Children${biggestParent ? ' (' + treeDisplayName(biggestParent.name) + ')' : ''}</span></div>
+        <div class="stat-card"><span class="stat-num">${Object.keys(genCounts).filter(g=>genCounts[g]>0).length}</span><span class="stat-label">Generations</span></div>
+      </div>
+      <div class="stats-sub">
+        <h4>People by Branch</h4>
+        ${BRANCH_ORDER.map(b => `
+          <div class="stats-bar-row">
+            <span class="stats-bar-label" style="color:${BRANCH_HEX[b]}">${b}</span>
+            <div class="stats-bar-track"><div class="stats-bar-fill" style="width:${Math.round(branchCounts[b]/maxBranch*100)}%;background:${BRANCH_HEX[b]}"></div></div>
+            <span class="stats-bar-count">${branchCounts[b]}</span>
+          </div>`).join('')}
+      </div>
+      <div class="stats-sub">
+        <h4>People by Generation</h4>
+        ${['A','B','C','D'].filter(g=>genCounts[g]>0).map(g => {
+          const num = {A:'1',B:'2',C:'3',D:'4'}[g];
+          const max = Math.max(...Object.values(genCounts));
+          return `<div class="stats-bar-row">
+            <span class="stats-bar-label">Gen. ${num}</span>
+            <div class="stats-bar-track"><div class="stats-bar-fill" style="width:${Math.round(genCounts[g]/max*100)}%"></div></div>
+            <span class="stats-bar-count">${genCounts[g]}</span>
+          </div>`;
+        }).join('')}
+      </div>
+      ${topNames.length ? `<div class="stats-sub"><h4>Most Common First Names</h4>${topNames.map(([n,c])=>`<div class="stats-bar-row"><span class="stats-bar-label">${escapeHtml(n)}</span><div class="stats-bar-track"><div class="stats-bar-fill" style="width:${Math.round(c/topNames[0][1]*100)}%"></div></div><span class="stats-bar-count">${c}</span></div>`).join('')}</div>` : ''}
+    `;
   }
 })();
 
