@@ -236,18 +236,6 @@ document.getElementById('pwd').addEventListener('keydown', e => {
   if (e.key === 'Enter') unlock();
 });
 
-// Secret URL bypass: ?open=PASSWORD skips the gate entirely
-(function() {
-  const params = new URLSearchParams(window.location.search);
-  const bypass = params.get('open');
-  if (bypass) {
-    decrypt(ENCRYPTED.ct, ENCRYPTED.salt, ENCRYPTED.iv, bypass).then(html => {
-      if (html) render(html);
-    }).catch(() => {});
-    return;
-  }
-})();
-
 // Check remembered session
 (function() {
   try {
@@ -261,6 +249,16 @@ document.getElementById('pwd').addEventListener('keydown', e => {
       }
     }
   } catch(e) {}
+})();
+
+// Secret URL bypass: ?open=PASSWORD — auto-fills and submits
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const bypass = params.get('open');
+  if (bypass) {
+    document.getElementById('pwd').value = bypass;
+    unlock();
+  }
 })();
 </script>
 </body>
