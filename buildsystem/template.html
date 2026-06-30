@@ -1726,7 +1726,7 @@ function setBranchFilter(branchKey) {
 
 function syncExplorerFilter(branchKey) {
   if (!explorerBuilt) return;
-  document.querySelectorAll('#explorer-svg circle, #explorer-svg text, #explorer-svg path').forEach(el => {
+  document.querySelectorAll('#explorer-svg rect, #explorer-svg text, #explorer-svg path').forEach(el => {
     const match = !branchKey || el.dataset.branch === branchKey || el.dataset.branch === '__apex__';
     el.style.opacity = match ? '1' : '0.08';
   });
@@ -2176,8 +2176,8 @@ backToTop.addEventListener('click', () => {
 // ---- Explorer view: visual branching diagram ----
 const GEN_DEPTH = { A: 0, B: 1, C: 2, D: 3, E: 4 };
 const LEVEL_TINT = { A: 0, B: 0, C: 22, D: 42, E: 58 }; // % white mixed in, by depth
-const NODE_SPACING_X = 46;
-const NODE_SPACING_Y = 92;
+const NODE_SPACING_X = 90;
+const NODE_SPACING_Y = 100;
 
 function lighten(hex, pct) {
   return `color-mix(in srgb, ${hex} ${100 - pct}%, white)`;
@@ -2258,27 +2258,34 @@ function buildExplorer() {
       }
     }
 
-    const circle = document.createElementNS(ns, 'circle');
-    circle.setAttribute('cx', px);
-    circle.setAttribute('cy', py);
-    circle.setAttribute('r', p.generation === 'A' ? 7 : 5);
-    circle.setAttribute('fill', color);
-    circle.setAttribute('stroke', '#fff');
-    circle.setAttribute('stroke-width', 1.2);
-    circle.dataset.id = p.id;
-    circle.dataset.branch = p.branch;
-    circle.style.cursor = 'pointer';
-    circle.addEventListener('click', (e) => { e.stopPropagation(); selectExplorerNode(p.id); });
-    nodesG.appendChild(circle);
+    const isGenA = p.generation === 'A';
+    const fontSize = isGenA ? 11 : 8.5;
+    const pillH = isGenA ? 24 : 18;
+    const pillW = Math.max(isGenA ? 60 : 44, p.name.length * (isGenA ? 6.5 : 5.0) + 18);
+
+    const pill = document.createElementNS(ns, 'rect');
+    pill.setAttribute('x', px - pillW / 2);
+    pill.setAttribute('y', py - pillH / 2);
+    pill.setAttribute('width', pillW);
+    pill.setAttribute('height', pillH);
+    pill.setAttribute('rx', pillH / 2);
+    pill.setAttribute('fill', color);
+    pill.setAttribute('stroke', '#fff');
+    pill.setAttribute('stroke-width', isGenA ? 2 : 1.5);
+    pill.dataset.id = p.id;
+    pill.dataset.branch = p.branch;
+    pill.style.cursor = 'pointer';
+    pill.addEventListener('click', (e) => { e.stopPropagation(); selectExplorerNode(p.id); });
+    nodesG.appendChild(pill);
 
     const label = document.createElementNS(ns, 'text');
     label.setAttribute('x', px);
-    label.setAttribute('y', py - 10);
+    label.setAttribute('y', py + fontSize * 0.36);
     label.setAttribute('text-anchor', 'middle');
-    label.setAttribute('font-size', p.generation === 'A' ? 11 : 8.5);
+    label.setAttribute('font-size', fontSize);
     label.setAttribute('font-family', 'Inter, sans-serif');
-    label.setAttribute('font-weight', p.generation === 'A' ? 700 : 500);
-    label.setAttribute('fill', '#23262b');
+    label.setAttribute('font-weight', isGenA ? 700 : 500);
+    label.setAttribute('fill', '#fff');
     label.style.pointerEvents = 'none';
     label.dataset.branch = p.branch;
     label.textContent = p.name;
@@ -2307,27 +2314,30 @@ function buildExplorer() {
     edgesG.appendChild(path);
   });
 
-  const apexCircle = document.createElementNS(ns, 'circle');
-  apexCircle.setAttribute('cx', apexPx);
-  apexCircle.setAttribute('cy', apexPy);
-  apexCircle.setAttribute('r', 9);
-  apexCircle.setAttribute('fill', trunkColor);
-  apexCircle.setAttribute('stroke', '#fff');
-  apexCircle.setAttribute('stroke-width', 1.5);
-  apexCircle.dataset.id = EXPLORER_ROOT_ID;
-  apexCircle.dataset.branch = '__apex__';
-  apexCircle.style.cursor = 'pointer';
-  apexCircle.addEventListener('click', (e) => { e.stopPropagation(); selectExplorerNode(EXPLORER_ROOT_ID); });
-  nodesG.appendChild(apexCircle);
+  const apexPillW = 110, apexPillH = 28;
+  const apexPill = document.createElementNS(ns, 'rect');
+  apexPill.setAttribute('x', apexPx - apexPillW / 2);
+  apexPill.setAttribute('y', apexPy - apexPillH / 2);
+  apexPill.setAttribute('width', apexPillW);
+  apexPill.setAttribute('height', apexPillH);
+  apexPill.setAttribute('rx', apexPillH / 2);
+  apexPill.setAttribute('fill', trunkColor);
+  apexPill.setAttribute('stroke', '#fff');
+  apexPill.setAttribute('stroke-width', 2);
+  apexPill.dataset.id = EXPLORER_ROOT_ID;
+  apexPill.dataset.branch = '__apex__';
+  apexPill.style.cursor = 'pointer';
+  apexPill.addEventListener('click', (e) => { e.stopPropagation(); selectExplorerNode(EXPLORER_ROOT_ID); });
+  nodesG.appendChild(apexPill);
 
   const apexLabel = document.createElementNS(ns, 'text');
   apexLabel.setAttribute('x', apexPx);
-  apexLabel.setAttribute('y', apexPy - 13);
+  apexLabel.setAttribute('y', apexPy + 12 * 0.36);
   apexLabel.setAttribute('text-anchor', 'middle');
   apexLabel.setAttribute('font-size', 12);
   apexLabel.setAttribute('font-family', "'Lora', serif");
   apexLabel.setAttribute('font-weight', 700);
-  apexLabel.setAttribute('fill', '#23262b');
+  apexLabel.setAttribute('fill', '#fff');
   apexLabel.style.pointerEvents = 'none';
   apexLabel.dataset.branch = '__apex__';
   apexLabel.textContent = 'Louis & Rose';

@@ -207,6 +207,7 @@
     flex-wrap: wrap;
   }
   .legend-note .swatch-key { display: inline-flex; align-items: center; gap: 0.3rem; }
+  .legend-note .ring { width: 0.65rem; height: 0.65rem; border-radius: 50%; border: 2px dashed var(--ink-soft); display: inline-block; }
   .legend-note .q { font-weight: 700; color: var(--ink-soft); }
 
   /* TREE */
@@ -343,6 +344,11 @@
     margin-top: 0;
   }
 
+  .partners > .vitals-panel-holder {
+    flex-basis: 100%;
+    width: 100%;
+  }
+
   .meta-row {
     display: flex;
     align-items: center;
@@ -393,6 +399,16 @@
     margin-left: 0.3rem;
     white-space: nowrap;
   }
+
+  .edit-vitals-btn {
+    position: relative;
+    font-size: 0.78rem;
+    opacity: 0.55;
+    cursor: pointer;
+    padding: 0.15rem 0.3rem;
+    border-radius: 4px;
+  }
+  .edit-vitals-btn:hover, .edit-vitals-btn:focus-visible { opacity: 1; background: var(--paper-deep); outline: 2px solid var(--focus); }
 
   .vitals-text {
     font-size: 0.78rem;
@@ -472,8 +488,92 @@
     border-radius: 7px;
     min-height: 40px;
   }
+  .lb-recenter { background: var(--ink); color: var(--paper); border: 1.5px solid var(--ink); }
   .lb-close { background: #fff; color: var(--ink); border: 1.5px solid var(--rule-soft); }
 
+  .crop-editor-frame {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+    margin: 0 auto 0.9rem;
+    border: 2px solid var(--rule);
+    touch-action: none;
+    cursor: grab;
+    background: var(--paper-deep);
+  }
+  .crop-editor-frame:active { cursor: grabbing; }
+  .crop-editor-frame img {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transform-origin: center center;
+    pointer-events: none;
+  }
+  .crop-zoom-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    max-width: 260px;
+    margin: 0 auto 0.8rem;
+  }
+  .crop-zoom-row input[type="range"] { flex: 1 1 auto; }
+  .crop-hint {
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    margin-bottom: 0.7rem;
+  }
+
+  .vitals-panel {
+    background: #fff;
+    border: 1.5px solid var(--rule-soft);
+    border-radius: 8px;
+    padding: 0.7rem 0.8rem;
+    margin: 0.3rem 0 0.4rem;
+    font-size: 0.82rem;
+  }
+  .vitals-panel .vp-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .vitals-panel label {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin-bottom: 0.15rem;
+  }
+  .vitals-panel input[type="text"] {
+    width: 100%;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.85rem;
+    border: 1.5px solid var(--rule-soft);
+    border-radius: 6px;
+    font-family: inherit;
+  }
+  .vitals-panel input[type="text"]:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
+  .vp-field { flex: 1 1 0; }
+  .vp-photo-row { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem; }
+  .vp-photo-preview {
+    width: 3rem; height: 3rem; border-radius: 50%; object-fit: cover;
+    border: 1.5px solid var(--rule-soft); background: var(--paper-deep);
+  }
+  .vp-actions { display: flex; gap: 0.5rem; }
+  .vp-actions button {
+    flex: 1 1 auto;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: 6px;
+    min-height: 40px;
+  }
+  .vp-save { background: var(--ink); color: var(--paper); border: 1.5px solid var(--ink); }
+  .vp-cancel { background: #fff; color: var(--ink); border: 1.5px solid var(--rule-soft); }
+  .vp-remove-photo { background: #fff; color: #8a2a23; border: 1.5px solid #d8b9b5; font-size: 0.72rem !important; flex: 0 0 auto !important; padding: 0.3rem 0.6rem !important; }
+  .vp-note { font-size: 0.68rem; color: var(--ink-soft); opacity: 0.8; margin-top: 0.3rem; }
   li.node.jump-highlight > .node-row { animation: jump-flash 1.8s ease; }
   @keyframes jump-flash {
     0%, 100% { box-shadow: none; }
@@ -679,7 +779,7 @@
   @media print {
     .panel, header .eyebrow, footer { }
     #search, .chip-row-wrap, .toolbar, #relate-toggle, #relate-panel, .legend-note, #search-status, .print-btn-full, #back-to-top,
-    #quiz-toggle, #quiz-panel, #explorer-wrap, .share-link-btn {
+    #quiz-toggle, #quiz-panel, #explorer-wrap, .edit-vitals-btn, .vitals-panel, .share-link-btn {
       display: none !important;
     }
     ul.children[hidden] { display: block !important; }
@@ -860,10 +960,9 @@
       <span class="swatch-key"><span class="q">*</span> inferred, not explicitly confirmed</span>
       <span class="swatch-key"><span class="flag-unplaced" style="padding:0 0.25rem;">?</span> branch known, exact parent unconfirmed</span>
       <span class="swatch-key"><span class="ordinal-chip" style="padding:0;">2nd child</span> order as listed in document, not confirmed birth order</span>
-      <span class="swatch-key">Spotted something wrong or missing? Use "Submit a Correction or Addition" below.</span>
+      <span class="swatch-key">&#x270F;&#xFE0F; tap to add a photo, birth/death year, or marriage dates (saved on this device only)</span>
     </div>
 
-    <a id="submit-update-btn" href="GOOGLE_FORM_URL_GOES_HERE" target="_blank" rel="noopener" class="print-btn-full" style="display:block;text-decoration:none;text-align:center;box-sizing:border-box;">&#128221; Submit a Correction or Addition</a>
     <button id="print-btn" type="button" class="print-btn-full">Print / Save PDF</button>
   </div>
 
@@ -991,21 +1090,45 @@ function setExpanded(row, expanded) {
 }
 
 // ---- Vitals (year born/deceased, marriage dates, photo) ----
-// One single source of truth: the "baked-in" official data shipped in PEOPLE_DATA.
-// There is no per-browser local editing or storage -- everyone who opens this file
-// sees exactly the same information. To change something, use the "Submit a
-// Correction or Addition" form; updates get folded into this file centrally.
-const bakedVitals = {};
+// Stored locally in this browser only (no server/backend exists for this static file).
+const VITALS_PREFIX = 'wfc-vitals-';
+const vitalsStore = {};
+function loadVitalsFromStorage(id) {
+  try {
+    const raw = localStorage.getItem(VITALS_PREFIX + id);
+    if (raw) vitalsStore[id] = JSON.parse(raw);
+  } catch (e) { /* localStorage unavailable; vitals just won't persist */ }
+}
 PEOPLE_DATA.forEach(p => {
-  if (p.vitals) bakedVitals[p.id] = p.vitals;
-  (p.partners || []).forEach((_, idx) => {
-    const pid = p.id + '__p' + idx;
-    if (p.partnerVitals && p.partnerVitals[idx]) bakedVitals[pid] = p.partnerVitals[idx];
-  });
+  loadVitalsFromStorage(p.id);
+  (p.partners || []).forEach((_, idx) => loadVitalsFromStorage(p.id + '__p' + idx));
 });
 
 function getVitals(id) {
-  return bakedVitals[id] || {};
+  return vitalsStore[id] || {};
+}
+
+function saveVitals(id, data) {
+  vitalsStore[id] = data;
+  try { localStorage.setItem(VITALS_PREFIX + id, JSON.stringify(data)); } catch (e) { /* storage full or unavailable */ }
+}
+
+function resizeImageFile(file, maxDim, callback) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > height && width > maxDim) { height = Math.round(height * maxDim / width); width = maxDim; }
+      else if (height > maxDim) { width = Math.round(width * maxDim / height); height = maxDim; }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      callback(canvas.toDataURL('image/jpeg', 0.85));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
 }
 
 // ---- Photo crop (pan/zoom) ----
@@ -1058,6 +1181,77 @@ function marriageLabel(v) {
   return '';
 }
 
+function renderVitalsPanel(id, displayName, container, opts) {
+  opts = opts || {};
+  const v = getVitals(id);
+  const panel = document.createElement('div');
+  panel.className = 'vitals-panel';
+  panel.innerHTML = `
+    <div class="vp-photo-row">
+      <img class="vp-photo-preview" src="${v.photo || ''}" style="${v.photo ? '' : 'display:none;'}">
+      <input type="file" accept="image/*" class="vp-photo-input">
+      ${v.photo ? '<button type="button" class="vp-remove-photo">Remove photo</button>' : ''}
+    </div>
+    <div class="vp-row">
+      <div class="vp-field"><label>Year Born</label><input type="text" class="vp-yearBorn" inputmode="numeric" placeholder="e.g. 1920" value="${escapeHtml(v.yearBorn || '')}"></div>
+      <div class="vp-field"><label>Year Deceased</label><input type="text" class="vp-yearDeceased" inputmode="numeric" placeholder="leave blank if living" value="${escapeHtml(v.yearDeceased || '')}"></div>
+    </div>
+    ${opts.showMarriage ? `
+    <div class="vp-row">
+      <div class="vp-field"><label>Date Married</label><input type="text" class="vp-dateMarried" placeholder="e.g. 1950" value="${escapeHtml(v.dateMarried || '')}"></div>
+      <div class="vp-field"><label>Marriage Ended</label><input type="text" class="vp-dateMarriageEnd" placeholder="if divorced/widowed" value="${escapeHtml(v.dateMarriageEnd || '')}"></div>
+    </div>` : ''}
+    <div class="vp-actions">
+      <button type="button" class="vp-cancel">Cancel</button>
+      <button type="button" class="vp-save">Save</button>
+    </div>
+    <div class="vp-note">Saved on this device/browser only \u2014 not synced or shared with anyone else.</div>
+  `;
+  container.appendChild(panel);
+
+  let pendingPhoto = v.photo || null;
+  let pendingCropReset = false;
+  const photoInput = panel.querySelector('.vp-photo-input');
+  const photoPreview = panel.querySelector('.vp-photo-preview');
+  photoInput.addEventListener('change', () => {
+    const file = photoInput.files[0];
+    if (!file) return;
+    resizeImageFile(file, 640, (dataUrl) => {
+      pendingPhoto = dataUrl;
+      photoPreview.src = dataUrl;
+      photoPreview.style.display = '';
+      pendingCropReset = true;
+    });
+  });
+  const removeBtn = panel.querySelector('.vp-remove-photo');
+  if (removeBtn) {
+    removeBtn.addEventListener('click', () => {
+      pendingPhoto = null;
+      pendingCropReset = true;
+      photoPreview.style.display = 'none';
+      photoPreview.src = '';
+    });
+  }
+  panel.querySelector('.vp-cancel').addEventListener('click', () => panel.remove());
+  panel.querySelector('.vp-save').addEventListener('click', () => {
+    const dateMarriedEl = panel.querySelector('.vp-dateMarried');
+    const dateMarriageEndEl = panel.querySelector('.vp-dateMarriageEnd');
+    const newVitals = {
+      yearBorn: panel.querySelector('.vp-yearBorn').value.trim(),
+      yearDeceased: panel.querySelector('.vp-yearDeceased').value.trim(),
+      dateMarried: dateMarriedEl ? dateMarriedEl.value.trim() : (v.dateMarried || ''),
+      dateMarriageEnd: dateMarriageEndEl ? dateMarriageEndEl.value.trim() : (v.dateMarriageEnd || ''),
+      photo: pendingPhoto,
+      photoZoom: pendingCropReset ? 1 : (v.photoZoom || 1),
+      photoPanX: pendingCropReset ? 0 : (v.photoPanX || 0),
+      photoPanY: pendingCropReset ? 0 : (v.photoPanY || 0),
+    };
+    saveVitals(id, newVitals);
+    panel.remove();
+    if (opts.onSaved) opts.onSaved();
+  });
+}
+
 function buildPartnersElement(person) {
   const partnersEl = document.createElement('div');
   partnersEl.className = 'partners';
@@ -1101,13 +1295,81 @@ function buildPartnersElement(person) {
       unit.appendChild(mEl);
     }
 
+    const editBtn = document.createElement('span');
+    editBtn.className = 'edit-vitals-btn';
+    editBtn.textContent = '\u270F\uFE0F';
+    editBtn.title = 'Add photo or info for ' + partnerName;
+    editBtn.setAttribute('role', 'button');
+    editBtn.setAttribute('tabindex', '0');
+    editBtn.setAttribute('aria-label', 'Edit details for ' + partnerName);
+    const openEdit = (e) => {
+      e.stopPropagation();
+      const already = partnersEl.querySelector(':scope > .vitals-panel[data-for="' + pid + '"]');
+      if (already) { already.remove(); return; }
+      const otherOpen = partnersEl.querySelector(':scope > .vitals-panel');
+      if (otherOpen) otherOpen.remove();
+      const panelHolder = document.createElement('div');
+      panelHolder.className = 'vitals-panel-holder';
+      partnersEl.appendChild(panelHolder);
+      renderVitalsPanel(pid, partnerName, panelHolder, {
+        showMarriage: true,
+        onSaved: () => refreshPartners(person.id),
+      });
+      panelHolder.firstElementChild && panelHolder.firstElementChild.setAttribute('data-for', pid);
+    };
+    editBtn.addEventListener('click', openEdit);
+    editBtn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openEdit(e); } });
+    unit.appendChild(editBtn);
+
     partnersEl.appendChild(unit);
   });
 
   return partnersEl;
 }
 
-// ---- Photo lightbox (view only) ----
+function refreshPartners(personId) {
+  const li = document.querySelector('li[data-id="' + personId + '"]');
+  if (!li) return;
+  const row = li.querySelector(':scope > .node-row');
+  const oldPartnersEl = row.querySelector('.partners');
+  const p = byId[personId];
+  const freshPartnersEl = buildPartnersElement(p);
+  if (oldPartnersEl) oldPartnersEl.replaceWith(freshPartnersEl);
+}
+
+function refreshPersonRow(id) {
+  const li = document.querySelector('li[data-id="' + id + '"]');
+  if (!li) return;
+  const row = li.querySelector(':scope > .node-row');
+  const v = getVitals(id);
+  const p = byId[id];
+
+  const existingPhotoEl = row.querySelector(':scope > .photo-thumb');
+  const existingDotEl = row.querySelector(':scope > .dot');
+  if (v.photo) {
+    const freshThumb = makePhotoThumb(id, p.name, v);
+    (existingPhotoEl || existingDotEl).replaceWith(freshThumb);
+  } else if (existingPhotoEl) {
+    const newDot = document.createElement('span');
+    newDot.className = 'dot';
+    existingPhotoEl.replaceWith(newDot);
+  }
+
+  let yearsEl = row.querySelector('.name + .vitals-text');
+  const label = vitalsLabel(v);
+  if (label) {
+    if (!yearsEl) {
+      yearsEl = document.createElement('span');
+      yearsEl.className = 'vitals-text';
+      row.querySelector('.name').insertAdjacentElement('afterend', yearsEl);
+    }
+    yearsEl.textContent = ' ' + label;
+  } else if (yearsEl) {
+    yearsEl.remove();
+  }
+}
+
+// ---- Photo lightbox + recenter/crop editor ----
 function closeLightbox() {
   const existing = document.querySelector('.lightbox-overlay');
   if (existing) existing.remove();
@@ -1126,13 +1388,106 @@ function openPhotoLightbox(personId, displayName) {
       <img class="lightbox-photo-full" src="${v.photo}" alt="">
       <div class="lb-actions">
         <button type="button" class="lb-close">Close</button>
+        <button type="button" class="lb-recenter">Recenter Photo</button>
       </div>
     </div>
   `;
   overlay.addEventListener('click', (e) => { if (e.target === overlay) closeLightbox(); });
   overlay.querySelector('.lb-close').addEventListener('click', closeLightbox);
+  overlay.querySelector('.lb-recenter').addEventListener('click', () => openCropEditor(personId, displayName));
   document.body.appendChild(overlay);
 }
+
+function openCropEditor(personId, displayName) {
+  closeLightbox();
+  const v = getVitals(personId);
+  if (!v.photo) return;
+
+  let zoom = v.photoZoom || 1;
+  let panX = v.photoPanX || 0;
+  let panY = v.photoPanY || 0;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'lightbox-overlay';
+  overlay.innerHTML = `
+    <div class="lightbox-card">
+      <div class="lb-name">Recenter ${escapeHtml(displayName)}'s photo</div>
+      <div class="crop-editor-frame">
+        <img class="crop-editor-img" src="${v.photo}" alt="">
+      </div>
+      <div class="crop-hint">Drag the photo to reposition &middot; use the slider to zoom</div>
+      <div class="crop-zoom-row">
+        <span style="font-size:0.75rem;">&minus;</span>
+        <input type="range" class="crop-zoom-slider" min="1" max="3" step="0.05" value="${zoom}">
+        <span style="font-size:0.75rem;">+</span>
+      </div>
+      <div class="lb-actions">
+        <button type="button" class="lb-close vp-cancel-crop">Cancel</button>
+        <button type="button" class="lb-recenter vp-save-crop">Save</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const frame = overlay.querySelector('.crop-editor-frame');
+  const img = overlay.querySelector('.crop-editor-img');
+  const slider = overlay.querySelector('.crop-zoom-slider');
+
+  function render() {
+    img.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+  }
+  render();
+
+  // clamp pan so the image can't be dragged far enough to reveal empty space
+  function clamp() {
+    const maxOffset = CROP_REFERENCE_FRAME * (zoom - 1) / 2;
+    panX = Math.max(-maxOffset, Math.min(maxOffset, panX));
+    panY = Math.max(-maxOffset, Math.min(maxOffset, panY));
+  }
+
+  let dragging = false, startX = 0, startY = 0, startPanX = 0, startPanY = 0;
+  frame.addEventListener('pointerdown', (e) => {
+    dragging = true;
+    try { frame.setPointerCapture(e.pointerId); } catch (err) { /* synthetic or unsupported pointer, ignore */ }
+    startX = e.clientX; startY = e.clientY;
+    startPanX = panX; startPanY = panY;
+  });
+  frame.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    panX = startPanX + (e.clientX - startX);
+    panY = startPanY + (e.clientY - startY);
+    clamp();
+    render();
+  });
+  const endDrag = () => { dragging = false; };
+  frame.addEventListener('pointerup', endDrag);
+  frame.addEventListener('pointercancel', endDrag);
+  frame.addEventListener('pointerleave', endDrag);
+
+  slider.addEventListener('input', () => {
+    zoom = parseFloat(slider.value);
+    clamp();
+    render();
+  });
+
+  overlay.querySelector('.vp-cancel-crop').addEventListener('click', () => openPhotoLightbox(personId, displayName));
+  overlay.querySelector('.vp-save-crop').addEventListener('click', () => {
+    const updated = Object.assign({}, getVitals(personId), { photoZoom: zoom, photoPanX: panX, photoPanY: panY });
+    saveVitals(personId, updated);
+    refreshAfterVitalsChange(personId);
+    closeLightbox();
+  });
+}
+
+function refreshAfterVitalsChange(id) {
+  if (byId[id]) {
+    refreshPersonRow(id);
+  } else {
+    // partner pseudo-ids look like `${ownerPersonId}__p${index}`
+    refreshPartners(id.split('__p')[0]);
+  }
+}
+
 
 function buildNode(id, depth, siblingIndex, siblingCount) {
   const p = byId[id];
@@ -1248,6 +1603,25 @@ function buildNode(id, depth, siblingIndex, siblingCount) {
     }
   });
   meta.appendChild(shareBtn);
+
+  const editBtn = document.createElement('span');
+  editBtn.className = 'edit-vitals-btn';
+  editBtn.textContent = '\uD83D\uDD17'.length ? '\u270F\uFE0F' : '\u270F\uFE0F';
+  editBtn.title = 'Add photo, birth/death year, or marriage dates for ' + p.name;
+  editBtn.setAttribute('role', 'button');
+  editBtn.setAttribute('tabindex', '0');
+  editBtn.setAttribute('aria-label', 'Edit details for ' + p.name);
+  const openVitalsEditor = (e) => {
+    e.stopPropagation();
+    const existing = wrap.querySelector(':scope > .vitals-panel');
+    if (existing) { existing.remove(); return; }
+    renderVitalsPanel(p.id, p.name, wrap, { showMarriage: false, onSaved: () => refreshPersonRow(p.id) });
+  };
+  editBtn.addEventListener('click', openVitalsEditor);
+  editBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openVitalsEditor(e); }
+  });
+  meta.appendChild(editBtn);
   wrap.appendChild(meta);
 
   const breadcrumb = document.createElement('div');
@@ -1352,7 +1726,7 @@ function setBranchFilter(branchKey) {
 
 function syncExplorerFilter(branchKey) {
   if (!explorerBuilt) return;
-  document.querySelectorAll('#explorer-svg circle, #explorer-svg text, #explorer-svg path').forEach(el => {
+  document.querySelectorAll('#explorer-svg rect, #explorer-svg text, #explorer-svg path').forEach(el => {
     const match = !branchKey || el.dataset.branch === branchKey || el.dataset.branch === '__apex__';
     el.style.opacity = match ? '1' : '0.08';
   });
@@ -1802,8 +2176,8 @@ backToTop.addEventListener('click', () => {
 // ---- Explorer view: visual branching diagram ----
 const GEN_DEPTH = { A: 0, B: 1, C: 2, D: 3, E: 4 };
 const LEVEL_TINT = { A: 0, B: 0, C: 22, D: 42, E: 58 }; // % white mixed in, by depth
-const NODE_SPACING_X = 46;
-const NODE_SPACING_Y = 92;
+const NODE_SPACING_X = 90;
+const NODE_SPACING_Y = 100;
 
 function lighten(hex, pct) {
   return `color-mix(in srgb, ${hex} ${100 - pct}%, white)`;
@@ -1884,27 +2258,34 @@ function buildExplorer() {
       }
     }
 
-    const circle = document.createElementNS(ns, 'circle');
-    circle.setAttribute('cx', px);
-    circle.setAttribute('cy', py);
-    circle.setAttribute('r', p.generation === 'A' ? 7 : 5);
-    circle.setAttribute('fill', color);
-    circle.setAttribute('stroke', '#fff');
-    circle.setAttribute('stroke-width', 1.2);
-    circle.dataset.id = p.id;
-    circle.dataset.branch = p.branch;
-    circle.style.cursor = 'pointer';
-    circle.addEventListener('click', (e) => { e.stopPropagation(); selectExplorerNode(p.id); });
-    nodesG.appendChild(circle);
+    const isGenA = p.generation === 'A';
+    const fontSize = isGenA ? 11 : 8.5;
+    const pillH = isGenA ? 24 : 18;
+    const pillW = Math.max(isGenA ? 60 : 44, p.name.length * (isGenA ? 6.5 : 5.0) + 18);
+
+    const pill = document.createElementNS(ns, 'rect');
+    pill.setAttribute('x', px - pillW / 2);
+    pill.setAttribute('y', py - pillH / 2);
+    pill.setAttribute('width', pillW);
+    pill.setAttribute('height', pillH);
+    pill.setAttribute('rx', pillH / 2);
+    pill.setAttribute('fill', color);
+    pill.setAttribute('stroke', '#fff');
+    pill.setAttribute('stroke-width', isGenA ? 2 : 1.5);
+    pill.dataset.id = p.id;
+    pill.dataset.branch = p.branch;
+    pill.style.cursor = 'pointer';
+    pill.addEventListener('click', (e) => { e.stopPropagation(); selectExplorerNode(p.id); });
+    nodesG.appendChild(pill);
 
     const label = document.createElementNS(ns, 'text');
     label.setAttribute('x', px);
-    label.setAttribute('y', py - 10);
+    label.setAttribute('y', py + fontSize * 0.36);
     label.setAttribute('text-anchor', 'middle');
-    label.setAttribute('font-size', p.generation === 'A' ? 11 : 8.5);
+    label.setAttribute('font-size', fontSize);
     label.setAttribute('font-family', 'Inter, sans-serif');
-    label.setAttribute('font-weight', p.generation === 'A' ? 700 : 500);
-    label.setAttribute('fill', '#23262b');
+    label.setAttribute('font-weight', isGenA ? 700 : 500);
+    label.setAttribute('fill', '#fff');
     label.style.pointerEvents = 'none';
     label.dataset.branch = p.branch;
     label.textContent = p.name;
@@ -1933,27 +2314,30 @@ function buildExplorer() {
     edgesG.appendChild(path);
   });
 
-  const apexCircle = document.createElementNS(ns, 'circle');
-  apexCircle.setAttribute('cx', apexPx);
-  apexCircle.setAttribute('cy', apexPy);
-  apexCircle.setAttribute('r', 9);
-  apexCircle.setAttribute('fill', trunkColor);
-  apexCircle.setAttribute('stroke', '#fff');
-  apexCircle.setAttribute('stroke-width', 1.5);
-  apexCircle.dataset.id = EXPLORER_ROOT_ID;
-  apexCircle.dataset.branch = '__apex__';
-  apexCircle.style.cursor = 'pointer';
-  apexCircle.addEventListener('click', (e) => { e.stopPropagation(); selectExplorerNode(EXPLORER_ROOT_ID); });
-  nodesG.appendChild(apexCircle);
+  const apexPillW = 110, apexPillH = 28;
+  const apexPill = document.createElementNS(ns, 'rect');
+  apexPill.setAttribute('x', apexPx - apexPillW / 2);
+  apexPill.setAttribute('y', apexPy - apexPillH / 2);
+  apexPill.setAttribute('width', apexPillW);
+  apexPill.setAttribute('height', apexPillH);
+  apexPill.setAttribute('rx', apexPillH / 2);
+  apexPill.setAttribute('fill', trunkColor);
+  apexPill.setAttribute('stroke', '#fff');
+  apexPill.setAttribute('stroke-width', 2);
+  apexPill.dataset.id = EXPLORER_ROOT_ID;
+  apexPill.dataset.branch = '__apex__';
+  apexPill.style.cursor = 'pointer';
+  apexPill.addEventListener('click', (e) => { e.stopPropagation(); selectExplorerNode(EXPLORER_ROOT_ID); });
+  nodesG.appendChild(apexPill);
 
   const apexLabel = document.createElementNS(ns, 'text');
   apexLabel.setAttribute('x', apexPx);
-  apexLabel.setAttribute('y', apexPy - 13);
+  apexLabel.setAttribute('y', apexPy + 12 * 0.36);
   apexLabel.setAttribute('text-anchor', 'middle');
   apexLabel.setAttribute('font-size', 12);
   apexLabel.setAttribute('font-family', "'Lora', serif");
   apexLabel.setAttribute('font-weight', 700);
-  apexLabel.setAttribute('fill', '#23262b');
+  apexLabel.setAttribute('fill', '#fff');
   apexLabel.style.pointerEvents = 'none';
   apexLabel.dataset.branch = '__apex__';
   apexLabel.textContent = 'Louis & Rose';
