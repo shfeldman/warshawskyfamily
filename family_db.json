@@ -92,7 +92,10 @@
     ],
     "generation": "A",
     "branch": "Sylvia",
-    "parent": null
+    "parent": null,
+    "vitals": {
+      "photo": "sylvia.jpg"
+    }
   },
   {
     "id": "rudy",
