@@ -85,7 +85,7 @@
   },
   {
     "id": "sylvia",
-    "name": "Sylvia",
+    "name": "Sylvia Rappaport",
     "partners": [
       "Seymour Feldman",
       "Sol Rappaport"
@@ -1128,10 +1128,10 @@
   },
   {
     "id": "paul",
-    "name": "Paul",
+    "name": "Paul Feldman",
     "partners": [
       "Carin Feldman",
-      "Lisa"
+      "Lisa Feldman"
     ],
     "generation": "B",
     "branch": "Sylvia",
@@ -1203,7 +1203,7 @@
   },
   {
     "id": "michelle_mimi",
-    "name": "Michelle/Mimi",
+    "name": "Mimi Kravetz",
     "partners": [
       "Lee Kravetz"
     ],
@@ -1294,7 +1294,7 @@
   },
   {
     "id": "alec",
-    "name": "Alec",
+    "name": "Alec Kravetz",
     "partners": [],
     "generation": "D",
     "branch": "Sylvia",
@@ -1302,7 +1302,7 @@
   },
   {
     "id": "chloe",
-    "name": "Chloe",
+    "name": "Chloe Kravetz",
     "partners": [],
     "generation": "D",
     "branch": "Sylvia",
