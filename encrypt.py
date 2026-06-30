@@ -143,7 +143,7 @@ GATE_HTML = """\
   <h1>Warshawsky Family Tree</h1>
   <p class="subtitle">Members only &mdash; please enter the family password</p>
   <label for="pwd">Password</label>
-  <input type="password" id="pwd" placeholder="Enter family password" autocomplete="current-password">
+  <input type="text" id="pwd" placeholder="Enter family password" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off">
   <div class="remember-row">
     <input type="checkbox" id="remember" checked>
     <label for="remember">Remember me on this device</label>
@@ -156,6 +156,50 @@ GATE_HTML = """\
 <script>
 const ENCRYPTED = __ENCRYPTED_PAYLOAD__;
 const STORAGE_KEY = 'wfc_pwd';
+
+// ── Password input: show last typed character briefly, then mask ──────────
+let realPwd = '';
+let peekTimer = null;
+const DOT = '•'; // •
+
+function showMasked() {
+  document.getElementById('pwd').value = DOT.repeat(realPwd.length);
+}
+
+function showPeek() {
+  clearTimeout(peekTimer);
+  document.getElementById('pwd').value = DOT.repeat(Math.max(0, realPwd.length - 1)) + realPwd.slice(-1);
+  peekTimer = setTimeout(showMasked, 800);
+}
+
+document.getElementById('pwd').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') return; // handled separately
+  if (e.ctrlKey || e.metaKey) {
+    if (e.key === 'a') { realPwd = ''; showMasked(); e.preventDefault(); }
+    else if (e.key === 'v') {
+      // Paste: read clipboard then append
+      navigator.clipboard && navigator.clipboard.readText().then(text => {
+        realPwd += text;
+        showPeek();
+      }).catch(() => {});
+      e.preventDefault();
+    }
+    return;
+  }
+  if (e.key === 'Backspace') {
+    realPwd = realPwd.slice(0, -1);
+    showMasked();
+    e.preventDefault();
+  } else if (e.key === 'Delete') {
+    realPwd = '';
+    showMasked();
+    e.preventDefault();
+  } else if (e.key.length === 1) {
+    realPwd += e.key;
+    showPeek();
+    e.preventDefault();
+  }
+});
 
 // ── Core decrypt ──────────────────────────────────────────────────────────
 function hexToBytes(hex) {
@@ -192,7 +236,7 @@ function showLoading() {
 
 // ── Unlock from typed password ────────────────────────────────────────────
 async function unlock() {
-  const pwd = document.getElementById('pwd').value.trim();
+  const pwd = realPwd.trim();
   if (!pwd) return;
   showLoading();
   try {
@@ -212,7 +256,7 @@ async function unlock() {
   }
 }
 
-document.getElementById('pwd').addEventListener('keydown', e => { if(e.key==='Enter') unlock(); });
+document.getElementById('pwd').addEventListener('keydown', e => { if(e.key==='Enter') unlock(); }, true);
 document.querySelector('button').addEventListener('click', unlock);
 
 // ── Remember-me: stored password ─────────────────────────────────────────
