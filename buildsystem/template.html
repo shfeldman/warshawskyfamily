@@ -2544,6 +2544,7 @@ function flashListCard(id) {
 (function buildBranchNav() {
   const nav = document.getElementById('explorer-branch-nav');
   if (!nav) return;
+  nav.hidden = true; // keep hidden until Tree Branch View is activated
   BRANCH_ORDER.forEach(branch => {
     const btn = document.createElement('button');
     btn.type = 'button';
