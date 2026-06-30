@@ -782,6 +782,51 @@
     background: var(--paper-deep) !important;
   }
 
+  /* ── New view switcher bar ── */
+  .view-switcher-bar {
+    padding: 0 1rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .view-switcher-buttons {
+    display: flex;
+    gap: 0;
+    border: 2px solid var(--rule-soft);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .view-switch-btn {
+    flex: 1;
+    padding: 0.65rem 1rem;
+    font-size: 0.95rem;
+    font-family: inherit;
+    font-weight: 600;
+    border: none;
+    background: var(--paper-deep);
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    letter-spacing: 0.02em;
+  }
+  .view-switch-btn:first-child {
+    border-right: 2px solid var(--rule-soft);
+  }
+  .view-switch-btn.active {
+    background: #8a6d1f;
+    color: #fff;
+  }
+  .view-switch-btn:not(.active):hover {
+    background: var(--paper-mid, #ede8dc);
+  }
+  .list-only-toolbar {
+    transition: opacity 0.2s;
+  }
+  .list-only-toolbar.hidden-toolbar {
+    opacity: 0;
+    pointer-events: none;
+  }
+
   .about-section {
     margin-top: 1rem;
     border: 1.5px solid var(--rule-soft);
@@ -1011,15 +1056,38 @@
     </div>
   </div>
 
-  <div class="below-panel">
-    <div class="toolbar">
+  <!-- View switcher: sits right below search, immediately above the active view -->
+  <div class="view-switcher-bar">
+    <div class="view-switcher-buttons">
+      <button id="view-list-btn" type="button" class="view-switch-btn active">&#9776; List View</button>
+      <button id="view-tree-btn" type="button" class="view-switch-btn">&#127795; Tree Branch View</button>
+    </div>
+    <div class="toolbar list-only-toolbar">
       <button id="expand-all" type="button">Expand All</button>
       <button id="collapse-all" type="button">Collapse All</button>
     </div>
-    <div class="toolbar">
-      <button id="view-toggle" type="button" class="view-toggle-btn">&#127795; Explorer View</button>
-    </div>
+  </div>
 
+  <!-- The views — appear immediately below the switcher -->
+  <ul class="tree" id="tree" role="region" aria-label="Family tree"></ul>
+
+  <div id="explorer-branch-nav" class="explorer-branch-nav" hidden></div>
+
+  <div id="explorer-wrap" class="explorer-wrap" hidden>
+    <div class="explorer-controls">
+      <button id="explorer-zoom-in" type="button" aria-label="Zoom in">+</button>
+      <button id="explorer-zoom-out" type="button" aria-label="Zoom out">&minus;</button>
+      <button id="explorer-fit" type="button" aria-label="Fit to screen">&#9974;</button>
+    </div>
+    <svg id="explorer-svg" width="100%" height="100%"></svg>
+    <div id="explorer-detail" class="explorer-detail" hidden></div>
+    <p class="explorer-hint">Drag to pan &middot; pinch or scroll to zoom &middot; tap a person for details</p>
+  </div>
+
+  <p class="no-results" id="no-results">No names match your search.</p>
+
+  <!-- Everything below the views -->
+  <div class="below-panel">
     <button id="relate-toggle" type="button" class="relate-toggle-btn">How are two people related?</button>
     <button id="quiz-toggle" type="button" class="relate-toggle-btn quiz-toggle-btn">&#127922; Family Quiz</button>
     <div id="quiz-panel" class="quiz-panel" hidden>
@@ -1068,23 +1136,6 @@
       </div>
     </div>
   </div>
-
-  <ul class="tree" id="tree" role="region" aria-label="Family tree"></ul>
-
-  <div id="explorer-branch-nav" class="explorer-branch-nav" hidden></div>
-
-  <div id="explorer-wrap" class="explorer-wrap" hidden>
-    <div class="explorer-controls">
-      <button id="explorer-zoom-in" type="button" aria-label="Zoom in">+</button>
-      <button id="explorer-zoom-out" type="button" aria-label="Zoom out">&minus;</button>
-      <button id="explorer-fit" type="button" aria-label="Fit to screen">&#9974;</button>
-    </div>
-    <svg id="explorer-svg" width="100%" height="100%"></svg>
-    <div id="explorer-detail" class="explorer-detail" hidden></div>
-    <p class="explorer-hint">Drag to pan &middot; pinch or scroll to zoom &middot; tap a person for details</p>
-  </div>
-
-  <p class="no-results" id="no-results">No names match your search.</p>
 </main>
 
 <button id="back-to-top" type="button" aria-label="Scroll back to top" hidden>&uarr; Top</button>
@@ -2436,27 +2487,40 @@ function hideExplorerDetail() {
 }
 
 function switchToListView() {
-  document.getElementById('tree').hidden = false;
-  document.getElementById('explorer-wrap').hidden = true;
-  viewToggle.textContent = '\uD83C\uDF33 Explorer View';
-}
-
-const viewToggle = document.getElementById('view-toggle');
-viewToggle.addEventListener('click', () => {
   const treeEl2 = document.getElementById('tree');
   const explorerWrap = document.getElementById('explorer-wrap');
   const branchNav = document.getElementById('explorer-branch-nav');
-  const showingExplorer = explorerWrap.hidden;
+  const listBtn = document.getElementById('view-list-btn');
+  const treeBtn = document.getElementById('view-tree-btn');
+  const listToolbar = document.querySelector('.list-only-toolbar');
+  treeEl2.hidden = false;
+  explorerWrap.hidden = true;
+  if (branchNav) branchNav.hidden = true;
+  listBtn.classList.add('active');
+  treeBtn.classList.remove('active');
+  if (listToolbar) listToolbar.classList.remove('hidden-toolbar');
+}
+
+function switchToTreeBranchView() {
+  const treeEl2 = document.getElementById('tree');
+  const explorerWrap = document.getElementById('explorer-wrap');
+  const branchNav = document.getElementById('explorer-branch-nav');
+  const listBtn = document.getElementById('view-list-btn');
+  const treeBtn = document.getElementById('view-tree-btn');
+  const listToolbar = document.querySelector('.list-only-toolbar');
   const wasAlreadyBuilt = explorerBuilt;
-  treeEl2.hidden = showingExplorer;
-  explorerWrap.hidden = !showingExplorer;
-  if (branchNav) branchNav.hidden = !showingExplorer;
-  viewToggle.textContent = showingExplorer ? '\uD83D\uDCCB List View' : '\uD83C\uDF33 Explorer View';
-  if (showingExplorer) {
-    buildExplorer();
-    if (!wasAlreadyBuilt) setTimeout(initialExplorerView, 50);
-  }
-});
+  treeEl2.hidden = true;
+  explorerWrap.hidden = false;
+  if (branchNav) branchNav.hidden = false;
+  treeBtn.classList.add('active');
+  listBtn.classList.remove('active');
+  if (listToolbar) listToolbar.classList.add('hidden-toolbar');
+  buildExplorer();
+  if (!wasAlreadyBuilt) setTimeout(initialExplorerView, 50);
+}
+
+document.getElementById('view-list-btn').addEventListener('click', switchToListView);
+document.getElementById('view-tree-btn').addEventListener('click', switchToTreeBranchView);
 document.getElementById('explorer-zoom-in').addEventListener('click', () => zoomExplorerAt({x: document.getElementById('explorer-wrap').clientWidth/2, y: document.getElementById('explorer-wrap').clientHeight/2}, 1.25));
 document.getElementById('explorer-zoom-out').addEventListener('click', () => zoomExplorerAt({x: document.getElementById('explorer-wrap').clientWidth/2, y: document.getElementById('explorer-wrap').clientHeight/2}, 0.8));
 document.getElementById('explorer-fit').addEventListener('click', fitExplorerToScreen);
