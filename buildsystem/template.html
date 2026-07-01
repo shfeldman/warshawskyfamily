@@ -134,6 +134,36 @@
   }
   .gen-jump-btn:hover { background: var(--rule-soft); color: var(--ink); }
 
+  .branch-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    padding: 0.6rem 0 0.4rem;
+    border-bottom: 1px solid var(--rule-soft);
+    margin-bottom: 0.5rem;
+  }
+  .branch-filter-btn {
+    border: 1.5px solid var(--rule-soft);
+    border-radius: 999px;
+    background: none;
+    padding: 0.3rem 0.85rem;
+    font-size: 0.82rem;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--ink-soft);
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .branch-filter-btn:hover { background: var(--rule-soft); color: var(--ink); }
+  .branch-filter-btn.active {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  @media (max-width: 640px) {
+    .branch-filter-btn { font-size: 0.72rem; padding: 0.25rem 0.6rem; }
+  }
+
   * { box-sizing: border-box; }
 
   body {
@@ -1272,6 +1302,20 @@
     <label for="search" class="sr-only" style="position:absolute;left:-9999px;">Search the family tree by name</label>
     <input type="search" id="search" placeholder="Search a name..." autocomplete="off" aria-describedby="search-status">
     <div id="search-status" role="status" aria-live="polite"></div>
+  </div>
+
+  <!-- Branch filter bar -->
+  <div class="branch-filter-bar" id="branch-filter-bar">
+    <button class="branch-filter-btn active" data-branch="" type="button">All</button>
+    <button class="branch-filter-btn" data-branch="Henry" type="button">Henry</button>
+    <button class="branch-filter-btn" data-branch="Dave" type="button">Dave</button>
+    <button class="branch-filter-btn" data-branch="Jack" type="button">Jack</button>
+    <button class="branch-filter-btn" data-branch="Bessie" type="button">Bessie</button>
+    <button class="branch-filter-btn" data-branch="Saul" type="button">Saul</button>
+    <button class="branch-filter-btn" data-branch="Milt" type="button">Milt</button>
+    <button class="branch-filter-btn" data-branch="Evelyn" type="button">Evelyn</button>
+    <button class="branch-filter-btn" data-branch="Sylvia" type="button">Sylvia</button>
+    <button class="branch-filter-btn" data-branch="Rudy" type="button">Rudy</button>
   </div>
 
   <!-- View switcher: sits right below search, immediately above the active view -->
@@ -3034,6 +3078,48 @@ document.querySelectorAll('.gen-jump-btn').forEach(btn => {
     });
   }, { rootMargin: '-10% 0px -85% 0px' });
   document.querySelectorAll('.gen-divider[data-gen-marker]').forEach(el => observer.observe(el));
+})();
+
+// ---- Branch filter bar ----
+(function() {
+  let activeBranch = '';
+
+  function applyBranchFilter(branch) {
+    activeBranch = branch;
+
+    // Update button states
+    document.querySelectorAll('.branch-filter-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.branch === branch);
+    });
+
+    // Filter list view: show/hide root-level branch nodes
+    const treeEl = document.getElementById('tree');
+    Array.from(treeEl.children).forEach(child => {
+      if (child.classList.contains('gen-divider')) {
+        child.style.display = '';
+        return;
+      }
+      const id = child.dataset && child.dataset.id;
+      if (!id) return;
+      const p = byId[id];
+      if (!branch) {
+        child.style.display = '';
+      } else {
+        child.style.display = (p && p.branch === branch) ? '' : 'none';
+      }
+    });
+
+    // Filter tree branch view (explorer)
+    syncExplorerFilter(branch);
+  }
+
+  document.querySelectorAll('.branch-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => applyBranchFilter(btn.dataset.branch));
+  });
+
+  // Re-apply filter whenever the user switches views
+  document.getElementById('view-list-btn').addEventListener('click', () => applyBranchFilter(activeBranch));
+  document.getElementById('view-tree-btn').addEventListener('click', () => applyBranchFilter(activeBranch));
 })();
 </script>
 
