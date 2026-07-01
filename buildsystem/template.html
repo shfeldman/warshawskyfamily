@@ -2934,13 +2934,31 @@ function flashListCard(id) {
     const decades = Object.keys(decadeCounts).map(Number).sort();
     const maxDec = Math.max(...Object.values(decadeCounts));
 
-    // Geographic spread
+    // Geographic spread — group by state
+    const STATE_NAMES = {
+      AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',
+      CO:'Colorado',CT:'Connecticut',DE:'Delaware',FL:'Florida',GA:'Georgia',
+      HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',
+      KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',
+      MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',
+      NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',
+      NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',
+      OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',
+      SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',
+      VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',
+      DC:'Washington D.C.'
+    };
     const locCounts = {};
     descendants.forEach(p => {
       const loc = p.vitals && p.vitals.location ? p.vitals.location.trim() : null;
-      if (loc) locCounts[loc] = (locCounts[loc]||0) + 1;
+      if (!loc) return;
+      // Extract state: last token after comma, or the whole string if no comma
+      const parts = loc.split(',');
+      const stateAbbr = parts[parts.length - 1].trim().toUpperCase();
+      const stateName = STATE_NAMES[stateAbbr] || stateAbbr;
+      locCounts[stateName] = (locCounts[stateName]||0) + 1;
     });
-    const topLocs = Object.entries(locCounts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    const topLocs = Object.entries(locCounts).sort((a,b)=>b[1]-a[1]).slice(0,10);
     const maxLoc = topLocs[0] ? topLocs[0][1] : 1;
     const withLocation = Object.values(locCounts).reduce((a,b)=>a+b,0);
 
