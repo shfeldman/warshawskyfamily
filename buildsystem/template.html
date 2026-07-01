@@ -145,7 +145,7 @@
     margin-bottom: 0.5rem;
   }
   .branch-filter-btn {
-    border: 1.5px solid var(--rule-soft);
+    border: 2px solid var(--btn-color, var(--rule-soft));
     border-radius: 999px;
     background: none;
     padding: 0.3rem 0.85rem;
@@ -153,11 +153,22 @@
     font-family: inherit;
     font-weight: 600;
     cursor: pointer;
-    color: var(--ink-soft);
+    color: var(--btn-color, var(--ink-soft));
     transition: background 0.15s, color 0.15s, border-color 0.15s;
   }
-  .branch-filter-btn:hover { background: var(--rule-soft); color: var(--ink); }
+  .branch-filter-btn:hover {
+    background: color-mix(in srgb, var(--btn-color, var(--rule-soft)) 12%, transparent);
+  }
   .branch-filter-btn.active {
+    background: var(--btn-color, var(--ink));
+    color: #fff;
+    border-color: var(--btn-color, var(--ink));
+  }
+  /* "All" button uses neutral ink color */
+  .branch-filter-btn[data-branch=""] {
+    --btn-color: var(--ink-soft);
+  }
+  .branch-filter-btn[data-branch=""].active {
     background: var(--ink);
     color: var(--paper);
     border-color: var(--ink);
@@ -3146,7 +3157,13 @@ document.querySelectorAll('.gen-jump-btn').forEach(btn => {
     syncExplorerFilter(branch);
   }
 
+  const BRANCH_HEX = {
+    Henry:'#c1440e', Dave:'#0d5c8c', Jack:'#1f7a4d', Bessie:'#8a3f8c',
+    Saul:'#6a4fb5', Milt:'#b8860b', Evelyn:'#1f9489', Sylvia:'#c2287d', Rudy:'#8a5a1e'
+  };
   document.querySelectorAll('.branch-filter-btn').forEach(btn => {
+    const color = BRANCH_HEX[btn.dataset.branch];
+    if (color) btn.style.setProperty('--btn-color', color);
     btn.addEventListener('click', () => applyBranchFilter(btn.dataset.branch));
   });
 
