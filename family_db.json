@@ -151,9 +151,9 @@
   },
   {
     "id": "bart",
-    "name": "Bart",
+    "name": "Bart Sarrel",
     "partners": [
-      "Annie"
+      "Annie Sarrel"
     ],
     "generation": "C",
     "branch": "Henry",
@@ -163,7 +163,7 @@
     "id": "louis",
     "name": "Louis Sarrel",
     "partners": [
-      "Marla"
+      "Marla Sarrel"
     ],
     "generation": "C",
     "branch": "Henry",
@@ -174,9 +174,9 @@
   },
   {
     "id": "ronald",
-    "name": "Ronald",
+    "name": "Ronald Sarrel",
     "partners": [
-      "Gina"
+      "Gina Sarrel"
     ],
     "generation": "C",
     "branch": "Henry",
@@ -245,7 +245,7 @@
   },
   {
     "id": "matthew_henry",
-    "name": "Matthew",
+    "name": "Matthew Sarrel",
     "partners": [],
     "generation": "D",
     "branch": "Henry",
@@ -253,7 +253,7 @@
   },
   {
     "id": "eric",
-    "name": "Eric",
+    "name": "Eric Sarrel",
     "partners": [],
     "generation": "D",
     "branch": "Henry",
@@ -261,7 +261,7 @@
   },
   {
     "id": "jacob_henry",
-    "name": "Jacob",
+    "name": "Jacob Sarrel",
     "partners": [],
     "generation": "D",
     "branch": "Henry",
@@ -269,7 +269,7 @@
   },
   {
     "id": "julia",
-    "name": "Julia",
+    "name": "Julia Sarrel",
     "partners": [],
     "generation": "D",
     "branch": "Henry",
@@ -277,7 +277,7 @@
   },
   {
     "id": "ava",
-    "name": "Ava",
+    "name": "Ava Sarrel",
     "partners": [],
     "generation": "D",
     "branch": "Henry",
