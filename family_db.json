@@ -372,9 +372,7 @@
   {
     "id": "drew",
     "name": "Drew Warner",
-    "partners": [
-      "Ledi Warner"
-    ],
+    "partners": [],
     "generation": "C",
     "branch": "Jack",
     "parent": "arthur"
