@@ -65,9 +65,9 @@
   },
   {
     "id": "milt",
-    "name": "Milt",
+    "name": "Milt Warner",
     "partners": [
-      "Sarah"
+      "Sarah Warner"
     ],
     "generation": "A",
     "branch": "Milt",
@@ -938,10 +938,10 @@
   },
   {
     "id": "alan",
-    "name": "Alan",
+    "name": "Alan Warner",
     "partners": [
-      "Faith",
-      "Donna"
+      "Faith Warner",
+      "Donna Warner"
     ],
     "generation": "B",
     "branch": "Milt",
@@ -949,7 +949,7 @@
   },
   {
     "id": "karen",
-    "name": "Karen",
+    "name": "Karen Wolosky",
     "partners": [
       "Larry Wolosky"
     ],
@@ -959,7 +959,7 @@
   },
   {
     "id": "zachary_milt",
-    "name": "Zachary",
+    "name": "Zachary Warner",
     "partners": [],
     "generation": "C",
     "branch": "Milt",
@@ -967,7 +967,7 @@
   },
   {
     "id": "madeline",
-    "name": "Madeline",
+    "name": "Madeline Warner",
     "partners": [],
     "generation": "C",
     "branch": "Milt",
@@ -975,7 +975,7 @@
   },
   {
     "id": "hannah",
-    "name": "Hannah",
+    "name": "Hannah Warner",
     "partners": [],
     "generation": "C",
     "branch": "Milt",
@@ -983,9 +983,9 @@
   },
   {
     "id": "adam_karen",
-    "name": "Adam",
+    "name": "Adam Wolosky",
     "partners": [
-      "Michelle"
+      "Michelle Wolosky"
     ],
     "generation": "C",
     "branch": "Milt",
@@ -993,7 +993,7 @@
   },
   {
     "id": "samantha_karen",
-    "name": "Samantha",
+    "name": "Samantha Wolosky",
     "partners": [],
     "generation": "C",
     "branch": "Milt",
@@ -1001,7 +1001,7 @@
   },
   {
     "id": "colin",
-    "name": "Colin",
+    "name": "Colin Wolosky",
     "partners": [],
     "generation": "D",
     "branch": "Milt",
@@ -1009,7 +1009,7 @@
   },
   {
     "id": "mackenzie",
-    "name": "Mackenzie",
+    "name": "MacKenzie Wolosky",
     "partners": [],
     "generation": "D",
     "branch": "Milt",
