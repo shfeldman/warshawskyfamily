@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Louis and Rose Warshawsky Family Circle</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1188,6 +1190,21 @@
   }
   #back-to-top:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 
+  #map-wrap {
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1.5px solid var(--rule-soft);
+    margin-bottom: 0.5rem;
+  }
+  #family-map {
+    width: 100%;
+    height: 72vh;
+    min-height: 420px;
+  }
+  .map-popup-name { font-weight: 700; font-size: 0.95rem; color: #2c1810; }
+  .map-popup-list { margin: 0.3rem 0 0; padding-left: 1.1rem; font-size: 0.85rem; color: #4a3f33; }
+
   .explorer-wrap {
     position: relative;
     width: 100%;
@@ -1323,6 +1340,7 @@
     <div class="view-switcher-buttons">
       <button id="view-list-btn" type="button" class="view-switch-btn active">&#9776; List View</button>
       <button id="view-tree-btn" type="button" class="view-switch-btn">&#127795; Tree Branch View</button>
+      <button id="view-map-btn" type="button" class="view-switch-btn">&#127760; Map View</button>
     </div>
     <div class="toolbar list-only-toolbar">
       <button id="expand-all" type="button">Expand All</button>
@@ -1351,6 +1369,12 @@
     <svg id="explorer-svg" width="100%" height="100%"></svg>
     <div id="explorer-detail" class="explorer-detail" hidden></div>
     <p class="explorer-hint">Drag to pan &middot; pinch or scroll to zoom &middot; tap a person for details</p>
+  </div>
+
+  <!-- Map View -->
+  <div id="map-wrap" hidden>
+    <div id="family-map"></div>
+    <p class="explorer-hint">Click a pin to see who lives there &middot; zoom and drag to explore</p>
   </div>
 
   <p class="no-results" id="no-results">No names match your search.</p>
@@ -2726,13 +2750,17 @@ function switchToListView() {
   const treeEl2 = document.getElementById('tree');
   const explorerWrap = document.getElementById('explorer-wrap');
   const branchNav = document.getElementById('explorer-branch-nav');
+  const mapWrap = document.getElementById('map-wrap');
   const listBtn = document.getElementById('view-list-btn');
   const treeBtn = document.getElementById('view-tree-btn');
+  const mapBtn = document.getElementById('view-map-btn');
   treeEl2.hidden = false;
   explorerWrap.hidden = true;
   if (branchNav) branchNav.hidden = true;
+  if (mapWrap) mapWrap.hidden = true;
   listBtn.classList.add('active');
   treeBtn.classList.remove('active');
+  if (mapBtn) mapBtn.classList.remove('active');
   document.querySelectorAll('.list-only-toolbar').forEach(el => el.classList.remove('hidden-toolbar'));
 }
 
@@ -2740,14 +2768,18 @@ function switchToTreeBranchView() {
   const treeEl2 = document.getElementById('tree');
   const explorerWrap = document.getElementById('explorer-wrap');
   const branchNav = document.getElementById('explorer-branch-nav');
+  const mapWrap = document.getElementById('map-wrap');
   const listBtn = document.getElementById('view-list-btn');
   const treeBtn = document.getElementById('view-tree-btn');
+  const mapBtn = document.getElementById('view-map-btn');
   const wasAlreadyBuilt = explorerBuilt;
   treeEl2.hidden = true;
   explorerWrap.hidden = false;
   if (branchNav) branchNav.hidden = false;
+  if (mapWrap) mapWrap.hidden = true;
   treeBtn.classList.add('active');
   listBtn.classList.remove('active');
+  if (mapBtn) mapBtn.classList.remove('active');
   document.querySelectorAll('.list-only-toolbar').forEach(el => el.classList.add('hidden-toolbar'));
   buildExplorer();
   if (!wasAlreadyBuilt) setTimeout(initialExplorerView, 50);
@@ -2755,6 +2787,7 @@ function switchToTreeBranchView() {
 
 document.getElementById('view-list-btn').addEventListener('click', switchToListView);
 document.getElementById('view-tree-btn').addEventListener('click', switchToTreeBranchView);
+document.getElementById('view-map-btn').addEventListener('click', switchToMapView);
 document.getElementById('explorer-zoom-in').addEventListener('click', () => zoomExplorerAt({x: document.getElementById('explorer-wrap').clientWidth/2, y: document.getElementById('explorer-wrap').clientHeight/2}, 1.25));
 document.getElementById('explorer-zoom-out').addEventListener('click', () => zoomExplorerAt({x: document.getElementById('explorer-wrap').clientWidth/2, y: document.getElementById('explorer-wrap').clientHeight/2}, 0.8));
 document.getElementById('explorer-fit').addEventListener('click', fitExplorerToScreen);
@@ -3121,6 +3154,81 @@ document.querySelectorAll('.gen-jump-btn').forEach(btn => {
   document.getElementById('view-list-btn').addEventListener('click', () => applyBranchFilter(activeBranch));
   document.getElementById('view-tree-btn').addEventListener('click', () => applyBranchFilter(activeBranch));
 })();
+
+// ---- Map View ----
+const LOCATION_COORDS = {
+  'Berkeley, CA':      [37.8716, -122.2727],
+  'Laurel, MD':        [39.0993,  -76.8483],
+  'Half Moon Bay, CA': [37.4636, -122.4286],
+  'Columbia, MD':      [39.2037,  -76.8610],
+  'Alexandria, VA':    [38.8048,  -77.0469],
+  'Annapolis, MD':     [38.9784,  -76.4922],
+};
+
+let familyMap = null;
+
+function switchToMapView() {
+  const treeEl2 = document.getElementById('tree');
+  const explorerWrap = document.getElementById('explorer-wrap');
+  const branchNav = document.getElementById('explorer-branch-nav');
+  const mapWrap = document.getElementById('map-wrap');
+  const listBtn = document.getElementById('view-list-btn');
+  const treeBtn = document.getElementById('view-tree-btn');
+  const mapBtn = document.getElementById('view-map-btn');
+  treeEl2.hidden = true;
+  explorerWrap.hidden = true;
+  if (branchNav) branchNav.hidden = true;
+  mapWrap.hidden = false;
+  mapBtn.classList.add('active');
+  listBtn.classList.remove('active');
+  treeBtn.classList.remove('active');
+  document.querySelectorAll('.list-only-toolbar').forEach(el => el.classList.add('hidden-toolbar'));
+
+  if (familyMap) { familyMap.invalidateSize(); return; }
+
+  // Build location → people index
+  const locPeople = {};
+  PEOPLE_DATA.forEach(p => {
+    const loc = p.vitals && p.vitals.location ? p.vitals.location.trim() : null;
+    if (!loc) return;
+    if (!locPeople[loc]) locPeople[loc] = [];
+    locPeople[loc].push(p);
+  });
+
+  familyMap = L.map('family-map').setView([38.5, -96], 4);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 18
+  }).addTo(familyMap);
+
+  const branchColors = {
+    Henry:'#c1440e', Dave:'#0d5c8c', Jack:'#1f7a4d', Bessie:'#8a3f8c',
+    Saul:'#6a4fb5', Milt:'#b8860b', Evelyn:'#1f9489', Sylvia:'#c2287d', Rudy:'#8a5a1e'
+  };
+
+  Object.entries(locPeople).forEach(([loc, people]) => {
+    const coords = LOCATION_COORDS[loc];
+    if (!coords) return;
+
+    // Pick pin color from the first person's branch
+    const pinColor = branchColors[people[0].branch] || '#8a6d1f';
+    const svgIcon = L.divIcon({
+      className: '',
+      html: `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="38" viewBox="0 0 28 38">
+        <path d="M14 0C6.27 0 0 6.27 0 14c0 9.63 14 24 14 24s14-14.37 14-24C28 6.27 21.73 0 14 0z" fill="${pinColor}"/>
+        <circle cx="14" cy="14" r="6" fill="white" opacity="0.9"/>
+        <text x="14" y="18" text-anchor="middle" font-size="9" font-weight="bold" fill="${pinColor}">${people.length}</text>
+      </svg>`,
+      iconSize: [28, 38],
+      iconAnchor: [14, 38],
+      popupAnchor: [0, -38]
+    });
+
+    const nameList = people.map(p => `<li>${p.name}</li>`).join('');
+    const popup = `<div class="map-popup-name">📍 ${loc}</div><ul class="map-popup-list">${nameList}</ul>`;
+    L.marker(coords, { icon: svgIcon }).addTo(familyMap).bindPopup(popup);
+  });
+}
 </script>
 
 </body>
