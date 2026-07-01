@@ -1434,10 +1434,10 @@
   },
   {
     "id": "bruce",
-    "name": "Bruce",
+    "name": "Bruce Warner",
     "partners": [
-      "Barbara",
-      "Debbie"
+      "Barbara Warner",
+      "Debbie Warner"
     ],
     "generation": "B",
     "branch": "Rudy",
@@ -1445,7 +1445,7 @@
   },
   {
     "id": "lori",
-    "name": "Lori",
+    "name": "Lori Robertson",
     "partners": [
       "Glenn Robertson"
     ],
@@ -1455,7 +1455,7 @@
   },
   {
     "id": "helene",
-    "name": "Helene",
+    "name": "Helene Pry",
     "partners": [
       "Greg Pry"
     ],
@@ -1465,7 +1465,7 @@
   },
   {
     "id": "daniel",
-    "name": "Daniel",
+    "name": "Daniel Warner",
     "partners": [],
     "generation": "C",
     "branch": "Rudy",
@@ -1473,7 +1473,7 @@
   },
   {
     "id": "hilary",
-    "name": "Hilary",
+    "name": "Hilary Widlansky",
     "partners": [
       "Robbie Widlansky"
     ],
@@ -1483,9 +1483,9 @@
   },
   {
     "id": "andrew",
-    "name": "Andrew",
+    "name": "Andrew Robertson",
     "partners": [
-      "Brittni"
+      "Brittni Robertson"
     ],
     "generation": "C",
     "branch": "Rudy",
@@ -1493,7 +1493,7 @@
   },
   {
     "id": "matthew_lori",
-    "name": "Matthew",
+    "name": "Matthew Robertson",
     "partners": [],
     "generation": "C",
     "branch": "Rudy",
@@ -1501,9 +1501,9 @@
   },
   {
     "id": "michael_helene",
-    "name": "Michael",
+    "name": "Michael Pry",
     "partners": [
-      "Betti"
+      "Betti Pry"
     ],
     "generation": "C",
     "branch": "Rudy",
@@ -1511,7 +1511,7 @@
   },
   {
     "id": "kristen",
-    "name": "Kristen",
+    "name": "Kristen Pry",
     "partners": [],
     "generation": "C",
     "branch": "Rudy",
@@ -1519,7 +1519,7 @@
   },
   {
     "id": "keith",
-    "name": "Keith",
+    "name": "Keith Pry",
     "partners": [],
     "generation": "C",
     "branch": "Rudy",
@@ -1527,7 +1527,7 @@
   },
   {
     "id": "devyn",
-    "name": "Devyn",
+    "name": "Devyn Widlansky",
     "partners": [],
     "generation": "D",
     "branch": "Rudy",
@@ -1535,7 +1535,7 @@
   },
   {
     "id": "kenzi",
-    "name": "Kenzi",
+    "name": "Kenzi Widlansky",
     "partners": [],
     "generation": "D",
     "branch": "Rudy",
@@ -1543,7 +1543,7 @@
   },
   {
     "id": "kylie",
-    "name": "Kylie",
+    "name": "Kylie Robertson",
     "partners": [],
     "generation": "D",
     "branch": "Rudy",
@@ -1552,7 +1552,7 @@
   },
   {
     "id": "parker_andrew",
-    "name": "Parker",
+    "name": "Parker Robertson",
     "partners": [],
     "generation": "D",
     "branch": "Rudy",
@@ -1561,7 +1561,7 @@
   },
   {
     "id": "savannah",
-    "name": "Savannah",
+    "name": "Savannah Pry",
     "partners": [],
     "generation": "D",
     "branch": "Rudy",
@@ -1569,7 +1569,7 @@
   },
   {
     "id": "kaitlyn",
-    "name": "Kaitlyn",
+    "name": "Kaitlyn Pry",
     "partners": [],
     "generation": "D",
     "branch": "Rudy",
@@ -1577,7 +1577,7 @@
   },
   {
     "id": "logan",
-    "name": "Logan",
+    "name": "Logan Pry",
     "partners": [],
     "generation": "D",
     "branch": "Rudy",
