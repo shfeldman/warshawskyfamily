@@ -792,7 +792,7 @@
     "name": "Linda",
     "partners": [
       "Marc Lobur",
-      "Tom M."
+      "Tom Miserendino"
     ],
     "generation": "B",
     "branch": "Saul",
@@ -858,7 +858,7 @@
   },
   {
     "id": "jeanette_linda",
-    "name": "Jeanette",
+    "name": "Jeanette Lobur",
     "partners": [],
     "generation": "C",
     "branch": "Saul",
@@ -866,7 +866,7 @@
   },
   {
     "id": "kevin",
-    "name": "Kevin",
+    "name": "Kevin Lobur",
     "partners": [],
     "generation": "C",
     "branch": "Saul",
