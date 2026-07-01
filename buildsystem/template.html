@@ -3240,6 +3240,24 @@ document.querySelectorAll('.gen-jump-btn').forEach(btn => {
       }
     });
 
+    // If a specific branch is selected, expand its tree; if All, collapse all back
+    if (branch) {
+      Array.from(treeEl.children).forEach(child => {
+        const id = child.dataset && child.dataset.id;
+        if (!id) return;
+        const p = byId[id];
+        if (p && p.branch === branch) {
+          // Expand all rows within this branch
+          child.querySelectorAll('.node-row[aria-expanded]').forEach(row => setExpanded(row, true));
+          child.querySelectorAll('ul.children').forEach(ul => ul.hidden = false);
+        }
+      });
+    } else {
+      // "All" — collapse everything back to just root level
+      document.querySelectorAll('.node-row[aria-expanded]').forEach(row => setExpanded(row, false));
+      document.querySelectorAll('ul.children').forEach(ul => ul.hidden = true);
+    }
+
     // Filter tree branch view (explorer)
     syncExplorerFilter(branch);
   }
