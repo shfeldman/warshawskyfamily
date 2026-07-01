@@ -1174,7 +1174,7 @@
   @media print {
     .panel, header .eyebrow, footer { }
     #search, .chip-row-wrap, .toolbar, #relate-toggle, #relate-panel, .legend-note, #search-status, .print-btn-full, #back-to-top,
-    #quiz-toggle, #quiz-panel, #explorer-wrap, .share-link-btn {
+    #quiz-toggle, #quiz-panel, #explorer-wrap, .share-link-btn, .branch-filter-bar, #map-wrap, .view-switcher-bar, .gen-jump-bar {
       display: none !important;
     }
     ul.children[hidden] { display: block !important; }
@@ -2029,7 +2029,11 @@ document.getElementById('print-btn').addEventListener('click', () => {
   document.querySelectorAll('li.node.hidden-by-filter').forEach(li => li.classList.remove('hidden-by-filter'));
   document.querySelectorAll('.node-row[aria-expanded]').forEach(row => setExpanded(row, true));
   document.querySelectorAll('ul.children').forEach(ul => ul.hidden = false);
-  setTimeout(() => window.print(), 100);
+  setTimeout(() => {
+    window.print();
+    // Re-apply branch filter after print dialog closes
+    setTimeout(() => { if (typeof applyBranchFilter === 'function') applyBranchFilter(window._activeBranch || ''); }, 500);
+  }, 100);
 });
 
 // ---- Relationship finder ----
@@ -2981,12 +2985,12 @@ function flashListCard(id) {
 
       <div class="stats-sub">
         <h4>Average Age by Generation</h4>
-        ${['A','B','C','D'].filter(g=>avgAge(g)!==null).map(g=>`
+        ${(()=>{const gens=['A','B','C','D'].filter(g=>avgAge(g)!==null);const maxA=Math.max(...gens.map(g=>avgAge(g)));return gens.map(g=>`
           <div class="stats-bar-row">
             <span class="stats-bar-label">Gen. ${GEN_NUM[g]}</span>
-            ${bar(Math.round(avgAge(g)/100*100))}
+            ${bar(Math.round(avgAge(g)/maxA*100))}
             <span class="stats-bar-count">${avgAge(g)} yrs</span>
-          </div>`).join('')}
+          </div>`).join('');})()}
         ${['A','B','C','D'].every(g=>avgAge(g)===null) ? '<p style="font-size:0.8rem;color:var(--ink-soft);margin:0">Add birthdays to profiles to see averages.</p>' : ''}
       </div>
 
@@ -3127,29 +3131,32 @@ document.querySelectorAll('.gen-jump-btn').forEach(btn => {
 // ---- Branch filter bar ----
 (function() {
   let activeBranch = '';
+  window._activeBranch = '';
 
   function applyBranchFilter(branch) {
     activeBranch = branch;
+    window._activeBranch = branch;
+    window.applyBranchFilter = applyBranchFilter;
 
     // Update button states
     document.querySelectorAll('.branch-filter-btn').forEach(b => {
       b.classList.toggle('active', b.dataset.branch === branch);
     });
 
-    // Filter list view: show/hide root-level branch nodes
+    // Filter list view using hidden-by-filter class (plays nicely with search + print)
     const treeEl = document.getElementById('tree');
     Array.from(treeEl.children).forEach(child => {
       if (child.classList.contains('gen-divider')) {
-        child.style.display = '';
+        child.classList.remove('hidden-by-filter');
         return;
       }
       const id = child.dataset && child.dataset.id;
       if (!id) return;
       const p = byId[id];
-      if (!branch) {
-        child.style.display = '';
+      if (!branch || (p && p.branch === branch)) {
+        child.classList.remove('hidden-by-filter');
       } else {
-        child.style.display = (p && p.branch === branch) ? '' : 'none';
+        child.classList.add('hidden-by-filter');
       }
     });
 
