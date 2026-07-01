@@ -75,7 +75,7 @@
   },
   {
     "id": "evelyn",
-    "name": "Evelyn",
+    "name": "Evelyn Weisman",
     "partners": [
       "Bernie Weisman"
     ],
@@ -1017,9 +1017,9 @@
   },
   {
     "id": "marty",
-    "name": "Marty",
+    "name": "Marty Weisman",
     "partners": [
-      "Ronnie"
+      "Ronnie Weisman"
     ],
     "generation": "B",
     "branch": "Evelyn",
@@ -1027,7 +1027,7 @@
   },
   {
     "id": "narda",
-    "name": "Narda",
+    "name": "Narda Shomsky",
     "partners": [
       "Larry Deutchman",
       "Gary Shomsky"
@@ -1038,7 +1038,7 @@
   },
   {
     "id": "beth",
-    "name": "Beth",
+    "name": "Beth Binsky",
     "partners": [
       "Daryl Binsky"
     ],
@@ -1048,9 +1048,9 @@
   },
   {
     "id": "neil",
-    "name": "Neil",
+    "name": "Neil Weisman",
     "partners": [
-      "Dani"
+      "Dani Weisman"
     ],
     "generation": "C",
     "branch": "Evelyn",
@@ -1058,7 +1058,7 @@
   },
   {
     "id": "ryan",
-    "name": "Ryan",
+    "name": "Ryan Deutchman",
     "partners": [],
     "generation": "C",
     "branch": "Evelyn",
@@ -1066,7 +1066,7 @@
   },
   {
     "id": "brett",
-    "name": "Brett",
+    "name": "Brett Deutchman",
     "partners": [],
     "generation": "C",
     "branch": "Evelyn",
@@ -1074,7 +1074,7 @@
   },
   {
     "id": "brooklyn",
-    "name": "Brooklyn",
+    "name": "Brooklyn Binsky",
     "partners": [],
     "generation": "D",
     "branch": "Evelyn",
@@ -1082,7 +1082,7 @@
   },
   {
     "id": "ilana",
-    "name": "Ilana",
+    "name": "Ilana Binsky",
     "partners": [],
     "generation": "D",
     "branch": "Evelyn",
@@ -1090,7 +1090,7 @@
   },
   {
     "id": "evan",
-    "name": "Evan",
+    "name": "Evan Binsky",
     "partners": [],
     "generation": "D",
     "branch": "Evelyn",
@@ -1098,7 +1098,7 @@
   },
   {
     "id": "allegra",
-    "name": "Allegra",
+    "name": "Allegra Weisman",
     "partners": [],
     "generation": "D",
     "branch": "Evelyn",
@@ -1106,7 +1106,7 @@
   },
   {
     "id": "luma",
-    "name": "Luma",
+    "name": "Luma Weisman",
     "partners": [],
     "generation": "D",
     "branch": "Evelyn",
@@ -1114,7 +1114,7 @@
   },
   {
     "id": "benicio",
-    "name": "Benicio",
+    "name": "Benicio Weisman",
     "partners": [],
     "generation": "D",
     "branch": "Evelyn",
