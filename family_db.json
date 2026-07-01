@@ -54,10 +54,10 @@
   },
   {
     "id": "saul",
-    "name": "Saul",
+    "name": "Saul Warner",
     "partners": [
-      "Claire",
-      "Jeanette"
+      "Claire Warner",
+      "Jeanette Warner"
     ],
     "generation": "A",
     "branch": "Saul",
@@ -759,7 +759,7 @@
   },
   {
     "id": "suzanne",
-    "name": "Suzanne",
+    "name": "Suzanne Lindemann",
     "partners": [
       "Mike Lindemann"
     ],
@@ -769,7 +769,7 @@
   },
   {
     "id": "maxine_saul",
-    "name": "Maxine",
+    "name": "Maxine Rogers",
     "partners": [
       "Ron Rogers"
     ],
@@ -779,9 +779,9 @@
   },
   {
     "id": "eddie",
-    "name": "Eddie",
+    "name": "Eddie Warner",
     "partners": [
-      "Raya"
+      "Raya Warner"
     ],
     "generation": "B",
     "branch": "Saul",
@@ -800,7 +800,7 @@
   },
   {
     "id": "michelle_saul",
-    "name": "Michelle",
+    "name": "Michelle Howlett",
     "partners": [
       "Jason Howlett"
     ],
@@ -810,7 +810,7 @@
   },
   {
     "id": "sarah_saul",
-    "name": "Sarah",
+    "name": "Sarah Beuthe",
     "partners": [
       "Tim Beuthe"
     ],
@@ -820,7 +820,7 @@
   },
   {
     "id": "rebecca",
-    "name": "Rebecca",
+    "name": "Rebecca Kreig",
     "partners": [
       "John Kreig"
     ],
@@ -830,7 +830,7 @@
   },
   {
     "id": "autumn",
-    "name": "Autumn",
+    "name": "Autumn Naniewicz",
     "partners": [
       "Eddie Naniewicz"
     ],
@@ -840,7 +840,7 @@
   },
   {
     "id": "jordan_eddie",
-    "name": "Jordan",
+    "name": "Jordan Warner",
     "partners": [
       "Lauren Kranson"
     ],
@@ -850,7 +850,7 @@
   },
   {
     "id": "scott",
-    "name": "Scott",
+    "name": "Scott Warner",
     "partners": [],
     "generation": "C",
     "branch": "Saul",
@@ -874,7 +874,7 @@
   },
   {
     "id": "emily",
-    "name": "Emily",
+    "name": "Emily Howlett",
     "partners": [],
     "generation": "D",
     "branch": "Saul",
@@ -882,7 +882,7 @@
   },
   {
     "id": "jane",
-    "name": "Jane",
+    "name": "Jane Howlett",
     "partners": [],
     "generation": "D",
     "branch": "Saul",
@@ -890,7 +890,7 @@
   },
   {
     "id": "nina",
-    "name": "Nina",
+    "name": "Nina Beuthe",
     "partners": [],
     "generation": "D",
     "branch": "Saul",
@@ -898,7 +898,7 @@
   },
   {
     "id": "alex",
-    "name": "Alex",
+    "name": "Alex Beuthe",
     "partners": [],
     "generation": "D",
     "branch": "Saul",
@@ -906,7 +906,7 @@
   },
   {
     "id": "abigail",
-    "name": "Abigail",
+    "name": "Abigail Kreig",
     "partners": [],
     "generation": "D",
     "branch": "Saul",
@@ -914,7 +914,7 @@
   },
   {
     "id": "peyton",
-    "name": "Peyton",
+    "name": "Peyton Naniewicz",
     "partners": [],
     "generation": "D",
     "branch": "Saul",
@@ -922,7 +922,7 @@
   },
   {
     "id": "parker_saul",
-    "name": "Parker",
+    "name": "Parker Naniewicz",
     "partners": [],
     "generation": "D",
     "branch": "Saul",
@@ -930,7 +930,7 @@
   },
   {
     "id": "norah_bee",
-    "name": "Norah Bee",
+    "name": "Norah Bee Warner",
     "partners": [],
     "generation": "D",
     "branch": "Saul",
