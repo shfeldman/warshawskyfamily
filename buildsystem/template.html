@@ -1216,6 +1216,58 @@
   .map-popup-name { font-weight: 700; font-size: 0.95rem; color: #2c1810; }
   .map-popup-list { margin: 0.3rem 0 0; padding-left: 1.1rem; font-size: 0.85rem; color: #4a3f33; }
 
+  .choropleth-section {
+    padding: 1.2rem 0 0.5rem;
+    border-top: 1.5px solid var(--rule-soft);
+    margin-top: 0.8rem;
+  }
+  .choropleth-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0 0 0.7rem;
+  }
+  #choropleth-map {
+    width: 100%;
+    height: 420px;
+    border-radius: 8px;
+    border: 1.5px solid var(--rule-soft);
+    overflow: hidden;
+  }
+  .choropleth-legend {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-top: 0.6rem;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+  }
+  .legend-swatch {
+    width: 18px;
+    height: 14px;
+    border-radius: 3px;
+    display: inline-block;
+    border: 1px solid rgba(0,0,0,0.15);
+  }
+  .international-list {
+    margin-top: 1rem;
+    padding: 0.8rem 1rem;
+    background: var(--paper-deep);
+    border-radius: 8px;
+    border: 1.5px solid var(--rule-soft);
+  }
+  .international-list h4 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+    color: var(--ink);
+  }
+  .international-list ul {
+    margin: 0; padding-left: 1.2rem;
+    font-size: 0.85rem; color: var(--ink-soft);
+  }
+
   .explorer-wrap {
     position: relative;
     width: 100%;
@@ -1386,6 +1438,16 @@
   <div id="map-wrap" hidden>
     <div id="family-map"></div>
     <p class="explorer-hint">Click a pin to see who lives there &middot; zoom and drag to explore</p>
+
+    <div class="choropleth-section">
+      <h3 class="choropleth-title">Family Members by State</h3>
+      <div id="choropleth-map"></div>
+      <div class="choropleth-legend" id="choropleth-legend"></div>
+      <div id="international-list" class="international-list" hidden>
+        <h4>International</h4>
+        <ul id="international-ul"></ul>
+      </div>
+    </div>
   </div>
 
   <p class="no-results" id="no-results">No names match your search.</p>
@@ -3270,6 +3332,109 @@ function switchToMapView() {
     const popup = `<div class="map-popup-name">📍 ${loc}</div><ul class="map-popup-list">${nameList}</ul>`;
     L.marker(coords, { icon: svgIcon }).addTo(familyMap).bindPopup(popup);
   });
+
+  // ── Choropleth map ────────────────────────────────────────────────────────
+  buildChoropleth(locPeople);
+}
+
+let choroplethMap = null;
+
+function buildChoropleth(locPeople) {
+  // Tally by state abbr and detect international
+  const STATE_NAMES = {
+    AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',
+    CO:'Colorado',CT:'Connecticut',DE:'Delaware',FL:'Florida',GA:'Georgia',
+    HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',
+    KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',
+    MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',
+    NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',
+    NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',
+    OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',
+    SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',
+    VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',
+    DC:'Washington D.C.'
+  };
+  const stateCount = {}; // abbr → count
+  const statePeople = {}; // abbr → [name,...]
+  const international = {}; // country → [name,...]
+
+  Object.entries(locPeople).forEach(([loc, people]) => {
+    const parts = loc.split(',').map(s => s.trim());
+    const last = parts[parts.length - 1].toUpperCase();
+    if (STATE_NAMES[last]) {
+      stateCount[last] = (stateCount[last]||0) + people.length;
+      statePeople[last] = (statePeople[last]||[]).concat(people.map(p=>p.name));
+    } else {
+      // International — use last token as country
+      const country = parts[parts.length-1];
+      international[country] = (international[country]||[]).concat(people.map(p=>p.name));
+    }
+  });
+
+  // International list
+  const intlEl = document.getElementById('international-list');
+  const intlUl = document.getElementById('international-ul');
+  const intlEntries = Object.entries(international);
+  if (intlEntries.length) {
+    intlUl.innerHTML = intlEntries.map(([country, names]) =>
+      `<li><strong>${country}</strong>: ${names.join(', ')}</li>`).join('');
+    intlEl.hidden = false;
+  }
+
+  const maxCount = Math.max(...Object.values(stateCount), 1);
+
+  function getColor(n) {
+    if (!n) return '#f0ece4';
+    const t = n / maxCount;
+    // Warm gold gradient: light cream → deep gold
+    const r = Math.round(240 - t * 100);
+    const g = Math.round(236 - t * 130);
+    const b = Math.round(220 - t * 180);
+    return `rgb(${r},${g},${b})`;
+  }
+
+  // Build legend
+  const legendEl = document.getElementById('choropleth-legend');
+  const steps = [0, Math.ceil(maxCount*0.25), Math.ceil(maxCount*0.5), Math.ceil(maxCount*0.75), maxCount];
+  legendEl.innerHTML = '<span>0</span>' + steps.slice(1).map(n =>
+    `<span class="legend-swatch" style="background:${getColor(n)}"></span><span>${n}</span>`
+  ).join('') + '<span style="margin-left:0.3rem">people</span>';
+
+  // Load US states GeoJSON and render choropleth
+  choroplethMap = L.map('choropleth-map', {zoomControl: true}).setView([38, -96], 4);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 10, opacity: 0.3
+  }).addTo(choroplethMap);
+
+  fetch('https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json')
+    .then(r => r.json())
+    .then(geojson => {
+      L.geoJson(geojson, {
+        style: feature => {
+          const name = feature.properties.name;
+          // Find abbr from full name
+          const abbr = Object.keys(STATE_NAMES).find(k => STATE_NAMES[k] === name) || '';
+          const count = stateCount[abbr] || 0;
+          return {
+            fillColor: getColor(count),
+            weight: 1.5,
+            color: '#c8b06a',
+            fillOpacity: count ? 0.85 : 0.4
+          };
+        },
+        onEachFeature: (feature, layer) => {
+          const name = feature.properties.name;
+          const abbr = Object.keys(STATE_NAMES).find(k => STATE_NAMES[k] === name) || '';
+          const count = stateCount[abbr] || 0;
+          const names = statePeople[abbr] || [];
+          const nameStr = names.length ? `<ul class="map-popup-list">${names.map(n=>`<li>${n}</li>`).join('')}</ul>` : '<p style="font-size:0.8rem;color:#999;margin:0.3rem 0 0">No family members recorded</p>';
+          layer.bindPopup(`<div class="map-popup-name">${name}</div><div style="font-size:0.85rem;color:#666;margin:0.1rem 0 0.3rem">${count} family member${count!==1?'s':''}</div>${nameStr}`);
+          layer.on('mouseover', () => layer.setStyle({weight: 3, color: '#8a6d1f'}));
+          layer.on('mouseout', e => e.target.setStyle({weight: 1.5, color: '#c8b06a'}));
+        }
+      }).addTo(choroplethMap);
+    });
 }
 </script>
 
