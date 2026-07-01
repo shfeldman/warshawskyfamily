@@ -267,26 +267,41 @@ async function unlock() {
 document.getElementById('pwd').addEventListener('keydown', e => { if(e.key==='Enter') unlock(); }, true);
 document.querySelector('button').addEventListener('click', unlock);
 
-// ── Remember-me: stored password ─────────────────────────────────────────
-(function() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) return;
-    const {pwd, exp} = JSON.parse(saved);
-    if (exp && Date.now() > exp) { localStorage.removeItem(STORAGE_KEY); return; }
-    showLoading();
-    tryDecrypt(pwd).then(html => { if(html) render(html); else { localStorage.removeItem(STORAGE_KEY); location.reload(); }}).catch(() => location.reload());
-  } catch(e) {}
-})();
-
-// ── URL bypass: bookmark https://warshawskyfamily.com#open:PASSWORD ───────
+// ── URL bypass runs FIRST — if hash present, skip remember-me entirely ───
 (function() {
   const hash = window.location.hash;
   if (!hash.startsWith('#open:')) return;
   const bypass = decodeURIComponent(hash.slice(6));
   if (!bypass) return;
   showLoading();
-  tryDecrypt(bypass).then(html => { if(html) render(html); else location.reload(); }).catch(() => location.reload());
+  tryDecrypt(bypass).then(html => {
+    if (html) {
+      // Update stored password to the new one so remember-me works going forward
+      try {
+        const exp = Date.now() + 30*24*60*60*1000;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({pwd: bypass, exp}));
+      } catch(e) {}
+      render(html);
+    } else {
+      // Wrong password in hash — clear hash and show gate
+      history.replaceState(null, '', location.pathname);
+      location.reload();
+    }
+  }).catch(() => { history.replaceState(null, '', location.pathname); location.reload(); });
+  return true; // sentinel — outer IIFE checks this
+})();
+
+// ── Remember-me: stored password (skipped if hash bypass is present) ─────
+(function() {
+  if (window.location.hash.startsWith('#open:')) return; // hash bypass handles it
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return;
+    const {pwd, exp} = JSON.parse(saved);
+    if (exp && Date.now() > exp) { localStorage.removeItem(STORAGE_KEY); return; }
+    showLoading();
+    tryDecrypt(pwd).then(html => { if(html) render(html); else { localStorage.removeItem(STORAGE_KEY); location.reload(); }}).catch(() => { localStorage.removeItem(STORAGE_KEY); location.reload(); });
+  } catch(e) {}
 })();
 </script>
 </body>
