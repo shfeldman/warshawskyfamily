@@ -44,7 +44,7 @@
   },
   {
     "id": "bessie",
-    "name": "Bessie",
+    "name": "Bessie Grossman",
     "partners": [
       "Joe Grossman"
     ],
@@ -645,9 +645,9 @@
   },
   {
     "id": "sandy",
-    "name": "Sandy",
+    "name": "Sandy Grossman",
     "partners": [
-      "Faith"
+      "Faith Grossman"
     ],
     "generation": "B",
     "branch": "Bessie",
@@ -655,9 +655,9 @@
   },
   {
     "id": "robert",
-    "name": "Robert",
+    "name": "Robert Grossman",
     "partners": [
-      "Sherri"
+      "Sherri Grossman"
     ],
     "generation": "C",
     "branch": "Bessie",
@@ -665,7 +665,7 @@
   },
   {
     "id": "jodi",
-    "name": "Jodi",
+    "name": "Jodi Rose",
     "partners": [
       "Jeff Rose"
     ],
@@ -675,7 +675,7 @@
   },
   {
     "id": "bari",
-    "name": "Bari",
+    "name": "Bari Rosenholtz",
     "partners": [
       "Jeff Rosenholtz"
     ],
@@ -685,9 +685,9 @@
   },
   {
     "id": "dean",
-    "name": "Dean",
+    "name": "Dean Grossman",
     "partners": [
-      "Deana"
+      "Deana Grossman"
     ],
     "generation": "C",
     "branch": "Bessie",
@@ -695,7 +695,7 @@
   },
   {
     "id": "alaya",
-    "name": "Alaya",
+    "name": "Alaya Grossman",
     "partners": [],
     "generation": "D",
     "branch": "Bessie",
@@ -703,7 +703,7 @@
   },
   {
     "id": "zachary_bessie",
-    "name": "Zachary",
+    "name": "Zachary Grossman",
     "partners": [],
     "generation": "D",
     "branch": "Bessie",
@@ -711,7 +711,7 @@
   },
   {
     "id": "alexa_bessie",
-    "name": "Alexa",
+    "name": "Alexa Rosenholtz",
     "partners": [],
     "generation": "D",
     "branch": "Bessie",
@@ -719,7 +719,7 @@
   },
   {
     "id": "jordan_bessie",
-    "name": "Jordan",
+    "name": "Jordan Rosenholtz",
     "partners": [],
     "generation": "D",
     "branch": "Bessie",
@@ -727,7 +727,7 @@
   },
   {
     "id": "kaylee",
-    "name": "Kaylee",
+    "name": "Kaylee Rosenholtz",
     "partners": [],
     "generation": "D",
     "branch": "Bessie",
@@ -735,7 +735,7 @@
   },
   {
     "id": "paige",
-    "name": "Paige",
+    "name": "Paige Grossman",
     "partners": [],
     "generation": "D",
     "branch": "Bessie",
@@ -743,7 +743,7 @@
   },
   {
     "id": "adam_bessie",
-    "name": "Adam",
+    "name": "Adam Grossman",
     "partners": [],
     "generation": "D",
     "branch": "Bessie",
@@ -751,7 +751,7 @@
   },
   {
     "id": "reese",
-    "name": "Reese",
+    "name": "Reese Grossman",
     "partners": [],
     "generation": "D",
     "branch": "Bessie",
