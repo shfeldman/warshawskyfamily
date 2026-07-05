@@ -1877,8 +1877,12 @@ function applyCropTransform(imgEl, vitals, renderedPx) {
     imgEl.style.top = ((renderedPx - rh) / 2 + ty) + 'px';
   }
 
-  imgEl.addEventListener('load', apply, { once: true });
-  if (imgEl.complete && imgEl.naturalWidth) apply();
+  if (imgEl.decode) {
+    imgEl.decode().then(apply).catch(apply);
+  } else {
+    imgEl.addEventListener('load', apply, { once: true });
+    if (imgEl.complete && imgEl.naturalWidth) apply();
+  }
 }
 
 function partnerId(personId, index) {
