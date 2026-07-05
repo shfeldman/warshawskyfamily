@@ -3122,7 +3122,7 @@ function flashListCard(id) {
       item.className = 'reunion-item';
       const img = document.createElement('img');
       img.src = entry.photo;
-      img.alt = `Warshawsky Family Reunion ${entry.year}`;
+      img.alt = entry.title || `Warshawsky Family Reunion ${entry.year}`;
       img.loading = 'lazy';
       const label = document.createElement('div');
       label.className = 'reunion-year';
