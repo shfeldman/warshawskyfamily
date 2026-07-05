@@ -1225,7 +1225,10 @@
     "branch": "Sylvia",
     "parent": "sidney",
     "vitals": {
-      "photo": "seth.jpg"
+      "photo": "seth.jpg",
+      "photoPanX": -23,
+      "photoPanY": -124,
+      "photoZoom": 2.59
     }
   },
   {
