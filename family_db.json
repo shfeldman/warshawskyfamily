@@ -1216,7 +1216,10 @@
     "partners": [],
     "generation": "C",
     "branch": "Sylvia",
-    "parent": "sidney"
+    "parent": "sidney",
+    "vitals": {
+      "photo": "seth.jpg"
+    }
   },
   {
     "id": "jill",
