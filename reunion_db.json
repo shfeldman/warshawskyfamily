@@ -1,5 +1,6 @@
 [
-  { "year": 2026, "photo": "reunion_2026.jpg" },
-  { "year": 2022, "photo": "reunion_2022.jpg" },
-  { "year": 2019, "photo": "reunion_2019.jpg" }
+  { "year": 2026, "title": "Family Reunion", "photo": "album_reunion_2026.jpg" },
+  { "year": 2022, "title": "Family Reunion", "photo": "album_reunion_2022.jpg" },
+  { "year": 2019, "title": "Family Reunion", "photo": "album_reunion_2019.jpg" },
+  { "year": 1947, "title": "Warshawsky Family Seder", "photo": "album_seder_1947.jpg" }
 ]
