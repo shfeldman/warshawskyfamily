@@ -633,15 +633,6 @@
     "confidence": "assumed_order"
   },
   {
-    "id": "scarlett",
-    "name": "Scarlett",
-    "partners": [],
-    "generation": "E",
-    "branch": "Dave",
-    "parent": "dave",
-    "confidence": "unplaced"
-  },
-  {
     "id": "sandy",
     "name": "Sandy Grossman",
     "partners": [
@@ -928,11 +919,14 @@
   },
   {
     "id": "norah_bee",
-    "name": "Norah Bee Warner",
+    "name": "Norah Bee Warner Kranson",
     "partners": [],
     "generation": "D",
     "branch": "Saul",
-    "parent": "jordan_eddie"
+    "parent": "jordan_eddie",
+    "vitals": {
+      "location": "Philadelphia, PA"
+    }
   },
   {
     "id": "alan",
@@ -1032,7 +1026,15 @@
     ],
     "generation": "B",
     "branch": "Evelyn",
-    "parent": "evelyn"
+    "parent": "evelyn",
+    "partnerVitals": {
+      "0": {
+        "dateMarried": "1979"
+      },
+      "1": {
+        "dateMarried": "2007"
+      }
+    }
   },
   {
     "id": "beth",
@@ -1068,7 +1070,11 @@
     "partners": [],
     "generation": "C",
     "branch": "Evelyn",
-    "parent": "narda"
+    "parent": "narda",
+    "vitals": {
+      "dateOfBirth": "1992-02-17",
+      "location": "Edison, NJ"
+    }
   },
   {
     "id": "brooklyn",
@@ -1140,7 +1146,10 @@
     "parent": "sylvia",
     "partnerVitals": {
       "0": {
-        "photo": "paul__p0.jpg"
+        "photo": "paul__p0.jpg",
+        "deceased": true,
+        "dateOfDeath": "2021-11-07",
+        "obituary": "Deeply beloved and loving wife, mother, and Bubbie, Carin Bea Feldman ('nee Lieb) of Half Moon Bay, California, known as “Bubbie” to her family who loved her, peacefully passed away on November 7th with her husband and children by her side. She was the beloved wife, best friend and partner of 50 years, of Dr. Paul R. Feldman, loving mother of Mimi Kravetz and son Shane H. Feldman, and deeply beloved Bubbie of Sabine Hava Feldman, Elliott Tibbitt Feldman, Alec Sawyer Kravetz, Chloe Willa Kravetz, and Lily Marie Tibbitt. She was highly adored and deeply cherished by numerous nieces, nephews, and cousins. While Carin most recently resided in Half Moon Bay, California, she and Paul had many wonderful homes, friendships and communities over the years, including in Connecticut, Virginia, Maryland, Massachusetts, New York, and her birth home in New Jersey. Carin’s love of life, endless energy, warmth, optimism and strength of character lifted and inspired everyone around her. She taught those who had the opportunity to know her about the importance of making others feel good about themselves. Carin saw the beauty of people, and treated the present as a gift. She befriended people everywhere she went and made lasting friendships. In 1972, Carin graduated from Adelphi University with a Bachelor’s in Speech Pathology, and in 1975 from Brooklyn College with a Master’s in Speech & Language Pathology. She held an exceptional decades-long career in her profession, working in every aspect of the field — with people of all ages and backgrounds at schools for the Deaf, at an ENT practice, at hospital rehab programs, at Georgetown University Pediatrics, and in foreign-accent reduction with business professionals. She taught at George Washington University, Gallaudet University and Loyola University, and continued to supervise countless graduate students right up until her last days. She also taught American Sign Language to those who wanted to be a part of the Deaf and hard-of-hearing community. She traveled to India with Smile Train to help cleft-palate patients. Among her proudest accomplishments was helping build and manage the speech program at the JEWELS school in Baltimore, an inclusive Jewish school for children with and without special needs. Her impact on each individual she worked with, and each student she mentored, was profound and will have lasting influence on them and those they, in turn, help."
       }
     },
     "vitals": {
@@ -1185,7 +1194,7 @@
   },
   {
     "id": "jill",
-    "name": "Jill McAndrew",
+    "name": "Jill Feldman",
     "partners": [
       "Tim McAndrew"
     ],
@@ -1193,7 +1202,10 @@
     "branch": "Sylvia",
     "parent": "sidney",
     "vitals": {
-      "photo": "jill.jpg"
+      "photo": "jill.jpg",
+      "deceased": true,
+      "dateOfDeath": "2015-12-27",
+      "obituary": "Jill L. Feldman, deeply loved and adored by family and friends, passed away on December 27, 2015 at the age of 42. Jill was born on February 15, 1973, and grew up in Dartmouth, MA. She is predeceased by her beloved brother Seth and father Sidney. Jill leaves behind her mother, Bonnie, her husband of 12 years Tim McAndrew, and her young son August “Gus” McAndrew — all of whom she fiercely loved.\n\nJill attended and loved Duke University, where she majored in Anthropology and excelled as a student and friend to many. She spent the next few years in New York City, working in publishing and prison reform. Her deep commitment to helping those with less led her to Harvard Law School, after which she practiced and taught civil rights law. Jill’s interests were wide and varied: she consumed books voraciously, was addicted to her favorite tv shows; loved to exercise (yoga and dance!), and always enjoyed a good meal and ice cream. Jill’s love of movement led her to Nia, a form of dance that she practiced and eventually taught with joy to others.\n\nAbove all else, Jill loved to be with her loved ones. She and her husband Tim were happy doing anything… as long as it was together. When she and Tim adopted Gus, she threw herself into motherhood – taking Gus on walks, to play dates and classes, and pouring her love into him. Jill was devoted to her family – the one into which she was born, and the one she created with Tim. For Jill, family was ever-widening as she made, kept, and grew deep friendships throughout her life. She naturally reached out to others, and in turn people were always drawn to her intelligence, warm and caring spirit, incredibly wise advice and perspectives, and an intense inner beauty that she always expressed through her radiant smile and rollicking laughter. Jill inspired everyone she touched just by being herself."
     }
   },
   {
@@ -1514,7 +1526,9 @@
   {
     "id": "kristen",
     "name": "Kristen Pry",
-    "partners": [],
+    "partners": [
+      "Brandon Barrett"
+    ],
     "generation": "C",
     "branch": "Rudy",
     "parent": "helene"
