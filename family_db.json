@@ -1580,7 +1580,7 @@
   {
     "id": "keith",
     "name": "Keith Pry",
-    "partners": [],
+    "partners": ["Gracie Pry"],
     "generation": "C",
     "branch": "Rudy",
     "parent": "helene"
