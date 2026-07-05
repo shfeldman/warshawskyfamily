@@ -605,6 +605,76 @@
     color: var(--ink-soft);
     font-style: italic;
   }
+  /* ── Memories & Stories ── */
+  .stories-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    padding: 0.22rem 0.65rem;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #2a6b4a;
+    background: #edf7f2;
+    border: 1px solid #6db990;
+    border-radius: 20px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .stories-toggle:hover { background: #d4eddf; }
+  .stories-toggle .st-caret { font-size: 0.6rem; transition: transform 0.2s; }
+  .stories-toggle.open .st-caret { transform: rotate(90deg); }
+  .stories-panel {
+    display: none;
+    margin-top: 0.6rem;
+    padding: 0.9rem 1.1rem;
+    background: linear-gradient(135deg, #f0f9f4 0%, #e8f5ed 100%);
+    border-left: 3px solid #6db990;
+    border-radius: 0 8px 8px 0;
+    width: min(620px, 90vw);
+  }
+  .stories-panel.open { display: block; }
+  .story-item {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid #b8ddc9;
+  }
+  .story-item:last-of-type { border-bottom: none; }
+  .story-text {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: #1e3d2e;
+    white-space: pre-line;
+    font-style: italic;
+  }
+  .story-text::before { content: '\201C'; }
+  .story-text::after  { content: '\201D'; }
+  .story-byline {
+    margin-top: 0.35rem;
+    font-size: 0.72rem;
+    color: #3a6b50;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  .story-share-btn {
+    display: inline-block;
+    margin-top: 0.8rem;
+    padding: 0.25rem 0.7rem;
+    font-size: 0.72rem;
+    color: #2a6b4a;
+    background: transparent;
+    border: 1px solid #6db990;
+    border-radius: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    transition: background 0.15s;
+  }
+  .story-share-btn:hover { background: #d4eddf; }
+
   .obituary-toggle {
     display: inline-flex;
     align-items: center;
@@ -1932,6 +2002,63 @@ function marriageLabel(v) {
   return '';
 }
 
+function makeStoriesBlock(personName, stories) {
+  const count = stories.length;
+  const wrap = document.createElement('div');
+
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'stories-toggle';
+  const caret = document.createElement('span');
+  caret.className = 'st-caret';
+  caret.textContent = '▶';
+  toggle.appendChild(caret);
+  toggle.appendChild(document.createTextNode(' Memories & Stories (' + count + ')'));
+
+  const panel = document.createElement('div');
+  panel.className = 'stories-panel';
+
+  stories.forEach(s => {
+    const item = document.createElement('div');
+    item.className = 'story-item';
+    const text = document.createElement('div');
+    text.className = 'story-text';
+    text.textContent = s.text;
+    const byline = document.createElement('div');
+    byline.className = 'story-byline';
+    byline.textContent = '— ' + s.author + (s.year ? ', ' + s.year : '');
+    item.appendChild(text);
+    item.appendChild(byline);
+    panel.appendChild(item);
+  });
+
+  const shareBtn = document.createElement('a');
+  shareBtn.className = 'story-share-btn';
+  shareBtn.href = 'mailto:shane@innivee.com?subject=' + encodeURIComponent('Memory: ' + personName) + '&body=' + encodeURIComponent('My memory of ' + personName + ':\n\n\n\nMy name: ');
+  shareBtn.textContent = '+ Share a Memory';
+  panel.appendChild(shareBtn);
+
+  toggle.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const open = panel.classList.toggle('open');
+    toggle.classList.toggle('open', open);
+  });
+
+  wrap.appendChild(toggle);
+  wrap.appendChild(panel);
+  return wrap;
+}
+
+function makeStoriesPrompt(personName) {
+  const wrap = document.createElement('div');
+  const shareBtn = document.createElement('a');
+  shareBtn.className = 'story-share-btn';
+  shareBtn.href = 'mailto:shane@innivee.com?subject=' + encodeURIComponent('Memory: ' + personName) + '&body=' + encodeURIComponent('My memory of ' + personName + ':\n\n\n\nMy name: ');
+  shareBtn.textContent = '+ Share a Memory about ' + personName.split(' ')[0];
+  wrap.appendChild(shareBtn);
+  return wrap;
+}
+
 function makeObitBlock(obituaryText, dateOfDeath, obituaryUrl) {
   const wrap = document.createElement('div');
 
@@ -2250,6 +2377,16 @@ function buildNode(id, depth, siblingIndex, siblingCount) {
 
   if (p.vitals && p.vitals.deceased && p.vitals.obituary) {
     wrap.insertBefore(makeObitBlock(p.vitals.obituary, p.vitals.dateOfDeath, p.vitals.obituaryUrl), wrap.querySelector('.marriages') || wrap.querySelector('.meta-row'));
+  }
+
+  // Stories block — shown for all people (collapsible if stories exist, prompt-only if none)
+  if (p.branch !== 'Founders') {
+    const anchor = wrap.querySelector('.marriages') || wrap.querySelector('.meta-row');
+    if (p.stories && p.stories.length) {
+      wrap.insertBefore(makeStoriesBlock(p.name, p.stories), anchor);
+    } else {
+      wrap.insertBefore(makeStoriesPrompt(p.name), anchor);
+    }
   }
 
   if (hasKids) {

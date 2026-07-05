@@ -128,7 +128,14 @@
       "photoPanX": 0,
       "photoPanY": 50,
       "photoZoom": 1.0
-    }
+    },
+    "stories": [
+      {
+        "author": "Shane Feldman",
+        "year": 2018,
+        "text": "I remember sitting with Rudy at a family reunion and asking him what it was like to parachute into Normandy on D-Day. He got quiet for a moment, then smiled and said, 'We were all scared, but we had each other.' He never bragged — he just did what had to be done. Knowing him was knowing what real courage looks like."
+      }
+    ]
   },
   {
     "id": "phyllis",
