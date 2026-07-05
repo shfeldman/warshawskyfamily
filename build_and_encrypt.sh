@@ -5,12 +5,19 @@ set -e
 
 cd "$(dirname "$0")"
 
+# Read password from local file (never hardcode it here)
+if [ ! -f .wfc_password ]; then
+  echo "ERROR: .wfc_password file not found. Create it with the family password on one line."
+  exit 1
+fi
+WFC_PASSWORD=$(tr -d '[:space:]' < .wfc_password)
+
 echo "=== Building site ==="
 python3 build.py
 
 echo ""
 echo "=== Encrypting ==="
-python3 encrypt.py --password LouisRoseWarshawsky
+python3 encrypt.py --password "$WFC_PASSWORD"
 
 echo ""
 echo "=== Committing ==="

@@ -402,6 +402,10 @@ def main():
 
     password = args.password or os.environ.get('WFC_PASSWORD') or None
     if not password:
+        pw_file = Path(__file__).parent / '.wfc_password'
+        if pw_file.exists():
+            password = pw_file.read_text().strip()
+    if not password:
         import getpass
         password = getpass.getpass('Family password: ')
 
