@@ -191,7 +191,12 @@ def main():
         for entry in reunion_raw:
             encoded = load_and_encode_reunion_photo(PHOTOS_DIR / entry["photo"], f"reunion {entry['year']}")
             if encoded:
-                reunion_photos.append({"year": entry["year"], "photo": encoded})
+                reunion_photos.append({
+                    "year": entry["year"],
+                    "title": entry.get("title", str(entry["year"])),
+                    "photo": encoded,
+                    "photoFull": "photos/" + entry["photoFull"] if entry.get("photoFull") else None
+                })
 
     people_json = json.dumps(people, separators=(",", ":"))
     reunion_photos_json = json.dumps(reunion_photos, separators=(",", ":"))

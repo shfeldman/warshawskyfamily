@@ -1629,7 +1629,7 @@
 
     <div class="reunion-section" id="reunion-section">
       <button class="reunion-toggle-btn" id="reunion-toggle" type="button" aria-expanded="false" aria-controls="reunion-body">
-        <span>📷 Family Album</span>
+        <span>📷 Family Albums</span>
         <span id="reunion-arrow">&#9660;</span>
       </button>
       <div id="reunion-body" hidden></div>
@@ -3126,7 +3126,7 @@ function flashListCard(id) {
       img.loading = 'lazy';
       const label = document.createElement('div');
       label.className = 'reunion-year';
-      label.textContent = entry.title + ' · ' + entry.year;
+      label.textContent = entry.title;
       item.appendChild(img);
       item.appendChild(label);
       // Lightbox on click
@@ -3134,7 +3134,7 @@ function flashListCard(id) {
         const lb = document.createElement('div');
         lb.className = 'reunion-lightbox';
         const lbImg = document.createElement('img');
-        lbImg.src = entry.photo;
+        lbImg.src = entry.photoFull || entry.photo;
         lbImg.alt = img.alt;
         lb.appendChild(lbImg);
         lb.addEventListener('click', () => lb.remove());
