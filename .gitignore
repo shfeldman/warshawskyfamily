@@ -1,1 +1,5 @@
 .wfc_password
+
+# Local crop editor tool
+crop_editor.html
+crop_editor.py
