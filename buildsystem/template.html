@@ -1191,11 +1191,63 @@
   }
   .reunion-toggle-btn:hover { background: var(--bg-soft); }
   .reunion-body {
-    padding: 1rem 1rem 1.25rem;
+    padding: 0 1rem 1.25rem;
     display: flex;
     flex-wrap: wrap;
     gap: 1.25rem;
     justify-content: center;
+  }
+  .reunion-next {
+    width: 100%;
+    background: linear-gradient(135deg, #1a6b3a 0%, #2d9e58 100%);
+    color: #fff;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin: 1rem 0 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .reunion-next .rn-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.85;
+    margin-bottom: 2px;
+  }
+  .reunion-next .rn-date {
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+  .reunion-next .rn-number {
+    font-size: 0.82rem;
+    opacity: 0.8;
+  }
+  .reunion-next .rn-countdown {
+    text-align: right;
+  }
+  .reunion-next .rn-days {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .reunion-next .rn-days-label {
+    font-size: 0.72rem;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .reunion-next.rn-soon { background: linear-gradient(135deg, #b8400a 0%, #e06030 100%); }
+  .reunion-next.rn-this-week { background: linear-gradient(135deg, #7b1a9e 0%, #a94fcb 100%); }
+  .reunion-founded {
+    width: 100%;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.03em;
   }
   .reunion-item {
     display: flex;
@@ -3147,6 +3199,69 @@ function flashListCard(id) {
     return;
   }
 
+  // Compute next last-weekend-of-June reunion date
+  function nextReunionDate() {
+    const today = new Date();
+    let year = today.getFullYear();
+    function lastSaturdayOfJune(y) {
+      // Find last Saturday in June of year y
+      const lastDay = new Date(y, 6, 0); // June 30
+      const offset = (lastDay.getDay() + 1) % 7; // days past Saturday
+      lastDay.setDate(lastDay.getDate() - offset);
+      return lastDay;
+    }
+    let sat = lastSaturdayOfJune(year);
+    // If that Saturday is in the past, use next year
+    const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    if (sat < todayMidnight) sat = lastSaturdayOfJune(year + 1);
+    return sat;
+  }
+
+  function ordinal(n) {
+    const s = ['th','st','nd','rd'], v = n % 100;
+    return n + (s[(v-20)%10] || s[v] || s[0]);
+  }
+
+  function buildCountdown(bodyEl) {
+    const sat = nextReunionDate();
+    const sun = new Date(sat); sun.setDate(sun.getDate() + 1);
+    const year = sat.getFullYear();
+    const annualNum = year - 1996 + 1; // 1996 was the 1st
+    const today = new Date();
+    const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const daysUntil = Math.round((sat - todayMidnight) / 86400000);
+
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const satStr = `${days[sat.getDay()]}, ${months[sat.getMonth()]} ${sat.getDate()}`;
+    const sunStr = `${days[sun.getDay()]}, ${months[sun.getMonth()]} ${sun.getDate()}, ${year}`;
+
+    const banner = document.createElement('div');
+    banner.className = 'reunion-next' + (daysUntil <= 7 ? ' rn-this-week' : daysUntil <= 30 ? ' rn-soon' : '');
+
+    const left = document.createElement('div');
+    left.innerHTML = `<div class="rn-label">Next Reunion</div>
+      <div class="rn-date">${satStr} – ${sunStr}</div>
+      <div class="rn-number">${ordinal(annualNum)} Annual Warshawsky Family Reunion · Seaside Heights, NJ</div>`;
+
+    const right = document.createElement('div');
+    right.className = 'rn-countdown';
+    if (daysUntil === 0) {
+      right.innerHTML = `<div class="rn-days">🎉</div><div class="rn-days-label">It's today!</div>`;
+    } else {
+      right.innerHTML = `<div class="rn-days">${daysUntil}</div><div class="rn-days-label">days away</div>`;
+    }
+
+    banner.appendChild(left);
+    banner.appendChild(right);
+    bodyEl.appendChild(banner);
+
+    const founded = document.createElement('div');
+    founded.className = 'reunion-founded';
+    founded.textContent = 'Annual reunion tradition started in 1996 · Always the last weekend of June';
+    bodyEl.appendChild(founded);
+  }
+
   // Build gallery content (lazy — only on first open)
   let built = false;
   function buildGallery() {
@@ -3154,6 +3269,7 @@ function flashListCard(id) {
     built = true;
     const wrap = document.createElement('div');
     wrap.className = 'reunion-body';
+    buildCountdown(wrap);
     // Sort newest first
     const sorted = [...REUNION_PHOTOS].sort((a, b) => b.year - a.year);
     sorted.forEach(entry => {
