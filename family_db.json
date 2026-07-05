@@ -666,7 +666,12 @@
     ],
     "generation": "B",
     "branch": "Bessie",
-    "parent": "bessie"
+    "parent": "bessie",
+    "vitals": {
+      "photo": "sandy.jpg",
+      "deceased": true,
+      "obituary": "Sandy Grossman was a legendary sports television director whose brilliance behind the camera shaped how America watches football. He directed a record 10 Super Bowl broadcasts and spent more than two decades working alongside Pat Summerall and John Madden — the most celebrated broadcast team in NFL history. Together, the four of them created something unforgettable: Summerall's understated grace, Madden's booming enthusiasm, and Sandy's instinct to capture exactly the right moment at exactly the right time.\n\nJohn Madden, who knew him as well as anyone, said it simply: \"He could just make magic.\" When Madden would make a point on air, Sandy would already have the clip ready to illustrate it — because he had done the homework, watched the film, and thought like a coach. He isolated cameras on linemen before anyone else did. He used music going into commercial breaks during basketball games, and when he played 'The Hustle' by Van McCoy, sales of the song skyrocketed — and the musician sent him gold records as a thank you.\n\nSandy directed 18 NBA Finals and five Stanley Cup Finals. He won eight Emmy Awards. CBS Sports Chairman Sean McManus called him \"one of the great directors in the history of sports television.\" Fox Sports President Eric Shanks said he mentored a generation: \"We learned more from him than he could imagine.\"\n\n\"If there wasn't an envelope to push, Sandy would create one,\" said Fox Sports Chairman David Hill. \"Watch any NFL game, and you will see Sandy Grossman's legacy. He was a legend.\"\n\nHe is survived by his wife of 51 years, Faithe, their four children, and eight grandchildren."
+    }
   },
   {
     "id": "robert",
