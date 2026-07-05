@@ -223,12 +223,16 @@ function showPeek() {
   peekTimer = setTimeout(renderPwd, 800);
 }
 
+document.getElementById('eye-btn').addEventListener('mousedown', function(e) {
+  e.preventDefault(); // keep focus on the input
+});
 document.getElementById('eye-btn').addEventListener('click', function() {
   showingPwd = !showingPwd;
   this.textContent = showingPwd ? '✖' : '👁';
   this.setAttribute('aria-label', showingPwd ? 'Hide password' : 'Show password');
   clearTimeout(peekTimer);
   renderPwd();
+  document.getElementById('pwd').focus();
 });
 
 document.getElementById('pwd').addEventListener('keydown', function(e) {
