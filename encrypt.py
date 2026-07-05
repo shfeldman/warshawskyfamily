@@ -216,7 +216,7 @@ function renderPwd() {
 }
 
 function showPeek() {
-  if (showingPwd) return;
+  if (showingPwd) { renderPwd(); return; }
   clearTimeout(peekTimer);
   const el = document.getElementById('pwd');
   el.value = DOT.repeat(Math.max(0, realPwd.length - 1)) + realPwd.slice(-1);
