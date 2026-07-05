@@ -4,5 +4,6 @@
 crop_editor.html
 crop_editor.py
 
-# Built data-viz page: plaintext until encrypted; deploy script force-adds it
+# Built data-viz pages: plaintext until encrypted; deploy script force-adds them
 data-viz/index.html
+data-viz/galaxy/index.html

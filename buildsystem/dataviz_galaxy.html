@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Warshawsky Family &mdash; The Family Galaxy</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { background: #06070d; color: #e8e0d0; font-family: 'Inter', sans-serif; overflow: hidden; }
+  #scene { position: fixed; inset: 0; }
+  .hud {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    padding: 1.1rem 1.4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    pointer-events: none;
+    background: linear-gradient(#06070dcc, transparent);
+  }
+  .hud a { pointer-events: auto; }
+  h1 { font-family: 'Lora', serif; font-weight: 600; font-size: 1.35rem; }
+  .subtitle { font-size: 0.8rem; color: #9a917e; margin-top: 2px; }
+  .back { color: #8fb8f0; text-decoration: none; font-size: 0.85rem; }
+  .back:hover { text-decoration: underline; }
+  .hint {
+    position: fixed;
+    bottom: 1rem; left: 0; right: 0;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #7a7264;
+    pointer-events: none;
+  }
+  #tooltip {
+    display: none;
+    position: fixed;
+    pointer-events: none;
+    background: #12141ecc;
+    border: 1px solid #3a3d4d;
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    backdrop-filter: blur(4px);
+    z-index: 5;
+    max-width: 230px;
+  }
+  #tooltip .tt-name { font-weight: 600; }
+  #tooltip .tt-sub { color: #9a917e; font-size: 0.76rem; }
+  #legend {
+    position: fixed;
+    bottom: 2.6rem; left: 0; right: 0;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    font-size: 0.72rem;
+    color: #9a917e;
+    pointer-events: none;
+    padding: 0 1rem;
+  }
+  #legend span { display: inline-flex; align-items: center; gap: 4px; }
+  #legend i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  #loading {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    color: #9a917e;
+  }
+</style>
+</head>
+<body>
+<div id="scene"></div>
+<div id="loading">Lighting the stars&hellip;</div>
+<div class="hud">
+  <div>
+    <h1>The Family Galaxy</h1>
+    <p class="subtitle">166 descendants of Louis &amp; Rose, orbiting the founders</p>
+  </div>
+  <a class="back" href="/data-viz/" target="_top">&larr; All charts</a>
+</div>
+<div id="legend"></div>
+<p class="hint">drag to orbit &middot; scroll or pinch to zoom &middot; hover or tap a star to light up their line</p>
+<div id="tooltip"></div>
+
+<script>const PEOPLE_DATA = __PEOPLE_DATA_JSON__;</script>
+<script type="importmap">
+{ "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const BRANCH_COLORS = {
+  Henry: '#e0602a', Dave: '#2f8dc4', Jack: '#3aa070', Bessie: '#b05fb3',
+  Saul: '#8d74e0', Milt: '#d9a52b', Evelyn: '#3ab5a8', Sylvia: '#e0509d', Rudy: '#b07c3a'
+};
+const GEN_IDX = { A: 0, B: 1, C: 2, D: 3, E: 4 };
+const GEN_LABEL = {
+  A: 'Child of Louis & Rose', B: 'Grandchild of Louis & Rose',
+  C: 'Great-grandchild', D: 'Great-great-grandchild', E: 'Great-great-great-grandchild'
+};
+
+// ── Family structure ──────────────────────────────────────────────────────
+const byId = {}, kids = {};
+PEOPLE_DATA.forEach(p => { byId[p.id] = p; kids[p.id] = []; });
+PEOPLE_DATA.forEach(p => { if (p.parent && kids[p.parent]) kids[p.parent].push(p.id); });
+const roots = PEOPLE_DATA.filter(p => !p.parent && p.branch !== 'Founders').map(p => p.id);
+
+function leaves(id) {
+  const c = kids[id];
+  return c.length ? c.reduce((s, k) => s + leaves(k), 0) : 1;
+}
+
+// Deterministic per-person jitter so the galaxy is stable between visits
+function hash(str) {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return (h >>> 0) / 4294967295;
+}
+
+// Angular layout identical to the sunburst, then swirled into spiral arms
+const positions = {};
+const totalLeaves = roots.reduce((s, r) => s + leaves(r), 0);
+(function walk(list, a0, a1, parentLeaves) {
+  let a = a0;
+  list.forEach(id => {
+    const p = byId[id];
+    const w = (a1 - a0) * leaves(id) / parentLeaves;
+    const mid = a + w / 2;
+    const depth = GEN_IDX[p.generation];
+    const r = 26 + depth * 26 + (hash(id) - 0.5) * 10;
+    const theta = mid + r * 0.028;
+    const y = (hash(id + 'y') - 0.5) * (24 - depth * 3.5);
+    positions[id] = new THREE.Vector3(r * Math.sin(theta), y, r * Math.cos(theta));
+    if (kids[id].length) walk(kids[id], a, a + w, leaves(id));
+    a += w;
+  });
+})(roots, 0, Math.PI * 2, totalLeaves);
+
+// ── Scene ─────────────────────────────────────────────────────────────────
+const container = document.getElementById('scene');
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+container.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#06070d');
+scene.fog = new THREE.FogExp2('#06070d', 0.0022);
+
+const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 2000);
+camera.position.set(0, 95, 195);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.4;
+controls.minDistance = 40;
+controls.maxDistance = 480;
+
+// Soft round glow texture, shared by every star
+function glowTexture() {
+  const c = document.createElement('canvas');
+  c.width = c.height = 64;
+  const g = c.getContext('2d');
+  const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+  grad.addColorStop(0, 'rgba(255,255,255,1)');
+  grad.addColorStop(0.25, 'rgba(255,255,255,0.85)');
+  grad.addColorStop(0.6, 'rgba(255,255,255,0.18)');
+  grad.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 64, 64);
+  return new THREE.CanvasTexture(c);
+}
+const glow = glowTexture();
+
+// Background starfield
+{
+  const n = 1400, pos = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) {
+    const v = new THREE.Vector3().randomDirection().multiplyScalar(500 + Math.random() * 500);
+    pos.set([v.x, v.y, v.z], i * 3);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  scene.add(new THREE.Points(geo, new THREE.PointsMaterial({
+    color: '#aab2cc', size: 1.4, sizeAttenuation: true,
+    transparent: true, opacity: 0.55, depthWrite: false
+  })));
+}
+
+// The founders' sun
+const sun = new THREE.Sprite(new THREE.SpriteMaterial({
+  map: glow, color: '#ffd9a0', blending: THREE.AdditiveBlending,
+  depthWrite: false, transparent: true
+}));
+sun.scale.setScalar(30);
+sun.userData.isSun = true;
+scene.add(sun);
+const sunHalo = new THREE.Sprite(new THREE.SpriteMaterial({
+  map: glow, color: '#c88a3a', blending: THREE.AdditiveBlending,
+  depthWrite: false, transparent: true, opacity: 0.45
+}));
+sunHalo.scale.setScalar(58);
+scene.add(sunHalo);
+
+// One star sprite per descendant
+const sprites = {};
+const starGroup = new THREE.Group();
+PEOPLE_DATA.forEach(p => {
+  if (p.branch === 'Founders') return;
+  const depth = GEN_IDX[p.generation];
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: glow, color: BRANCH_COLORS[p.branch], blending: THREE.AdditiveBlending,
+    depthWrite: false, transparent: true
+  }));
+  s.position.copy(positions[p.id]);
+  s.scale.setScalar(7.5 - depth * 0.9);
+  s.userData.id = p.id;
+  s.userData.baseScale = s.scale.x;
+  sprites[p.id] = s;
+  starGroup.add(s);
+});
+scene.add(starGroup);
+
+// Curved constellation lines, parent → child
+const lines = {};
+PEOPLE_DATA.forEach(p => {
+  if (p.branch === 'Founders') return;
+  const from = p.parent ? positions[p.parent] : new THREE.Vector3(0, 0, 0);
+  const to = positions[p.id];
+  const ctrl = from.clone().add(to).multiplyScalar(0.5).multiplyScalar(0.88);
+  const curve = new THREE.QuadraticBezierCurve3(from, ctrl, to);
+  const geo = new THREE.BufferGeometry().setFromPoints(curve.getPoints(12));
+  const mat = new THREE.LineBasicMaterial({
+    color: BRANCH_COLORS[p.branch], transparent: true, opacity: 0.28,
+    blending: THREE.AdditiveBlending, depthWrite: false
+  });
+  const line = new THREE.Line(geo, mat);
+  lines[p.id] = line;
+  scene.add(line);
+});
+
+// Legend
+document.getElementById('legend').innerHTML = Object.entries(BRANCH_COLORS).map(([b, c]) =>
+  '<span><i style="background:' + c + ';box-shadow:0 0 6px ' + c + '"></i>' + b + '</span>'
+).join('');
+
+// ── Hover / tap: light up a lineage ───────────────────────────────────────
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+const tooltip = document.getElementById('tooltip');
+let hoveredId = null;
+let focusTarget = null;
+
+function chainOf(id) {
+  const set = new Set();
+  for (let c = id; c; c = byId[c].parent) set.add(c);
+  (function down(x) { set.add(x); kids[x].forEach(down); })(id);
+  return set;
+}
+
+function applyHighlight(id) {
+  const chain = id ? chainOf(id) : null;
+  Object.values(sprites).forEach(s => {
+    const mine = !chain || chain.has(s.userData.id);
+    s.material.opacity = mine ? 1 : 0.12;
+    s.scale.setScalar(s.userData.baseScale * (id === s.userData.id ? 1.8 : 1));
+  });
+  Object.entries(lines).forEach(([childId, line]) => {
+    const parentId = byId[childId].parent;
+    const on = chain && chain.has(childId) && (!parentId || chain.has(parentId));
+    line.material.opacity = chain ? (on ? 0.85 : 0.05) : 0.28;
+  });
+  sun.material.opacity = chain ? 0.55 : 1;
+}
+
+function pick(clientX, clientY) {
+  pointer.x = (clientX / window.innerWidth) * 2 - 1;
+  pointer.y = -(clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects([...starGroup.children, sun]);
+  return hits.length ? hits[0].object : null;
+}
+
+function showTooltip(obj, x, y) {
+  if (obj.userData.isSun) {
+    tooltip.innerHTML = '<div class="tt-name">Louis &amp; Rose Warshawsky</div>' +
+      '<div class="tt-sub">The founders &mdash; where every line begins</div>';
+  } else {
+    const p = byId[obj.userData.id];
+    const nk = kids[p.id].length;
+    tooltip.innerHTML = '<div class="tt-name">' + p.name + '</div>' +
+      '<div class="tt-sub">' + GEN_LABEL[p.generation] + ' &middot; ' + p.branch + "'s line" +
+      (nk ? ' &middot; ' + nk + (nk === 1 ? ' child' : ' children') : '') + '</div>';
+  }
+  tooltip.style.display = 'block';
+  tooltip.style.left = Math.min(x + 14, window.innerWidth - 240) + 'px';
+  tooltip.style.top = (y + 14) + 'px';
+}
+
+window.addEventListener('pointermove', e => {
+  const obj = pick(e.clientX, e.clientY);
+  const id = obj && !obj.userData.isSun ? obj.userData.id : null;
+  if (id !== hoveredId) { hoveredId = id; applyHighlight(id); }
+  if (obj) showTooltip(obj, e.clientX, e.clientY);
+  else tooltip.style.display = 'none';
+  document.body.style.cursor = obj ? 'pointer' : '';
+});
+
+window.addEventListener('pointerdown', e => {
+  const obj = pick(e.clientX, e.clientY);
+  if (obj && !obj.userData.isSun) {
+    hoveredId = obj.userData.id;
+    applyHighlight(hoveredId);
+    showTooltip(obj, e.clientX, e.clientY);
+    focusTarget = obj.position.clone();
+  } else if (obj && obj.userData.isSun) {
+    focusTarget = new THREE.Vector3(0, 0, 0);
+  }
+});
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ── Animate ───────────────────────────────────────────────────────────────
+const clock = new THREE.Clock();
+function animate() {
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+  sun.scale.setScalar(30 + Math.sin(t * 1.6) * 1.6);
+  sunHalo.scale.setScalar(58 + Math.sin(t * 1.1) * 3);
+  if (focusTarget) {
+    controls.target.lerp(focusTarget, 0.06);
+    if (controls.target.distanceTo(focusTarget) < 0.5) focusTarget = null;
+  }
+  controls.update();
+  renderer.render(scene, camera);
+}
+document.getElementById('loading').remove();
+animate();
+</script>
+</body>
+</html>

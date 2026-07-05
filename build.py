@@ -24,10 +24,12 @@ from pathlib import Path
 PHOTOS_DIR = Path(__file__).parent / "photos"
 TEMPLATE = Path(__file__).parent / "buildsystem" / "template.html"
 DATAVIZ_TEMPLATE = Path(__file__).parent / "buildsystem" / "dataviz_template.html"
+GALAXY_TEMPLATE = Path(__file__).parent / "buildsystem" / "dataviz_galaxy.html"
 DB = Path(__file__).parent / "family_db.json"
 REUNION_DB = Path(__file__).parent / "reunion_db.json"
 OUTPUT = Path(__file__).parent / "index.html"
 DATAVIZ_OUTPUT = Path(__file__).parent / "data-viz" / "index.html"
+GALAXY_OUTPUT = Path(__file__).parent / "data-viz" / "galaxy" / "index.html"
 LOCATIONS_CACHE = Path(__file__).parent / "locations_cache.json"
 
 REUNION_MAX_DIM = 400
@@ -259,6 +261,16 @@ def main():
         with open(DATAVIZ_OUTPUT, "w") as f:
             f.write(viz)
         print(f"Build complete: {DATAVIZ_OUTPUT} ({DATAVIZ_OUTPUT.stat().st_size / 1024:.1f} KB)")
+
+    # Build the /data-viz/galaxy page
+    if GALAXY_TEMPLATE.exists():
+        with open(GALAXY_TEMPLATE) as f:
+            galaxy = f.read()
+        galaxy = galaxy.replace("__PEOPLE_DATA_JSON__", json.dumps(viz_people, separators=(",", ":")))
+        GALAXY_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+        with open(GALAXY_OUTPUT, "w") as f:
+            f.write(galaxy)
+        print(f"Build complete: {GALAXY_OUTPUT} ({GALAXY_OUTPUT.stat().st_size / 1024:.1f} KB)")
 
 
 if __name__ == "__main__":

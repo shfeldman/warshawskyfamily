@@ -22,11 +22,15 @@ python3 encrypt.py --password "$WFC_PASSWORD" \
   --input data-viz/index.html \
   --title "Warshawsky Family — Data Visualizations" \
   --url "https://warshawskyfamily.com/data-viz/"
+python3 encrypt.py --password "$WFC_PASSWORD" \
+  --input data-viz/galaxy/index.html \
+  --title "Warshawsky Family — The Family Galaxy" \
+  --url "https://warshawskyfamily.com/data-viz/galaxy/"
 
 echo ""
 echo "=== Committing ==="
 git add index.html
-git add -f data-viz/index.html
+git add -f data-viz/index.html data-viz/galaxy/index.html
 git commit -m "Rebuild and re-encrypt site"
 
 echo ""
