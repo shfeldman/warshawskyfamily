@@ -27,8 +27,8 @@ DB = Path(__file__).parent / "family_db.json"
 OUTPUT = Path(__file__).parent / "index.html"
 LOCATIONS_CACHE = Path(__file__).parent / "locations_cache.json"
 
-MAX_DIM = 640
-JPEG_QUALITY = 85
+MAX_DIM = 500
+JPEG_QUALITY = 78
 
 
 def load_and_encode_photo(filepath: Path, label: str) -> str:
