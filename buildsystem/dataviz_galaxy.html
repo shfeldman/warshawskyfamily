@@ -143,6 +143,39 @@
   }
   #sp-result .sp-via { font-size: 0.76rem; color: #9a917e; margin-top: 4px; }
   #sp-tracing { display: none; text-align: center; font-size: 0.85rem; color: #9a917e; padding: 0.2rem 0; }
+  .sp-row { margin-bottom: 0.45rem; }
+  .sp-chip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1c1f2c;
+    border: 1px solid #4a4432;
+    border-radius: 8px;
+    padding: 0.45rem 0.7rem;
+    font-size: 0.88rem;
+    color: #ffe9b0;
+  }
+  .sp-chip button {
+    background: none; border: none; color: #9a917e;
+    font-size: 1rem; cursor: pointer; padding: 0 0.1rem; line-height: 1;
+  }
+  .sp-chip button:hover { color: #e8e0d0; }
+  #sp-launch {
+    position: fixed;
+    right: 1.2rem;
+    bottom: 4.8rem;
+    z-index: 6;
+    background: #12141ede;
+    border: 1px solid #3a3d4d;
+    color: #ffe9b0;
+    border-radius: 999px;
+    padding: 0.55rem 1rem;
+    font-family: inherit;
+    font-size: 0.82rem;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+  }
+  #sp-launch:hover { border-color: #8fb8f0; }
 </style>
 </head>
 <body>
@@ -160,11 +193,13 @@
 <div id="echo"></div>
 <div id="spanel">
   <div class="sp-head">
-    <span class="sp-name" id="sp-name"></span>
+    <span class="sp-name" id="sp-name">&#10022; How are they related?</span>
     <button id="sp-close" type="button" aria-label="Close">&times;</button>
   </div>
   <div id="sp-body">
-    <input id="sp-input" placeholder="Trace a starpath to&hellip;" autocomplete="off" spellcheck="false">
+    <div class="sp-row" id="sp-row-a"></div>
+    <div class="sp-row" id="sp-row-b"></div>
+    <input id="sp-input" placeholder="First person&hellip;" autocomplete="off" spellcheck="false">
     <ul id="sp-list"></ul>
   </div>
   <div id="sp-tracing">Tracing starpath&hellip;</div>
@@ -173,6 +208,7 @@
     <div class="sp-via" id="sp-via"></div>
   </div>
 </div>
+<button id="sp-launch" type="button">&#10022; How are they related?</button>
 <div id="tooltip"></div>
 
 <script>const PEOPLE_DATA = __PEOPLE_DATA_JSON__;</script>
@@ -412,7 +448,7 @@ function applyHighlight(id) {
   sun.material.opacity = chain ? 0.55 : 1;
 }
 
-function pick(clientX, clientY) {
+function pickStar(clientX, clientY) {
   pointer.x = (clientX / window.innerWidth) * 2 - 1;
   pointer.y = -(clientY / window.innerHeight) * 2 + 1;
   raycaster.setFromCamera(pointer, camera);
@@ -508,7 +544,7 @@ function endEcho() {
 
 function tickEcho(t) {
   if (!echoState) {
-    if (t > nextEchoAt && !hoveredId && !selectedId && !pathMembers) startEcho(t);
+    if (t > nextEchoAt && !hoveredId && !panelOpen() && !pathMembers) startEcho(t);
     return;
   }
   const k = (t - echoState.start) / ECHO_DURATION;
@@ -538,7 +574,10 @@ const spTracing = document.getElementById('sp-tracing');
 const spResult = document.getElementById('sp-result');
 const SEG_DURATION = 0.45;
 
-let selectedId = null, pathAnim = null, pathMembers = null, pathEdges = null;
+let pathAnim = null, pathMembers = null, pathEdges = null;
+const pick = { a: null, b: null };
+const pathLabels = [];
+const litStars = new Set();
 
 const comet = new THREE.Sprite(new THREE.SpriteMaterial({
   map: glow, color: '#fff2c8', blending: THREE.AdditiveBlending,
@@ -591,23 +630,24 @@ function relationship(aId, bId, lca, da, db) {
     (removed ? ', ' + (removed === 1 ? 'once' : removed === 2 ? 'twice' : removed + ' times') + ' removed' : '');
 }
 
+function panelOpen() { return spanel.style.display === 'block'; }
+function activeSlot() { return pick.a ? (pick.b ? null : 'b') : 'a'; }
+
 function openPanel(id) {
   if (echoState) { nextEchoAt = clock.getElapsedTime() + ECHO_GAP; endEcho(); }
   clearPath();
-  selectedId = id;
-  spName.textContent = '★ ' + byId[id].name;
+  pick.a = id || null;
+  pick.b = null;
   spBody.style.display = 'block';
   spTracing.style.display = 'none';
   spResult.style.display = 'none';
-  spInput.value = '';
-  renderSuggestions('');
   spanel.style.display = 'block';
-  if (matchMedia('(hover: hover)').matches) spInput.focus();
+  renderRows();
 }
 
 function closePanel() {
   spanel.style.display = 'none';
-  selectedId = null;
+  pick.a = pick.b = null;
   clearPath();
   applyHighlight(hoveredId);
 }
@@ -617,12 +657,104 @@ function clearPath() {
   pathMembers = null;
   pathEdges = null;
   comet.visible = false;
+  pathLabels.forEach(({ sprite }) => {
+    scene.remove(sprite);
+    sprite.material.map.dispose();
+    sprite.material.dispose();
+  });
+  pathLabels.length = 0;
+  litStars.forEach(id => {
+    const s = sprites[id];
+    s.scale.setScalar(s.userData.baseScale);
+    s.material.color.copy(s.userData.baseColor);
+  });
+  litStars.clear();
+}
+
+// A floating name plate, legible against the starfield
+function nameLabelSprite(text) {
+  const fs = 46, pad = 30;
+  const measure = document.createElement('canvas').getContext('2d');
+  measure.font = '600 ' + fs + 'px Inter, sans-serif';
+  const tw = Math.ceil(measure.measureText(text).width);
+  const c = document.createElement('canvas');
+  c.width = tw + pad * 2;
+  c.height = 100;
+  const g = c.getContext('2d');
+  g.fillStyle = 'rgba(6,7,13,0.78)';
+  if (g.roundRect) {
+    g.beginPath();
+    g.roundRect(4, 14, c.width - 8, 72, 36);
+    g.fill();
+  } else {
+    g.fillRect(4, 14, c.width - 8, 72);
+  }
+  g.font = '600 ' + fs + 'px Inter, sans-serif';
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  g.shadowColor = '#c8963a';
+  g.shadowBlur = 16;
+  g.fillStyle = '#ffe9b0';
+  g.fillText(text, c.width / 2, 52);
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: new THREE.CanvasTexture(c), transparent: true,
+    depthWrite: false, depthTest: false, opacity: 0
+  }));
+  sprite.renderOrder = 10;
+  const S = 0.11;
+  sprite.scale.set(c.width * S, c.height * S, 1);
+  return sprite;
+}
+
+// Light a star on the traced path: brighten it and hang its name above it
+function lightPathNode(id, t) {
+  let lift = 22;
+  if (id !== '__sun') {
+    const s = sprites[id];
+    litStars.add(id);
+    s.scale.setScalar(s.userData.baseScale * 1.7);
+    s.material.color.copy(s.userData.baseColor).lerp(WHITE, 0.6);
+    lift = s.userData.baseScale * 0.8 + 3.5;
+  }
+  const label = nameLabelSprite(fullName(id));
+  label.position.copy(memberPos(id));
+  label.position.y += lift;
+  scene.add(label);
+  pathLabels.push({ sprite: label, born: t });
+}
+
+function fullName(id) {
+  return id === '__sun' ? 'Louis & Rose Warshawsky' : byId[id].name;
+}
+
+function renderRows() {
+  const rowA = document.getElementById('sp-row-a');
+  const rowB = document.getElementById('sp-row-b');
+  const chip = (slot, id) =>
+    '<div class="sp-chip"><span>' + fullName(id) + '</span>' +
+    '<button type="button" data-unpick="' + slot + '" aria-label="Remove">&times;</button></div>';
+  rowA.innerHTML = pick.a ? chip('a', pick.a) : '';
+  rowB.innerHTML = pick.b ? chip('b', pick.b) : '';
+  const slot = activeSlot();
+  if (slot) {
+    (slot === 'a' ? rowA : rowB).appendChild(spInput);
+    spInput.placeholder = slot === 'a' ? 'First person…'
+      : 'Relate ' + displayName(pick.a) + ' to…';
+    spInput.value = '';
+    spInput.style.display = 'block';
+    spList.style.display = 'block';
+    renderSuggestions('');
+    if (matchMedia('(hover: hover)').matches) spInput.focus();
+  } else {
+    spInput.style.display = 'none';
+    spList.style.display = 'none';
+  }
 }
 
 function renderSuggestions(q) {
   const ql = q.trim().toLowerCase();
   const rows = NAME_INDEX
-    .filter(e => e.id !== selectedId && (!ql || e.name.toLowerCase().includes(ql)))
+    .filter(e => e.id !== pick.a && e.id !== pick.b && (!ql || e.name.toLowerCase().includes(ql)))
     .slice(0, 8);
   spList.innerHTML = rows.map(e =>
     '<li data-id="' + e.id + '">' + e.name +
@@ -633,10 +765,32 @@ function renderSuggestions(q) {
 spInput.addEventListener('input', () => renderSuggestions(spInput.value));
 spList.addEventListener('click', e => {
   const li = e.target.closest('li[data-id]');
-  if (li && selectedId) startPath(selectedId, li.getAttribute('data-id'));
+  if (!li) return;
+  const id = li.getAttribute('data-id');
+  if (!pick.a) { pick.a = id; renderRows(); }
+  else if (!pick.b) {
+    pick.b = id;
+    renderRows();
+    startPath(pick.a, pick.b);
+  }
+});
+spanel.addEventListener('click', e => {
+  const btn = e.target.closest('button[data-unpick]');
+  if (!btn) return;
+  pick[btn.getAttribute('data-unpick')] = null;
+  clearPath();
+  applyHighlight(hoveredId);
+  spBody.style.display = 'block';
+  spTracing.style.display = 'none';
+  spResult.style.display = 'none';
+  renderRows();
 });
 document.getElementById('sp-close').addEventListener('click', closePanel);
-window.addEventListener('keydown', e => { if (e.key === 'Escape' && spanel.style.display === 'block') closePanel(); });
+document.getElementById('sp-launch').addEventListener('click', () => {
+  if (panelOpen()) closePanel();
+  else openPanel(null);
+});
+window.addEventListener('keydown', e => { if (e.key === 'Escape' && panelOpen()) closePanel(); });
 
 function startPath(aId, bId) {
   const chainA = chainUp(aId);
@@ -655,6 +809,9 @@ function startPath(aId, bId) {
   const segments = [];
   for (let i = 0; i < da; i++) segments.push({ child: chainA[i], reverse: true });
   for (let i = chainB.length - 1; i >= 0; i--) segments.push({ child: chainB[i], reverse: false });
+
+  // Stars visited in order: A up to the shared ancestor, then down to B
+  const nodes = [...chainA.slice(0, da + 1), ...chainB.slice().reverse()];
 
   pathMembers = new Set([aId, bId, lca, ...chainA.slice(0, da), ...chainB]);
   pathEdges = new Set(segments.map(s => s.child));
@@ -675,9 +832,10 @@ function startPath(aId, bId) {
     ? 'starpath runs through Louis & Rose themselves'
     : 'closest shared ancestor: ' + byId[lca].name;
   pathAnim = {
-    segments, seg: 0, segStart: clock.getElapsedTime(),
+    segments, nodes, seg: 0, segStart: clock.getElapsedTime(),
     verdict, via: aId === bId ? '' : via, target: bId
   };
+  lightPathNode(nodes[0], clock.getElapsedTime());
   if (!segments.length) finishPath();   // same star
   else comet.visible = true;
 }
@@ -703,13 +861,14 @@ function tickStarpath(t) {
     lines[seg.child].material.opacity = 0.9;
     pathAnim.seg++;
     pathAnim.segStart = t;
+    lightPathNode(pathAnim.nodes[pathAnim.seg], t);
     if (pathAnim.seg >= pathAnim.segments.length) finishPath();
   }
 }
 
 window.addEventListener('pointermove', e => {
   if (pathAnim || pathMembers) { tooltip.style.display = 'none'; return; }
-  const obj = pick(e.clientX, e.clientY);
+  const obj = pickStar(e.clientX, e.clientY);
   const id = obj && !obj.userData.isSun ? obj.userData.id : null;
   if (id !== hoveredId) { hoveredId = id; applyHighlight(id); }
   if (obj) showTooltip(obj, e.clientX, e.clientY);
@@ -719,7 +878,7 @@ window.addEventListener('pointermove', e => {
 
 window.addEventListener('pointerdown', e => {
   if (e.target !== renderer.domElement) return;
-  const obj = pick(e.clientX, e.clientY);
+  const obj = pickStar(e.clientX, e.clientY);
   if (obj && !obj.userData.isSun) {
     hoveredId = obj.userData.id;
     openPanel(obj.userData.id);
@@ -746,6 +905,7 @@ function animate() {
   const t = clock.getElapsedTime();
   tickEcho(t);
   tickStarpath(t);
+  pathLabels.forEach(l => { l.sprite.material.opacity = Math.min(1, (t - l.born) * 2.5); });
   sun.scale.setScalar(30 + Math.sin(t * 1.6) * 1.6 + echoSunBoost);
   sunHalo.scale.setScalar(58 + Math.sin(t * 1.1) * 3 + echoSunBoost);
   if (focusTarget) {
