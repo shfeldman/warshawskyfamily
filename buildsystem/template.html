@@ -1221,18 +1221,57 @@
   .reunion-lightbox {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.88);
+    background: rgba(0,0,0,0.92);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 9999;
-    cursor: zoom-out;
+    overflow: hidden;
+    touch-action: none;
   }
   .reunion-lightbox img {
     max-width: 95vw;
     max-height: 92vh;
-    border-radius: 8px;
+    border-radius: 6px;
     box-shadow: 0 4px 40px rgba(0,0,0,0.6);
+    transform-origin: center center;
+    user-select: none;
+    -webkit-user-drag: none;
+    transition: none;
+  }
+  .reunion-lightbox .lb-hint {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,0.55);
+    font-size: 12px;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .reunion-lightbox .lb-close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    color: #fff;
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.7;
+  }
+  .reunion-lightbox .lb-close:hover { opacity: 1; }
+  .reunion-lightbox .lb-caption {
+    position: absolute;
+    bottom: 36px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,0.8);
+    font-size: 13px;
+    pointer-events: none;
+    white-space: nowrap;
+    max-width: 90vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .stats-section {
@@ -3129,16 +3168,115 @@ function flashListCard(id) {
       label.textContent = entry.title;
       item.appendChild(img);
       item.appendChild(label);
-      // Lightbox on click
+      // Lightbox on click — with scroll/pinch zoom and drag-to-pan
       item.addEventListener('click', () => {
         const lb = document.createElement('div');
         lb.className = 'reunion-lightbox';
+
         const lbImg = document.createElement('img');
         lbImg.src = entry.photoFull || entry.photo;
         lbImg.alt = img.alt;
+        lbImg.draggable = false;
+
+        const caption = document.createElement('div');
+        caption.className = 'lb-caption';
+        caption.textContent = entry.title;
+
+        const hint = document.createElement('div');
+        hint.className = 'lb-hint';
+        hint.textContent = 'Scroll or pinch to zoom · Drag to pan · Click × to close';
+
+        const closeBtn = document.createElement('div');
+        closeBtn.className = 'lb-close';
+        closeBtn.innerHTML = '&times;';
+        closeBtn.addEventListener('click', () => lb.remove());
+
         lb.appendChild(lbImg);
-        lb.addEventListener('click', () => lb.remove());
+        lb.appendChild(caption);
+        lb.appendChild(hint);
+        lb.appendChild(closeBtn);
+
+        // Zoom/pan state
+        let scale = 1, tx = 0, ty = 0;
+        let dragging = false, dragStartX, dragStartY, dragTx, dragTy;
+
+        function applyTransform() {
+          lbImg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+          lbImg.style.cursor = scale > 1 ? (dragging ? 'grabbing' : 'grab') : 'zoom-in';
+          hint.style.display = scale > 1 ? 'none' : '';
+        }
+
+        // Mouse wheel zoom
+        lb.addEventListener('wheel', e => {
+          e.preventDefault();
+          const delta = e.deltaY < 0 ? 1.15 : 0.87;
+          scale = Math.min(Math.max(scale * delta, 1), 8);
+          if (scale === 1) { tx = 0; ty = 0; }
+          applyTransform();
+        }, { passive: false });
+
+        // Mouse drag to pan
+        lbImg.addEventListener('mousedown', e => {
+          if (scale <= 1) return;
+          dragging = true;
+          dragStartX = e.clientX; dragStartY = e.clientY;
+          dragTx = tx; dragTy = ty;
+          e.preventDefault();
+        });
+        window.addEventListener('mousemove', e => {
+          if (!dragging) return;
+          tx = dragTx + (e.clientX - dragStartX);
+          ty = dragTy + (e.clientY - dragStartY);
+          applyTransform();
+        });
+        window.addEventListener('mouseup', () => { dragging = false; applyTransform(); });
+
+        // Touch pinch-to-zoom and drag
+        let lastDist = null, lastMidX, lastMidY, touchTx, touchTy, singleTouchStart;
+        lb.addEventListener('touchstart', e => {
+          if (e.touches.length === 2) {
+            lastDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+            lastMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+            lastMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+            touchTx = tx; touchTy = ty;
+          } else if (e.touches.length === 1 && scale > 1) {
+            singleTouchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY, tx, ty };
+          }
+          e.preventDefault();
+        }, { passive: false });
+        lb.addEventListener('touchmove', e => {
+          if (e.touches.length === 2 && lastDist !== null) {
+            const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+            scale = Math.min(Math.max(scale * (dist / lastDist), 1), 8);
+            lastDist = dist;
+            if (scale === 1) { tx = 0; ty = 0; }
+            applyTransform();
+          } else if (e.touches.length === 1 && singleTouchStart && scale > 1) {
+            tx = singleTouchStart.tx + (e.touches[0].clientX - singleTouchStart.x);
+            ty = singleTouchStart.ty + (e.touches[0].clientY - singleTouchStart.y);
+            applyTransform();
+          }
+          e.preventDefault();
+        }, { passive: false });
+        lb.addEventListener('touchend', e => {
+          if (e.touches.length < 2) lastDist = null;
+          if (e.touches.length === 0) singleTouchStart = null;
+        });
+
+        // Double-click to zoom in/reset
+        lbImg.addEventListener('dblclick', e => {
+          if (scale > 1) { scale = 1; tx = 0; ty = 0; }
+          else { scale = 3; }
+          applyTransform();
+        });
+
+        // Click backdrop to close (only when not panned/zoomed)
+        lb.addEventListener('click', e => {
+          if (e.target === lb && scale === 1) lb.remove();
+        });
+
         document.body.appendChild(lb);
+        applyTransform();
       });
       wrap.appendChild(item);
     });
