@@ -1166,6 +1166,75 @@
   }
 
   /* ── Family stats section ── */
+  /* ── Reunion gallery ── */
+  .reunion-section {
+    margin-top: 1rem;
+    border: 1.5px solid var(--rule-soft);
+    border-radius: 10px;
+    background: #fff;
+    overflow: hidden;
+  }
+  [data-theme="dark"] .reunion-section { background: #211e18; }
+  .reunion-toggle-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--ink);
+    gap: 0.5rem;
+  }
+  .reunion-toggle-btn:hover { background: var(--bg-soft); }
+  .reunion-body {
+    padding: 1rem 1rem 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    justify-content: center;
+  }
+  .reunion-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+  .reunion-item img {
+    width: 100%;
+    max-width: 420px;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+    transition: transform 0.15s;
+  }
+  .reunion-item img:hover { transform: scale(1.02); }
+  .reunion-year {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--ink-soft);
+    letter-spacing: 0.04em;
+  }
+  .reunion-lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.88);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    cursor: zoom-out;
+  }
+  .reunion-lightbox img {
+    max-width: 95vw;
+    max-height: 92vh;
+    border-radius: 8px;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.6);
+  }
+
   .stats-section {
     margin-top: 1rem;
     border: 1.5px solid var(--rule-soft);
@@ -1557,6 +1626,14 @@
 
     <a id="submit-update-btn" href="https://forms.gle/aZ9qrLaibyCsm2Bc8" target="_blank" rel="noopener" class="submit-update-link">&#128221; Submit a Correction or Addition</a>
     <button id="print-btn" type="button" class="print-btn-full">Print / Save PDF</button>
+
+    <div class="reunion-section" id="reunion-section">
+      <button class="reunion-toggle-btn" id="reunion-toggle" type="button" aria-expanded="false" aria-controls="reunion-body">
+        <span>🏖️ Family Reunions</span>
+        <span id="reunion-arrow">&#9660;</span>
+      </button>
+      <div id="reunion-body" hidden></div>
+    </div>
 
     <div class="stats-section" id="stats-section">
       <button class="stats-toggle-btn" id="stats-toggle" type="button" aria-expanded="false" aria-controls="stats-body">
@@ -3017,6 +3094,65 @@ function flashListCard(id) {
   li.classList.add('list-flash');
   setTimeout(() => li.classList.remove('list-flash'), 1700);
 }
+
+// ---- Reunion gallery ----
+(function wireReunionGallery() {
+  const REUNION_PHOTOS = __REUNION_PHOTOS_JSON__;
+  const btn = document.getElementById('reunion-toggle');
+  const body = document.getElementById('reunion-body');
+  const arrow = document.getElementById('reunion-arrow');
+  if (!btn || !body) return;
+
+  if (!REUNION_PHOTOS || REUNION_PHOTOS.length === 0) {
+    btn.closest('.reunion-section').hidden = true;
+    return;
+  }
+
+  // Build gallery content (lazy — only on first open)
+  let built = false;
+  function buildGallery() {
+    if (built) return;
+    built = true;
+    const wrap = document.createElement('div');
+    wrap.className = 'reunion-body';
+    // Sort newest first
+    const sorted = [...REUNION_PHOTOS].sort((a, b) => b.year - a.year);
+    sorted.forEach(entry => {
+      const item = document.createElement('div');
+      item.className = 'reunion-item';
+      const img = document.createElement('img');
+      img.src = entry.photo;
+      img.alt = `Warshawsky Family Reunion ${entry.year}`;
+      img.loading = 'lazy';
+      const label = document.createElement('div');
+      label.className = 'reunion-year';
+      label.textContent = entry.year + ' Reunion';
+      item.appendChild(img);
+      item.appendChild(label);
+      // Lightbox on click
+      item.addEventListener('click', () => {
+        const lb = document.createElement('div');
+        lb.className = 'reunion-lightbox';
+        const lbImg = document.createElement('img');
+        lbImg.src = entry.photo;
+        lbImg.alt = img.alt;
+        lb.appendChild(lbImg);
+        lb.addEventListener('click', () => lb.remove());
+        document.body.appendChild(lb);
+      });
+      wrap.appendChild(item);
+    });
+    body.appendChild(wrap);
+  }
+
+  btn.addEventListener('click', () => {
+    const expanded = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!expanded));
+    body.hidden = expanded;
+    if (arrow) arrow.textContent = expanded ? '▾' : '▴';
+    if (!expanded) buildGallery();
+  });
+})();
 
 // ---- About section toggle ----
 (function wireAboutSection() {
