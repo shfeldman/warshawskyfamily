@@ -1858,6 +1858,9 @@ function getVitals(id) {
 const CROP_REFERENCE_FRAME = 220;
 
 function applyCropTransform(imgEl, vitals, renderedPx) {
+  // For tiny thumbnails (partner row photos), CSS cover centering is sufficient
+  if (renderedPx < 50) return;
+
   const zoom = vitals.photoZoom || 1;
   const panX = vitals.photoPanX || 0;
   const panY = vitals.photoPanY || 0;
