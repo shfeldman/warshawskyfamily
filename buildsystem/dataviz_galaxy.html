@@ -375,7 +375,9 @@ const sunHalo = new THREE.Sprite(new THREE.SpriteMaterial({
 sunHalo.scale.setScalar(58);
 scene.add(sunHalo);
 
-// One star sprite per descendant
+// One star sprite per descendant — a bit brighter on phones, where the
+// screen is small and glare washes out dim sprites
+const STAR_BOOST = matchMedia('(pointer: coarse)').matches ? 1.35 : 1;
 const sprites = {};
 const starGroup = new THREE.Group();
 PEOPLE_DATA.forEach(p => {
@@ -386,7 +388,7 @@ PEOPLE_DATA.forEach(p => {
     depthWrite: false, transparent: true
   }));
   s.position.copy(positions[p.id]);
-  s.scale.setScalar(7.5 - depth * 0.9);
+  s.scale.setScalar((7.5 - depth * 0.9) * STAR_BOOST);
   s.userData.id = p.id;
   s.userData.baseScale = s.scale.x;
   sprites[p.id] = s;
@@ -572,6 +574,7 @@ const spInput = document.getElementById('sp-input');
 const spList = document.getElementById('sp-list');
 const spTracing = document.getElementById('sp-tracing');
 const spResult = document.getElementById('sp-result');
+const spLaunch = document.getElementById('sp-launch');
 const SEG_DURATION = 0.45;
 
 let pathAnim = null, pathMembers = null, pathEdges = null;
@@ -642,11 +645,13 @@ function openPanel(id) {
   spTracing.style.display = 'none';
   spResult.style.display = 'none';
   spanel.style.display = 'block';
+  spLaunch.style.display = 'none';
   renderRows();
 }
 
 function closePanel() {
   spanel.style.display = 'none';
+  spLaunch.style.display = '';
   pick.a = pick.b = null;
   clearPath();
   applyHighlight(hoveredId);
@@ -786,7 +791,7 @@ spanel.addEventListener('click', e => {
   renderRows();
 });
 document.getElementById('sp-close').addEventListener('click', closePanel);
-document.getElementById('sp-launch').addEventListener('click', () => {
+spLaunch.addEventListener('click', () => {
   if (panelOpen()) closePanel();
   else openPanel(null);
 });
