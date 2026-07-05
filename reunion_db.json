@@ -1,11 +1,11 @@
 [
-  { "year": 2026, "title": "31st Annual Warshawsky Family Reunion, Seaside Heights, New Jersey, June 2026", "photo": "album_reunion_2026.jpg", "photoFull": "album_full_reunion_2026.jpg" },
-  { "year": 2023, "title": "28th Annual Warshawsky Family Reunion, Seaside Heights, New Jersey, June 2023", "photo": "album_reunion_2023.jpg", "photoFull": "album_full_reunion_2023.jpg" },
-  { "year": 2022, "title": "27th Annual Warshawsky Family Reunion, Seaside Heights, New Jersey, June 2022", "photo": "album_reunion_2022.jpg", "photoFull": "album_full_reunion_2022.jpg" },
-  { "year": 2019, "title": "24th Annual Warshawsky Family Reunion, Seaside Heights, New Jersey, June 2019", "photo": "album_reunion_2019.jpg", "photoFull": "album_full_reunion_2019.jpg" },
-  { "year": 2013, "title": "18th Annual Warshawsky Family Reunion, Seaside Heights, New Jersey, June 2013", "photo": "album_reunion_2013.jpg", "photoFull": "album_full_reunion_2013.jpg" },
-  { "year": 2012, "title": "17th Annual Warshawsky Family Reunion, Seaside Heights, New Jersey, June 2012", "photo": "album_reunion_2012.jpg", "photoFull": "album_full_reunion_2012.jpg" },
-  { "year": 0, "title": "Warshawsky Family Reunion (Year Unknown)", "photo": "album_reunion_unkn1.jpg", "photoFull": "album_full_reunion_unkn1.jpg" },
-  { "year": 0, "title": "Warshawsky Family Reunion (Year Unknown)", "photo": "album_reunion_unkn2.jpg", "photoFull": "album_full_reunion_unkn2.jpg" },
-  { "year": 1947, "title": "Warshawsky Family Seder, 1947", "photo": "album_seder_1947.jpg", "photoFull": "album_full_seder_1947.jpg" }
+  { "year": 2026, "personCount": 103, "title": "31st Annual Warshawsky Family Reunion, Seaside Heights, New Jersey, June 2026", "photo": "album_reunion_2026.jpg", "photoFull": "album_full_reunion_2026.jpg" },
+  { "year": 2023, "personCount": 110, "title": "28th Annual Warshawsky Family Reunion, Seaside Heights, New Jersey, June 2023", "photo": "album_reunion_2023.jpg", "photoFull": "album_full_reunion_2023.jpg" },
+  { "year": 2022, "personCount": 132, "title": "27th Annual Warshawsky Family Reunion, Seaside Heights, New Jersey, June 2022", "photo": "album_reunion_2022.jpg", "photoFull": "album_full_reunion_2022.jpg" },
+  { "year": 2019, "personCount": 115, "title": "24th Annual Warshawsky Family Reunion, Seaside Heights, New Jersey, June 2019", "photo": "album_reunion_2019.jpg", "photoFull": "album_full_reunion_2019.jpg" },
+  { "year": 2013, "personCount": 75,  "title": "18th Annual Warshawsky Family Reunion, Seaside Heights, New Jersey, June 2013", "photo": "album_reunion_2013.jpg", "photoFull": "album_full_reunion_2013.jpg" },
+  { "year": 2012, "personCount": 70,  "title": "17th Annual Warshawsky Family Reunion, Seaside Heights, New Jersey, June 2012", "photo": "album_reunion_2012.jpg", "photoFull": "album_full_reunion_2012.jpg" },
+  { "year": 0, "personCount": 115, "title": "Warshawsky Family Reunion (Year Unknown)", "photo": "album_reunion_unkn1.jpg", "photoFull": "album_full_reunion_unkn1.jpg" },
+  { "year": 0, "personCount": 87,  "title": "Warshawsky Family Reunion (Year Unknown)", "photo": "album_reunion_unkn2.jpg", "photoFull": "album_full_reunion_unkn2.jpg" },
+  { "year": 1947, "personCount": 27, "title": "Warshawsky Family Seder, 1947", "photo": "album_seder_1947.jpg", "photoFull": "album_full_seder_1947.jpg" }
 ]
