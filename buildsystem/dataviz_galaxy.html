@@ -86,6 +86,63 @@
     text-shadow: 0 0 14px #c8963a88;
   }
   #echo .echo-names { font-size: 0.78rem; color: #b0a68e; margin-top: 3px; }
+  #spanel {
+    display: none;
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 4.8rem;
+    width: min(360px, calc(100vw - 2rem));
+    background: #12141ede;
+    border: 1px solid #3a3d4d;
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+    backdrop-filter: blur(6px);
+    z-index: 6;
+  }
+  .sp-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
+  .sp-head .sp-name { font-family: 'Lora', serif; font-size: 0.98rem; color: #ffe9b0; }
+  .sp-head button {
+    background: none; border: none; color: #9a917e; font-size: 1.2rem;
+    cursor: pointer; line-height: 1; padding: 0 0.2rem;
+  }
+  .sp-head button:hover { color: #e8e0d0; }
+  #sp-input {
+    width: 100%;
+    background: #1c1f2c;
+    border: 1px solid #3a3d4d;
+    border-radius: 8px;
+    color: #e8e0d0;
+    font-family: inherit;
+    font-size: 0.9rem;
+    padding: 0.55rem 0.7rem;
+    outline: none;
+  }
+  #sp-input:focus { border-color: #8fb8f0; }
+  #sp-list {
+    list-style: none;
+    margin-top: 0.4rem;
+    max-height: 168px;
+    overflow-y: auto;
+  }
+  #sp-list li {
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: #cfc7b2;
+  }
+  #sp-list li:hover { background: #23273a; color: #fff; }
+  #sp-list li .sp-branch { color: #7a7264; font-size: 0.75rem; }
+  #sp-result { display: none; text-align: center; padding: 0.3rem 0 0.1rem; }
+  #sp-result .sp-verdict {
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    color: #ffe9b0;
+    text-shadow: 0 0 14px #c8963a88;
+  }
+  #sp-result .sp-via { font-size: 0.76rem; color: #9a917e; margin-top: 4px; }
+  #sp-tracing { display: none; text-align: center; font-size: 0.85rem; color: #9a917e; padding: 0.2rem 0; }
 </style>
 </head>
 <body>
@@ -101,6 +158,21 @@
 <div id="legend"></div>
 <p class="hint">drag to orbit &middot; scroll or pinch to zoom &middot; hover or tap a star to light up their line</p>
 <div id="echo"></div>
+<div id="spanel">
+  <div class="sp-head">
+    <span class="sp-name" id="sp-name"></span>
+    <button id="sp-close" type="button" aria-label="Close">&times;</button>
+  </div>
+  <div id="sp-body">
+    <input id="sp-input" placeholder="Trace a starpath to&hellip;" autocomplete="off" spellcheck="false">
+    <ul id="sp-list"></ul>
+  </div>
+  <div id="sp-tracing">Tracing starpath&hellip;</div>
+  <div id="sp-result">
+    <div class="sp-verdict" id="sp-verdict"></div>
+    <div class="sp-via" id="sp-via"></div>
+  </div>
+</div>
 <div id="tooltip"></div>
 
 <script>const PEOPLE_DATA = __PEOPLE_DATA_JSON__;</script>
@@ -288,12 +360,14 @@ scene.add(starGroup);
 
 // Curved constellation lines, parent → child
 const lines = {};
+const curves = {};
 PEOPLE_DATA.forEach(p => {
   if (p.branch === 'Founders') return;
   const from = p.parent ? positions[p.parent] : new THREE.Vector3(0, 0, 0);
   const to = positions[p.id];
   const ctrl = from.clone().add(to).multiplyScalar(0.5).multiplyScalar(0.88);
   const curve = new THREE.QuadraticBezierCurve3(from, ctrl, to);
+  curves[p.id] = curve;
   const geo = new THREE.BufferGeometry().setFromPoints(curve.getPoints(12));
   const mat = new THREE.LineBasicMaterial({
     color: BRANCH_COLORS[p.branch], transparent: true, opacity: 0.28,
@@ -434,7 +508,7 @@ function endEcho() {
 
 function tickEcho(t) {
   if (!echoState) {
-    if (t > nextEchoAt && !hoveredId) startEcho(t);
+    if (t > nextEchoAt && !hoveredId && !selectedId && !pathMembers) startEcho(t);
     return;
   }
   const k = (t - echoState.start) / ECHO_DURATION;
@@ -454,7 +528,187 @@ function tickEcho(t) {
   echoState.lines.forEach(l => { l.material.opacity = 0.55 * env * twinkle; });
 }
 
+// ── Starpath: pick two stars, trace the path, name the relationship ───────
+const spanel = document.getElementById('spanel');
+const spName = document.getElementById('sp-name');
+const spBody = document.getElementById('sp-body');
+const spInput = document.getElementById('sp-input');
+const spList = document.getElementById('sp-list');
+const spTracing = document.getElementById('sp-tracing');
+const spResult = document.getElementById('sp-result');
+const SEG_DURATION = 0.45;
+
+let selectedId = null, pathAnim = null, pathMembers = null, pathEdges = null;
+
+const comet = new THREE.Sprite(new THREE.SpriteMaterial({
+  map: glow, color: '#fff2c8', blending: THREE.AdditiveBlending,
+  depthWrite: false, transparent: true
+}));
+comet.scale.setScalar(7);
+comet.visible = false;
+scene.add(comet);
+
+const NAME_INDEX = PEOPLE_DATA
+  .filter(p => p.branch !== 'Founders')
+  .map(p => ({ id: p.id, name: p.name, branch: p.branch }))
+  .sort((a, b) => a.name.localeCompare(b.name));
+NAME_INDEX.unshift({ id: '__sun', name: 'Louis & Rose Warshawsky', branch: 'the founders' });
+
+function parentOf(id) {
+  if (id === '__sun') return null;
+  return byId[id].parent || '__sun';
+}
+function chainUp(id) {
+  const c = [];
+  for (let x = id; x; x = parentOf(x)) c.push(x);
+  return c;   // [id, ..., '__sun']
+}
+
+function ordinal(n) {
+  return ['first','second','third','fourth','fifth'][n - 1] || (n + 'th');
+}
+function greats(n) { return 'great-'.repeat(n); }
+function descTerm(n) {
+  return n === 1 ? 'child' : greats(n - 2) + 'grandchild';
+}
+function ancTerm(n) {
+  return n === 1 ? 'parent' : greats(n - 2) + 'grandparent';
+}
+function displayName(id) {
+  return id === '__sun' ? 'Louis & Rose' : byId[id].name.split(' ')[0];
+}
+
+function relationship(aId, bId, lca, da, db) {
+  const a = displayName(aId), b = displayName(bId);
+  if (da === 0) return b + ' is ' + a + "'s " + descTerm(db);
+  if (db === 0) return b + ' is ' + a + "'s " + ancTerm(da);
+  if (da === 1 && db === 1) return a + ' and ' + b + ' are siblings';
+  if (da === 1) return b + ' is ' + a + "'s " + greats(db - 2) + 'niece or nephew';
+  if (db === 1) return b + ' is ' + a + "'s " + greats(da - 2) + 'aunt or uncle';
+  const degree = Math.min(da, db) - 1;
+  const removed = Math.abs(da - db);
+  return a + ' and ' + b + ' are ' + ordinal(degree) + ' cousins' +
+    (removed ? ', ' + (removed === 1 ? 'once' : removed === 2 ? 'twice' : removed + ' times') + ' removed' : '');
+}
+
+function openPanel(id) {
+  if (echoState) { nextEchoAt = clock.getElapsedTime() + ECHO_GAP; endEcho(); }
+  clearPath();
+  selectedId = id;
+  spName.textContent = '★ ' + byId[id].name;
+  spBody.style.display = 'block';
+  spTracing.style.display = 'none';
+  spResult.style.display = 'none';
+  spInput.value = '';
+  renderSuggestions('');
+  spanel.style.display = 'block';
+  if (matchMedia('(hover: hover)').matches) spInput.focus();
+}
+
+function closePanel() {
+  spanel.style.display = 'none';
+  selectedId = null;
+  clearPath();
+  applyHighlight(hoveredId);
+}
+
+function clearPath() {
+  pathAnim = null;
+  pathMembers = null;
+  pathEdges = null;
+  comet.visible = false;
+}
+
+function renderSuggestions(q) {
+  const ql = q.trim().toLowerCase();
+  const rows = NAME_INDEX
+    .filter(e => e.id !== selectedId && (!ql || e.name.toLowerCase().includes(ql)))
+    .slice(0, 8);
+  spList.innerHTML = rows.map(e =>
+    '<li data-id="' + e.id + '">' + e.name +
+    ' <span class="sp-branch">&middot; ' + (e.id === '__sun' ? e.branch : e.branch + "'s line") + '</span></li>'
+  ).join('');
+}
+
+spInput.addEventListener('input', () => renderSuggestions(spInput.value));
+spList.addEventListener('click', e => {
+  const li = e.target.closest('li[data-id]');
+  if (li && selectedId) startPath(selectedId, li.getAttribute('data-id'));
+});
+document.getElementById('sp-close').addEventListener('click', closePanel);
+window.addEventListener('keydown', e => { if (e.key === 'Escape' && spanel.style.display === 'block') closePanel(); });
+
+function startPath(aId, bId) {
+  const chainA = chainUp(aId);
+  const idxA = {};
+  chainA.forEach((id, i) => { idxA[id] = i; });
+  const chainB = [];
+  let lca = null;
+  for (let x = bId; x; x = parentOf(x)) {
+    if (idxA[x] !== undefined) { lca = x; break; }
+    chainB.push(x);
+  }
+  const da = idxA[lca];          // steps from A up to LCA
+  const db = chainB.length;      // steps from B up to LCA
+
+  // Edges: up from A to LCA (traversed child→parent), then down to B
+  const segments = [];
+  for (let i = 0; i < da; i++) segments.push({ child: chainA[i], reverse: true });
+  for (let i = chainB.length - 1; i >= 0; i--) segments.push({ child: chainB[i], reverse: false });
+
+  pathMembers = new Set([aId, bId, lca, ...chainA.slice(0, da), ...chainB]);
+  pathEdges = new Set(segments.map(s => s.child));
+
+  // Dim the universe, faintly pre-light the route
+  Object.values(sprites).forEach(s => { s.material.opacity = pathMembers.has(s.userData.id) ? 1 : 0.08; });
+  Object.entries(lines).forEach(([childId, l]) => {
+    l.material.opacity = pathEdges.has(childId) ? 0.16 : 0.03;
+  });
+  sun.material.opacity = pathMembers.has('__sun') ? 1 : 0.4;
+
+  spBody.style.display = 'none';
+  spResult.style.display = 'none';
+  spTracing.style.display = 'block';
+
+  const verdict = aId === bId ? 'That is the same star' : relationship(aId, bId, lca, da, db);
+  const via = lca === '__sun'
+    ? 'starpath runs through Louis & Rose themselves'
+    : 'closest shared ancestor: ' + byId[lca].name;
+  pathAnim = {
+    segments, seg: 0, segStart: clock.getElapsedTime(),
+    verdict, via: aId === bId ? '' : via, target: bId
+  };
+  if (!segments.length) finishPath();   // same star
+  else comet.visible = true;
+}
+
+function finishPath() {
+  comet.visible = false;
+  document.getElementById('sp-verdict').textContent = '✦ ' + pathAnim.verdict;
+  document.getElementById('sp-via').textContent = pathAnim.via;
+  spTracing.style.display = 'none';
+  spResult.style.display = 'block';
+  pathAnim = null;
+}
+
+function tickStarpath(t) {
+  if (!pathAnim) return;
+  const seg = pathAnim.segments[pathAnim.seg];
+  const k = Math.min((t - pathAnim.segStart) / SEG_DURATION, 1);
+  const curve = curves[seg.child];
+  comet.position.copy(curve.getPoint(seg.reverse ? 1 - k : k));
+  comet.scale.setScalar(7 + Math.sin(t * 12) * 1.2);
+  lines[seg.child].material.opacity = 0.16 + 0.74 * k;
+  if (k >= 1) {
+    lines[seg.child].material.opacity = 0.9;
+    pathAnim.seg++;
+    pathAnim.segStart = t;
+    if (pathAnim.seg >= pathAnim.segments.length) finishPath();
+  }
+}
+
 window.addEventListener('pointermove', e => {
+  if (pathAnim || pathMembers) { tooltip.style.display = 'none'; return; }
   const obj = pick(e.clientX, e.clientY);
   const id = obj && !obj.userData.isSun ? obj.userData.id : null;
   if (id !== hoveredId) { hoveredId = id; applyHighlight(id); }
@@ -464,14 +718,18 @@ window.addEventListener('pointermove', e => {
 });
 
 window.addEventListener('pointerdown', e => {
+  if (e.target !== renderer.domElement) return;
   const obj = pick(e.clientX, e.clientY);
   if (obj && !obj.userData.isSun) {
     hoveredId = obj.userData.id;
+    openPanel(obj.userData.id);
     applyHighlight(hoveredId);
     showTooltip(obj, e.clientX, e.clientY);
     focusTarget = obj.position.clone();
   } else if (obj && obj.userData.isSun) {
     focusTarget = new THREE.Vector3(0, 0, 0);
+  } else if (spanel.style.display === 'block') {
+    closePanel();
   }
 });
 
@@ -487,6 +745,7 @@ function animate() {
   requestAnimationFrame(animate);
   const t = clock.getElapsedTime();
   tickEcho(t);
+  tickStarpath(t);
   sun.scale.setScalar(30 + Math.sin(t * 1.6) * 1.6 + echoSunBoost);
   sunHalo.scale.setScalar(58 + Math.sin(t * 1.1) * 3 + echoSunBoost);
   if (focusTarget) {
@@ -497,6 +756,7 @@ function animate() {
   renderer.render(scene, camera);
 }
 document.getElementById('loading').remove();
+window.__galaxy = { openPanel, startPath, closePanel };
 animate();
 </script>
 </body>
