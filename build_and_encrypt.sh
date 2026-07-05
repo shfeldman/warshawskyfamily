@@ -25,7 +25,8 @@ python3 encrypt.py --password "$WFC_PASSWORD" \
 
 echo ""
 echo "=== Committing ==="
-git add index.html data-viz/index.html
+git add index.html
+git add -f data-viz/index.html
 git commit -m "Rebuild and re-encrypt site"
 
 echo ""

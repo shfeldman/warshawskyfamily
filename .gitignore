@@ -3,3 +3,6 @@
 # Local crop editor tool
 crop_editor.html
 crop_editor.py
+
+# Built data-viz page: plaintext until encrypted; deploy script force-adds it
+data-viz/index.html
