@@ -28,8 +28,8 @@ REUNION_DB = Path(__file__).parent / "reunion_db.json"
 OUTPUT = Path(__file__).parent / "index.html"
 LOCATIONS_CACHE = Path(__file__).parent / "locations_cache.json"
 
-REUNION_MAX_DIM = 280
-REUNION_JPEG_QUALITY = 32
+REUNION_MAX_DIM = 240
+REUNION_JPEG_QUALITY = 28
 
 MAX_DIM = 500
 JPEG_QUALITY = 78
