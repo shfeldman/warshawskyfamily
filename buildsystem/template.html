@@ -1720,11 +1720,12 @@ function makePhotoThumb(id, displayName, vitals, sizeClass) {
 }
 
 function vitalsLabel(v) {
-  let yearPart = '';
-  if (v.yearBorn && v.yearDeceased) yearPart = `(${v.yearBorn}\u2013${v.yearDeceased})`;
-  else if (v.yearBorn) yearPart = `(b. ${v.yearBorn})`;
-  else if (v.yearDeceased) yearPart = `(d. ${v.yearDeceased})`;
-  return yearPart;
+  const born = v.yearBorn || (v.dateOfBirth ? v.dateOfBirth.slice(0,4) : '');
+  const died = v.yearDeceased || (v.dateOfDeath ? v.dateOfDeath.slice(0,4) : '');
+  if (born && died) return `(${born}\u2013${died})`;
+  if (born) return `(b. ${born})`;
+  if (died) return `(d. ${died})`;
+  return '';
 }
 
 function formatDOB(dateStr) {
