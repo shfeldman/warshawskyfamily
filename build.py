@@ -28,8 +28,8 @@ REUNION_DB = Path(__file__).parent / "reunion_db.json"
 OUTPUT = Path(__file__).parent / "index.html"
 LOCATIONS_CACHE = Path(__file__).parent / "locations_cache.json"
 
-REUNION_MAX_DIM = 210
-REUNION_JPEG_QUALITY = 25
+REUNION_MAX_DIM = 400
+REUNION_JPEG_QUALITY = 72
 
 MAX_DIM = 500
 JPEG_QUALITY = 78
@@ -183,20 +183,23 @@ def main():
     if founders and founders.get("vitals", {}).get("photo"):
         founders_photo = resolve_photo(founders["vitals"]["photo"], "founders")
 
-    # Load and encode reunion photos
+    # Reunion photos — thumbnails and full-res are served as static GitHub Pages files,
+    # not embedded in the encrypted HTML, so we can add unlimited photos without size concerns.
     reunion_photos = []
     if REUNION_DB.exists():
         with open(REUNION_DB) as f:
             reunion_raw = json.load(f)
         for entry in reunion_raw:
-            encoded = load_and_encode_reunion_photo(PHOTOS_DIR / entry["photo"], f"reunion {entry['year']}")
-            if encoded:
-                reunion_photos.append({
-                    "year": entry["year"],
-                    "title": entry.get("title", str(entry["year"])),
-                    "photo": encoded,
-                    "photoFull": "photos/" + entry["photoFull"] if entry.get("photoFull") else None
-                })
+            thumb_path = PHOTOS_DIR / entry["photo"]
+            if not thumb_path.exists():
+                print(f"WARNING: Reunion thumbnail not found: {thumb_path}", file=sys.stderr)
+                continue
+            reunion_photos.append({
+                "year": entry["year"],
+                "title": entry.get("title", str(entry["year"])),
+                "photo": "photos/" + entry["photo"],
+                "photoFull": "photos/" + entry["photoFull"] if entry.get("photoFull") else None
+            })
 
     people_json = json.dumps(people, separators=(",", ":"))
     reunion_photos_json = json.dumps(reunion_photos, separators=(",", ":"))
