@@ -98,6 +98,7 @@
     "parent": null,
     "vitals": {
       "photo": "sylvia.jpg",
+      "location": "Lauderhill, FL",
       "deceased": true,
       "dateOfBirth": "1923-09-04",
       "dateOfDeath": "2004-10-17",
