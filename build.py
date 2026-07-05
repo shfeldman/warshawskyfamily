@@ -23,9 +23,11 @@ from pathlib import Path
 
 PHOTOS_DIR = Path(__file__).parent / "photos"
 TEMPLATE = Path(__file__).parent / "buildsystem" / "template.html"
+DATAVIZ_TEMPLATE = Path(__file__).parent / "buildsystem" / "dataviz_template.html"
 DB = Path(__file__).parent / "family_db.json"
 REUNION_DB = Path(__file__).parent / "reunion_db.json"
 OUTPUT = Path(__file__).parent / "index.html"
+DATAVIZ_OUTPUT = Path(__file__).parent / "data-viz" / "index.html"
 LOCATIONS_CACHE = Path(__file__).parent / "locations_cache.json"
 
 REUNION_MAX_DIM = 400
@@ -161,6 +163,18 @@ def main():
     with open(DB) as f:
         people = json.load(f)
 
+    # Slim copy for the data-viz page: structure only, no photos/obituaries.
+    # Must be taken BEFORE photo filenames are resolved into base64 data URLs.
+    viz_people = []
+    for person in people:
+        slim = {k: person[k] for k in ("id", "name", "partners", "generation", "branch", "parent")}
+        vitals = person.get("vitals") or {}
+        slim_vitals = {k: vitals[k] for k in ("dateOfBirth", "dateOfDeath", "deceased", "location")
+                       if k in vitals}
+        if slim_vitals:
+            slim["vitals"] = slim_vitals
+        viz_people.append(slim)
+
     # Resolve any photo filenames → base64 data URLs
     for person in people:
         vitals = person.get("vitals") or {}
@@ -231,6 +245,20 @@ def main():
     size_kb = OUTPUT.stat().st_size / 1024
     print(f"Build complete: {OUTPUT} ({size_kb:.1f} KB)")
     print(f"  People: {len(people)}")
+
+    # Build the /data-viz page
+    if DATAVIZ_TEMPLATE.exists():
+        with open(DATAVIZ_TEMPLATE) as f:
+            viz = f.read()
+        viz = viz.replace("__PEOPLE_DATA_JSON__", json.dumps(viz_people, separators=(",", ":")))
+        viz = viz.replace("__BUILD_DATE__", build_date)
+        if "__PEOPLE_DATA_JSON__" in viz:
+            print("ERROR: data-viz placeholder was not replaced.", file=sys.stderr)
+            sys.exit(1)
+        DATAVIZ_OUTPUT.parent.mkdir(exist_ok=True)
+        with open(DATAVIZ_OUTPUT, "w") as f:
+            f.write(viz)
+        print(f"Build complete: {DATAVIZ_OUTPUT} ({DATAVIZ_OUTPUT.stat().st_size / 1024:.1f} KB)")
 
 
 if __name__ == "__main__":

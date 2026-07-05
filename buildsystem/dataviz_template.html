@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Warshawsky Family &mdash; Data Visualizations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f7f3ea;
+    --paper-deep: #efe8d8;
+    --card: #ffffff;
+    --ink: #23262b;
+    --ink-soft: #5b5650;
+    --rule: #b8a165;
+    --rule-soft: #d8cba0;
+    --focus: #1a5fb4;
+
+    --c-henry:  #c1440e;
+    --c-dave:   #0d5c8c;
+    --c-jack:   #1f7a4d;
+    --c-bessie: #8a3f8c;
+    --c-saul:   #6a4fb5;
+    --c-milt:   #b8860b;
+    --c-evelyn: #1f9489;
+    --c-sylvia: #c2287d;
+    --c-rudy:   #8a5a1e;
+  }
+  [data-theme="dark"] {
+    --paper: #1a1814;
+    --paper-deep: #111009;
+    --card: #211e18;
+    --ink: #e8e0d0;
+    --ink-soft: #a09080;
+    --rule: #8a6d1f;
+    --rule-soft: #4a3d1a;
+    --focus: #6ea4f0;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+  .page { max-width: 860px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 2rem; position: relative; }
+  h1 {
+    font-family: 'Lora', serif;
+    font-weight: 600;
+    font-size: 1.9rem;
+    margin-bottom: 0.4rem;
+  }
+  .subtitle { color: var(--ink-soft); font-size: 0.95rem; }
+  .back-link {
+    display: inline-block;
+    margin-top: 0.8rem;
+    color: var(--focus);
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+  .back-link:hover { text-decoration: underline; }
+  .dark-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: none;
+    border: 1px solid var(--rule-soft);
+    border-radius: 999px;
+    padding: 0.35rem 0.8rem;
+    font-family: inherit;
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .dark-toggle:hover { border-color: var(--rule); color: var(--ink); }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+    margin-bottom: 2.5rem;
+  }
+  .stat {
+    background: var(--card);
+    border: 1px solid var(--rule-soft);
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+    text-align: center;
+  }
+  .stat .num { font-family: 'Lora', serif; font-size: 1.7rem; font-weight: 600; }
+  .stat .lbl { font-size: 0.75rem; color: var(--ink-soft); margin-top: 2px; }
+  section { margin-bottom: 3.5rem; }
+  h2 {
+    font-family: 'Lora', serif;
+    font-weight: 600;
+    font-size: 1.35rem;
+    margin-bottom: 0.3rem;
+  }
+  .section-note { color: var(--ink-soft); font-size: 0.9rem; margin-bottom: 1.2rem; max-width: 640px; }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    margin-bottom: 1rem;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .legend i { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+  #sun-wrap { position: relative; }
+  #sunburst { width: 100%; height: auto; display: block; }
+  #tooltip {
+    display: none;
+    position: absolute;
+    pointer-events: none;
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 0.55rem 0.8rem;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    max-width: 240px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+    z-index: 5;
+  }
+  #tooltip .tt-name { font-weight: 600; }
+  #tooltip .tt-sub { color: var(--ink-soft); }
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .bar-label { width: 72px; flex-shrink: 0; text-align: right; font-size: 0.85rem; font-weight: 500; }
+  .bar-track { flex: 1; display: flex; height: 26px; border-radius: 5px; overflow: hidden; background: var(--paper-deep); }
+  .bar-seg { height: 100%; }
+  .bar-total { width: 34px; font-size: 0.85rem; color: var(--ink-soft); }
+  .surname-row { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
+  .surname-label { width: 110px; flex-shrink: 0; text-align: right; font-size: 0.85rem; }
+  .surname-track { flex: 1; height: 20px; background: var(--paper-deep); border-radius: 5px; overflow: hidden; }
+  .surname-fill { height: 100%; border-radius: 5px; }
+  .surname-count { width: 30px; font-size: 0.82rem; color: var(--ink-soft); }
+  .footnote { font-size: 0.78rem; color: var(--ink-soft); margin-top: 1rem; }
+  footer { text-align: center; color: var(--ink-soft); font-size: 0.8rem; border-top: 1px solid var(--rule-soft); padding-top: 1.5rem; }
+  @media (max-width: 560px) {
+    .bar-label { width: 58px; font-size: 0.78rem; }
+    .surname-label { width: 88px; font-size: 0.78rem; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+<header>
+  <button class="dark-toggle" id="dark-toggle" type="button">Dark mode</button>
+  <h1>The Family in Charts</h1>
+  <p class="subtitle">The Louis and Rose Warshawsky Family Circle &mdash; visualized</p>
+  <a class="back-link" href="/">&larr; Back to the family tree</a>
+</header>
+
+<div class="stats" id="stats"></div>
+
+<section aria-labelledby="h-sunburst">
+  <h2 id="h-sunburst">Five generations, one circle</h2>
+  <p class="section-note">Louis &amp; Rose at the center; each ring is a generation, each wedge a descendant.
+     Hover (or tap) anyone to light up their whole line back to the founders.</p>
+  <div class="legend" id="sun-legend"></div>
+  <div id="sun-wrap">
+    <svg id="sunburst" viewBox="0 0 800 800" role="img" aria-label="Radial family tree: Louis and Rose Warshawsky at the center with nine branches of descendants across five generational rings"></svg>
+    <div id="tooltip"></div>
+  </div>
+</section>
+
+<section aria-labelledby="h-branches">
+  <h2 id="h-branches">How each branch grew</h2>
+  <p class="section-note">Descendants per branch, stacked by generation &mdash; children, grandchildren,
+     great-grandchildren, and beyond of each of the nine siblings.</p>
+  <div class="legend" id="bar-legend"></div>
+  <div id="branch-bars"></div>
+</section>
+
+<section aria-labelledby="h-surnames">
+  <h2 id="h-surnames">One name became many</h2>
+  <p class="section-note">As daughters married and lines branched, the Warshawsky name fanned out into
+     dozens of family names. Bars are colored by the branch each surname belongs to.</p>
+  <div id="surnames"></div>
+  <p class="footnote" id="surname-footnote"></p>
+</section>
+
+<footer>Built from the family database &middot; __BUILD_DATE__</footer>
+</div>
+
+<script>const PEOPLE_DATA = __PEOPLE_DATA_JSON__;</script>
+<script>
+(function () {
+  const BRANCHES = ['Henry','Dave','Jack','Bessie','Saul','Milt','Evelyn','Sylvia','Rudy'];
+  const GEN_IDX = { A: 0, B: 1, C: 2, D: 3, E: 4 };
+  const GEN_LABEL = {
+    A: 'Child of Louis & Rose',
+    B: 'Grandchild of Louis & Rose',
+    C: 'Great-grandchild',
+    D: 'Great-great-grandchild',
+    E: 'Great-great-great-grandchild'
+  };
+
+  const byId = {}, kids = {};
+  PEOPLE_DATA.forEach(p => { byId[p.id] = p; kids[p.id] = []; });
+  PEOPLE_DATA.forEach(p => { if (p.parent && kids[p.parent]) kids[p.parent].push(p.id); });
+  const roots = PEOPLE_DATA.filter(p => !p.parent && p.branch !== 'Founders').map(p => p.id);
+
+  function branchColor(branch) {
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue('--c-' + branch.toLowerCase()).trim();
+  }
+  function hexMix(hex, target, t) {
+    const h = hex.replace('#',''), g = target.replace('#','');
+    const c = i => Math.round(
+      parseInt(h.substr(i,2),16) * (1-t) + parseInt(g.substr(i,2),16) * t
+    ).toString(16).padStart(2,'0');
+    return '#' + c(0) + c(2) + c(4);
+  }
+  function isDark() { return document.documentElement.getAttribute('data-theme') === 'dark'; }
+  function genShade(branch, gen) {
+    const base = branchColor(branch);
+    const t = GEN_IDX[gen] * (isDark() ? 0.14 : 0.17);
+    return hexMix(base, isDark() ? '#111009' : '#ffffff', t);
+  }
+
+  // ── Stats ──────────────────────────────────────────────────────────────
+  const descendants = PEOPLE_DATA.filter(p => p.branch !== 'Founders');
+  const partnerTotal = descendants.reduce((s,p) => s + (p.partners || []).length, 0);
+  const surnameOf = n => n.split(' ').pop();
+  const surnameSet = new Set(descendants.map(p => surnameOf(p.name)));
+  const stats = [
+    [descendants.length, 'descendants'],
+    [partnerTotal, 'partners married in'],
+    [5, 'generations'],
+    [9, 'branches'],
+    [surnameSet.size, 'family names']
+  ];
+  document.getElementById('stats').innerHTML = stats.map(([n, l]) =>
+    '<div class="stat"><div class="num">' + n + '</div><div class="lbl">' + l + '</div></div>'
+  ).join('');
+
+  // ── Sunburst ───────────────────────────────────────────────────────────
+  const TAU = Math.PI * 2, CX = 400, CY = 400, R0 = 66, RW = 60;
+
+  function leaves(id) {
+    const c = kids[id];
+    return c.length ? c.reduce((s,k) => s + leaves(k), 0) : 1;
+  }
+  function pt(r, a) {
+    return (CX + r * Math.sin(a)).toFixed(2) + ' ' + (CY - r * Math.cos(a)).toFixed(2);
+  }
+  function arcPath(r0, r1, a0, a1) {
+    const pad = Math.min(0.006, (a1 - a0) * 0.15);
+    a0 += pad; a1 -= pad;
+    const laf = (a1 - a0) > Math.PI ? 1 : 0;
+    return 'M ' + pt(r1, a0) + ' A ' + r1 + ' ' + r1 + ' 0 ' + laf + ' 1 ' + pt(r1, a1) +
+           ' L ' + pt(r0, a1) + ' A ' + r0 + ' ' + r0 + ' 0 ' + laf + ' 0 ' + pt(r0, a0) + ' Z';
+  }
+
+  const svg = document.getElementById('sunburst');
+  const tooltip = document.getElementById('tooltip');
+  const sunWrap = document.getElementById('sun-wrap');
+
+  function drawSunburst() {
+    const totalLeaves = roots.reduce((s,r) => s + leaves(r), 0);
+    let html =
+      '<circle cx="' + CX + '" cy="' + CY + '" r="' + (R0 - 8) + '" fill="var(--paper-deep)" stroke="var(--rule-soft)"/>' +
+      '<text x="' + CX + '" y="' + (CY - 12) + '" text-anchor="middle" font-family="Lora,serif" font-size="17" font-weight="600" fill="var(--ink)">Louis &amp; Rose</text>' +
+      '<text x="' + CX + '" y="' + (CY + 8) + '" text-anchor="middle" font-size="13" fill="var(--ink-soft)">Warshawsky</text>' +
+      '<text x="' + CX + '" y="' + (CY + 26) + '" text-anchor="middle" font-size="11" fill="var(--ink-soft)">the founders</text>';
+
+    (function walk(list, a0, a1, parentLeaves) {
+      let a = a0;
+      list.forEach(id => {
+        const p = byId[id];
+        const w = (a1 - a0) * leaves(id) / parentLeaves;
+        const d = GEN_IDX[p.generation];
+        const r0 = R0 + d * RW, r1 = r0 + RW - 4;
+        html += '<path data-id="' + id + '" d="' + arcPath(r0, r1, a, a + w) + '"' +
+                ' fill="' + genShade(p.branch, p.generation) + '"' +
+                ' stroke="var(--paper)" stroke-width="1.2" style="cursor:pointer;"/>';
+        if (kids[id].length) walk(kids[id], a, a + w, leaves(id));
+        a += w;
+      });
+    })(roots, 0, TAU, totalLeaves);
+
+    svg.innerHTML = html;
+  }
+
+  function ancestorsOf(id) {
+    const s = new Set();
+    for (let c = id; c; c = byId[c].parent) s.add(c);
+    return s;
+  }
+  function subtreeOf(id, s) {
+    s.add(id);
+    kids[id].forEach(k => subtreeOf(k, s));
+    return s;
+  }
+
+  svg.addEventListener('pointerover', e => {
+    const el = e.target.closest('path[data-id]');
+    if (!el) return;
+    const p = byId[el.getAttribute('data-id')];
+    const keep = subtreeOf(p.id, ancestorsOf(p.id));
+    svg.querySelectorAll('path[data-id]').forEach(seg => {
+      seg.style.opacity = keep.has(seg.getAttribute('data-id')) ? '1' : '0.22';
+    });
+    const nk = kids[p.id].length;
+    const np = (p.partners || []).length;
+    const fam = [];
+    if (np) fam.push(np === 1 ? '1 partner' : np + ' partners');
+    if (nk) fam.push(nk === 1 ? '1 child' : nk + ' children');
+    tooltip.innerHTML =
+      '<div class="tt-name">' + p.name + '</div>' +
+      '<div class="tt-sub">' + GEN_LABEL[p.generation] + ' &middot; ' + p.branch + "'s line" +
+      (fam.length ? '<br>' + fam.join(' &middot; ') : '') + '</div>';
+    tooltip.style.display = 'block';
+  });
+  svg.addEventListener('pointermove', e => {
+    const r = sunWrap.getBoundingClientRect();
+    let x = e.clientX - r.left + 14, y = e.clientY - r.top + 14;
+    if (x > r.width - 250) x -= 270;
+    tooltip.style.left = x + 'px';
+    tooltip.style.top = y + 'px';
+  });
+  svg.addEventListener('pointerout', e => {
+    if (e.relatedTarget && svg.contains(e.relatedTarget)) return;
+    tooltip.style.display = 'none';
+    svg.querySelectorAll('path[data-id]').forEach(seg => { seg.style.opacity = '1'; });
+  });
+
+  function drawSunLegend() {
+    document.getElementById('sun-legend').innerHTML = BRANCHES.map(b => {
+      const n = descendants.filter(p => p.branch === b).length;
+      return '<span><i style="background:' + branchColor(b) + '"></i>' + b + ' (' + n + ')</span>';
+    }).join('');
+  }
+
+  // ── Branch growth bars ─────────────────────────────────────────────────
+  function drawBranchBars() {
+    const gens = ['B','C','D','E'];
+    const counts = {};
+    BRANCHES.forEach(b => {
+      counts[b] = gens.map(g => descendants.filter(p => p.branch === b && p.generation === g).length);
+    });
+    const maxTotal = Math.max(...BRANCHES.map(b => counts[b].reduce((a,x) => a+x, 0)));
+    const sorted = BRANCHES.slice().sort((a,b) =>
+      counts[b].reduce((s,x)=>s+x,0) - counts[a].reduce((s,x)=>s+x,0));
+
+    document.getElementById('branch-bars').innerHTML = sorted.map(b => {
+      const total = counts[b].reduce((s,x) => s+x, 0);
+      const segs = gens.map((g,i) => {
+        const n = counts[b][i];
+        if (!n) return '';
+        return '<div class="bar-seg" style="width:' + (n / maxTotal * 100) + '%;background:' +
+               genShade(b, g) + '" title="' + b + ' — generation ' + g + ': ' + n + '"></div>';
+      }).join('');
+      return '<div class="bar-row"><div class="bar-label">' + b + '</div>' +
+             '<div class="bar-track" role="img" aria-label="' + b + "'s branch: " + total + ' descendants">' +
+             segs + '</div><div class="bar-total">' + total + '</div></div>';
+    }).join('');
+
+    document.getElementById('bar-legend').innerHTML =
+      ['B — children','C — grandchildren','D — great-grand','E — great-great-grand'].map((l,i) =>
+        '<span><i style="background:' + genShade('Saul', 'BCDE'[i]) + ';filter:grayscale(1);"></i>' + l + '</span>'
+      ).join('');
+  }
+
+  // ── Surnames ───────────────────────────────────────────────────────────
+  function drawSurnames() {
+    const tally = {};
+    descendants.forEach(p => {
+      const s = surnameOf(p.name);
+      if (!tally[s]) tally[s] = { n: 0, branches: {} };
+      tally[s].n++;
+      tally[s].branches[p.branch] = (tally[s].branches[p.branch] || 0) + 1;
+    });
+    const rows = Object.entries(tally).sort((a,b) => b[1].n - a[1].n);
+    const shown = rows.slice(0, 14);
+    const rest = rows.slice(14);
+    const max = shown[0][1].n;
+
+    document.getElementById('surnames').innerHTML = shown.map(([s, info]) => {
+      const domBranch = Object.entries(info.branches).sort((a,b) => b[1]-a[1])[0][0];
+      return '<div class="surname-row"><div class="surname-label">' + s + '</div>' +
+             '<div class="surname-track"><div class="surname-fill" style="width:' +
+             (info.n / max * 100) + '%;background:' + branchColor(domBranch) + '"></div></div>' +
+             '<div class="surname-count">' + info.n + '</div></div>';
+    }).join('');
+
+    document.getElementById('surname-footnote').textContent = rest.length
+      ? 'Plus ' + rest.length + ' more: ' + rest.map(r => r[0]).join(', ') + '.'
+      : '';
+  }
+
+  // ── Dark mode (shared with the main site via wfc_theme) ────────────────
+  const toggle = document.getElementById('dark-toggle');
+  function applyTheme(theme) {
+    if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    else document.documentElement.removeAttribute('data-theme');
+    toggle.textContent = theme === 'dark' ? 'Light mode' : 'Dark mode';
+    redraw();
+  }
+  toggle.addEventListener('click', () => {
+    const next = isDark() ? 'light' : 'dark';
+    try { localStorage.setItem('wfc_theme', next); } catch (e) {}
+    applyTheme(next);
+  });
+
+  function redraw() {
+    drawSunburst();
+    drawSunLegend();
+    drawBranchBars();
+    drawSurnames();
+  }
+
+  let saved = null;
+  try { saved = localStorage.getItem('wfc_theme'); } catch (e) {}
+  applyTheme(saved === 'dark' ? 'dark' : 'light');
+})();
+</script>
+</body>
+</html>

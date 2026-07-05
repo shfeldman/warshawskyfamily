@@ -18,10 +18,14 @@ python3 build.py
 echo ""
 echo "=== Encrypting ==="
 python3 encrypt.py --password "$WFC_PASSWORD"
+python3 encrypt.py --password "$WFC_PASSWORD" \
+  --input data-viz/index.html \
+  --title "Warshawsky Family — Data Visualizations" \
+  --url "https://warshawskyfamily.com/data-viz/"
 
 echo ""
 echo "=== Committing ==="
-git add index.html
+git add index.html data-viz/index.html
 git commit -m "Rebuild and re-encrypt site"
 
 echo ""

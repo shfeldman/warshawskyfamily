@@ -9,6 +9,8 @@ approach can be verified independently.
 Usage:
     python3 encrypt.py                  # uses PASSWORD env var or prompts
     python3 encrypt.py --password XXXX  # explicit password
+    python3 encrypt.py --input data-viz/index.html --title "Family Data Visualizations" \
+        --url https://warshawskyfamily.com/data-viz/   # gate a secondary page
 """
 
 import argparse
@@ -27,8 +29,9 @@ except ImportError:
     print("ERROR: pip3 install cryptography", file=sys.stderr)
     sys.exit(1)
 
-INPUT  = Path(__file__).parent / "index.html"
-OUTPUT = Path(__file__).parent / "index.html"
+DEFAULT_INPUT = Path(__file__).parent / "index.html"
+DEFAULT_TITLE = "Warshawsky Family Tree"
+DEFAULT_URL   = "https://warshawskyfamily.com/"
 
 PBKDF2_ITERATIONS = 200_000
 SALT_BYTES        = 32
@@ -44,7 +47,7 @@ GATE_HTML = """\
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Warshawsky Family Tree</title>
+<title>__GATE_TITLE__</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -173,7 +176,7 @@ GATE_HTML = """\
 </head>
 <body>
 <div class="card">
-  <h1>Warshawsky Family Tree</h1>
+  <h1>__GATE_TITLE__</h1>
   <p class="subtitle">Members only &mdash; please enter the family password</p>
   <label for="pwd">Password</label>
   <div class="pwd-wrap">
@@ -398,7 +401,18 @@ def make_qr_svg(url: str, size: int = 120) -> str:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--password', default=None)
+    parser.add_argument('--input', default=str(DEFAULT_INPUT),
+                        help='HTML file to encrypt (default: index.html)')
+    parser.add_argument('--output', default=None,
+                        help='Where to write the gate page (default: same as --input)')
+    parser.add_argument('--title', default=DEFAULT_TITLE,
+                        help='Title shown on the password gate')
+    parser.add_argument('--url', default=DEFAULT_URL,
+                        help='Public URL of the page, used for the QR code')
     args = parser.parse_args()
+
+    input_path = Path(args.input)
+    output_path = Path(args.output) if args.output else input_path
 
     password = args.password or os.environ.get('WFC_PASSWORD') or None
     if not password:
@@ -412,20 +426,21 @@ def main():
     # Always encrypt with lowercase so the gate JS can accept any case
     password = password.lower()
 
-    if not INPUT.exists():
-        print(f"ERROR: {INPUT} not found — run build.py first.", file=sys.stderr)
+    if not input_path.exists():
+        print(f"ERROR: {input_path} not found — run build.py first.", file=sys.stderr)
         sys.exit(1)
 
-    plaintext = INPUT.read_bytes()
-    print(f"Encrypting {INPUT.name} ({len(plaintext)/1024:.1f} KB)...")
+    plaintext = input_path.read_bytes()
+    print(f"Encrypting {input_path} ({len(plaintext)/1024:.1f} KB)...")
     payload = encrypt_html(plaintext, password)
 
-    bypass_url = f'https://warshawskyfamily.com/#open:{password}'
+    bypass_url = f'{args.url}#open:{password}'
     qr_svg = make_qr_svg(bypass_url)
     gate = GATE_HTML.replace('__ENCRYPTED_PAYLOAD__', json.dumps(payload))
     gate = gate.replace('__QR_CODE_SVG__', qr_svg)
-    OUTPUT.write_text(gate, encoding='utf-8')
-    print(f"Protected page written: {OUTPUT.name} ({OUTPUT.stat().st_size/1024:.1f} KB)")
+    gate = gate.replace('__GATE_TITLE__', args.title)
+    output_path.write_text(gate, encoding='utf-8')
+    print(f"Protected page written: {output_path} ({output_path.stat().st_size/1024:.1f} KB)")
     print("Password gate is active.")
 
 
