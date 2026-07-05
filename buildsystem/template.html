@@ -688,10 +688,8 @@
   }
   .photo-thumb img {
     position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    object-fit: cover;
-    transform-origin: center center;
+    max-width: none;
+    object-fit: fill;
   }
   .photo-thumb:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 
@@ -1862,7 +1860,26 @@ function applyCropTransform(imgEl, vitals, renderedPx) {
   const panX = vitals.photoPanX || 0;
   const panY = vitals.photoPanY || 0;
   const ratio = renderedPx / CROP_REFERENCE_FRAME;
-  imgEl.style.transform = `translate(${panX * ratio}px, ${panY * ratio}px) scale(${zoom})`;
+  const tx = panX * ratio;
+  const ty = panY * ratio;
+
+  function apply() {
+    const iw = imgEl.naturalWidth, ih = imgEl.naturalHeight;
+    if (!iw || !ih) return;
+    const coverScale = Math.max(renderedPx / iw, renderedPx / ih);
+    const rw = Math.round(iw * coverScale * zoom);
+    const rh = Math.round(ih * coverScale * zoom);
+    imgEl.style.width = rw + 'px';
+    imgEl.style.height = rh + 'px';
+    imgEl.style.left = ((renderedPx - rw) / 2 + tx) + 'px';
+    imgEl.style.top = ((renderedPx - rh) / 2 + ty) + 'px';
+  }
+
+  if (imgEl.complete && imgEl.naturalWidth) {
+    apply();
+  } else {
+    imgEl.addEventListener('load', apply, { once: true });
+  }
 }
 
 function partnerId(personId, index) {
