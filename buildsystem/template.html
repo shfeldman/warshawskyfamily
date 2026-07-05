@@ -2320,8 +2320,14 @@ function updateQuizProgress() {
   quizProgressBar.style.width = ((quizQuestionNum - 1) / QUIZ_TOTAL_QUESTIONS * 100) + '%';
 }
 
+function quizFirstName(fullName) {
+  const nick = fullName.match(/"([^"]+)"/);
+  if (nick) return nick[1];
+  return fullName.trim().split(/\s+/)[0];
+}
+
 function pickQuizQuestion() {
-  const allIds = PEOPLE_DATA.map(p => p.id);
+  const allIds = PEOPLE_DATA.filter(p => p.id !== 'founders').map(p => p.id);
   for (let attempt = 0; attempt < 60; attempt++) {
     const id = allIds[Math.floor(Math.random() * allIds.length)];
     const p = byId[id];
@@ -2329,7 +2335,7 @@ function pickQuizQuestion() {
     const siblings = p.parent ? (childrenOf[p.parent] || []).filter(s => s !== id) : [];
 
     const types = [];
-    if (p.parent) types.push('parent');
+    if (p.parent && byId[p.parent] && byId[p.parent].id !== 'founders') types.push('parent');
     if (siblings.length > 0) types.push('sibling');
     if (kids.length > 0) types.push('child');
     if (types.length === 0) continue;
@@ -2339,21 +2345,24 @@ function pickQuizQuestion() {
 
     if (qtype === 'parent') {
       correctId = p.parent;
-      prompt = `Who is <strong>${escapeHtml(p.name)}</strong>'s parent?`;
+      prompt = `Who is <strong>${escapeHtml(treeDisplayName(p.name))}</strong>'s parent?`;
     } else if (qtype === 'sibling') {
       correctId = siblings[Math.floor(Math.random() * siblings.length)];
-      prompt = `Who is a sibling of <strong>${escapeHtml(p.name)}</strong>?`;
+      prompt = `Who is a sibling of <strong>${escapeHtml(treeDisplayName(p.name))}</strong>?`;
     } else {
       correctId = kids[Math.floor(Math.random() * kids.length)];
-      prompt = `Who is a child of <strong>${escapeHtml(p.name)}</strong>?`;
+      prompt = `Who is a child of <strong>${escapeHtml(treeDisplayName(p.name))}</strong>?`;
     }
 
-    const correctName = byId[correctId].name;
-    const distPool = allIds.filter(d => d !== id && d !== correctId);
-    const distractors = distPool.sort(() => Math.random() - 0.5).slice(0, 3).map(d => byId[d].name);
-    const options = [correctName, ...distractors].sort(() => Math.random() - 0.5);
+    const correctPerson = byId[correctId];
+    // Prefer distractors from same generation as correct answer for harder questions
+    const sameGen = allIds.filter(d => d !== id && d !== correctId && byId[d].generation === correctPerson.generation);
+    const fallback = allIds.filter(d => d !== id && d !== correctId);
+    const distPool = sameGen.length >= 3 ? sameGen : fallback;
+    const distIds = distPool.sort(() => Math.random() - 0.5).slice(0, 3);
+    const optionIds = [correctId, ...distIds].sort(() => Math.random() - 0.5);
 
-    return { id, qtype, correctId, correctName, prompt, options, p };
+    return { id, qtype, correctId, prompt, optionIds, p };
   }
   return null;
 }
@@ -2384,42 +2393,43 @@ function nextQuizQuestion() {
   `;
 
   quizOptionsEl.innerHTML = '';
-  q.options.forEach(name => {
+  q.optionIds.forEach(oid => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'quiz-option-btn';
-    btn.textContent = name;
-    btn.addEventListener('click', () => answerQuiz(name, btn));
+    btn.dataset.id = oid;
+    btn.textContent = quizFirstName(byId[oid].name);
+    btn.addEventListener('click', () => answerQuiz(oid, btn));
     quizOptionsEl.appendChild(btn);
   });
 }
 
-function answerQuiz(chosenName, btnEl) {
+function answerQuiz(chosenId, btnEl) {
   if (!currentQuiz) return;
-  const { correctName, correctId, qtype, p } = currentQuiz;
-  const isCorrect = chosenName === correctName;
+  const { correctId, qtype, p } = currentQuiz;
+  const isCorrect = chosenId === correctId;
 
   if (isCorrect) quizScore++;
 
   Array.from(quizOptionsEl.children).forEach(btn => {
     btn.disabled = true;
-    if (btn.textContent === correctName) btn.classList.add('correct');
+    if (btn.dataset.id === correctId) btn.classList.add('correct');
     else if (btn === btnEl) btn.classList.add('incorrect');
   });
 
   const correct = byId[correctId];
   let explanation = '';
   if (qtype === 'parent') {
-    explanation = `${escapeHtml(correct.name)} is ${escapeHtml(p.name)}'s parent (${escapeHtml(correct.branch)} branch).`;
+    explanation = `${escapeHtml(treeDisplayName(correct.name))} is ${escapeHtml(treeDisplayName(p.name))}'s parent (${escapeHtml(correct.branch)} branch).`;
   } else if (qtype === 'sibling') {
-    explanation = `${escapeHtml(correct.name)} and ${escapeHtml(p.name)} are both children of ${escapeHtml(byId[p.parent].name)}.`;
+    explanation = `${escapeHtml(treeDisplayName(correct.name))} and ${escapeHtml(treeDisplayName(p.name))} are both children of ${escapeHtml(treeDisplayName(byId[p.parent].name))}.`;
   } else {
-    explanation = `${escapeHtml(correct.name)} is a child of ${escapeHtml(p.name)} (${escapeHtml(correct.branch)} branch).`;
+    explanation = `${escapeHtml(treeDisplayName(correct.name))} is a child of ${escapeHtml(treeDisplayName(p.name))} (${escapeHtml(correct.branch)} branch).`;
   }
 
   quizFeedbackEl.className = 'quiz-feedback ' + (isCorrect ? 'correct' : 'incorrect');
   quizFeedbackEl.innerHTML = `
-    <div class="qf-headline">${isCorrect ? '\u2713 Correct!' : '\u2717 Not quite \u2014 the answer is ' + escapeHtml(correctName) + '.'}</div>
+    <div class="qf-headline">${isCorrect ? '\u2713 Correct!' : '\u2717 Not quite \u2014 the answer is ' + escapeHtml(treeDisplayName(correct.name)) + '.'}</div>
     <div class="quiz-context" style="margin-top:0.3rem;">${explanation}</div>
   `;
 
@@ -3258,8 +3268,6 @@ document.querySelectorAll('.gen-jump-btn').forEach(btn => {
       document.querySelectorAll('ul.children').forEach(ul => ul.hidden = true);
     }
 
-    // Filter tree branch view (explorer)
-    syncExplorerFilter(branch);
   }
 
   const BRANCH_HEX = {
@@ -3278,14 +3286,7 @@ document.querySelectorAll('.gen-jump-btn').forEach(btn => {
 })();
 
 // ---- Map View ----
-const LOCATION_COORDS = {
-  'Berkeley, CA':      [37.8716, -122.2727],
-  'Laurel, MD':        [39.0993,  -76.8483],
-  'Half Moon Bay, CA': [37.4636, -122.4286],
-  'Columbia, MD':      [39.2037,  -76.8610],
-  'Alexandria, VA':    [38.8048,  -77.0469],
-  'Annapolis, MD':     [38.9784,  -76.4922],
-};
+const LOCATION_COORDS = __LOCATION_COORDS_JSON__;
 
 let familyMap = null;
 

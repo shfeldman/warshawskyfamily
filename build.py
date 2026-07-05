@@ -15,6 +15,9 @@ import base64
 import json
 import os
 import sys
+import time
+import urllib.request
+import urllib.parse
 from datetime import date
 from pathlib import Path
 
@@ -22,6 +25,7 @@ PHOTOS_DIR = Path(__file__).parent / "photos"
 TEMPLATE = Path(__file__).parent / "buildsystem" / "template.html"
 DB = Path(__file__).parent / "family_db.json"
 OUTPUT = Path(__file__).parent / "index.html"
+LOCATIONS_CACHE = Path(__file__).parent / "locations_cache.json"
 
 MAX_DIM = 640
 JPEG_QUALITY = 85
@@ -70,6 +74,52 @@ def resolve_photo(value: str, label: str) -> str:
     return load_and_encode_photo(filepath, label)
 
 
+def geocode_location(location: str):
+    """Geocode a 'City, State' string via Nominatim. Returns [lat, lng] or None."""
+    url = "https://nominatim.openstreetmap.org/search?" + urllib.parse.urlencode({
+        "q": location, "format": "json", "limit": 1
+    })
+    req = urllib.request.Request(url, headers={"User-Agent": "warshawskyfamily-build/1.0"})
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            results = json.loads(resp.read())
+        if results:
+            return [round(float(results[0]["lat"]), 4), round(float(results[0]["lon"]), 4)]
+    except Exception as e:
+        print(f"  WARNING: geocoding failed for '{location}': {e}", file=sys.stderr)
+    return None
+
+
+def resolve_location_coords(people: list) -> dict:
+    """Return {location: [lat, lng]} for all people with vitals.location."""
+    cache = {}
+    if LOCATIONS_CACHE.exists():
+        with open(LOCATIONS_CACHE) as f:
+            cache = json.load(f)
+
+    locations = {p["vitals"]["location"] for p in people
+                 if p.get("vitals", {}).get("location")}
+    new_found = False
+    for loc in sorted(locations):
+        if loc not in cache:
+            print(f"  Geocoding: {loc} ...", end=" ", flush=True)
+            coords = geocode_location(loc)
+            if coords:
+                cache[loc] = coords
+                new_found = True
+                print(coords)
+            else:
+                print("not found")
+            time.sleep(1)  # Nominatim rate limit: 1 req/sec
+
+    if new_found:
+        with open(LOCATIONS_CACHE, "w") as f:
+            json.dump(cache, f, indent=2, sort_keys=True)
+        print(f"  Location cache updated: {LOCATIONS_CACHE.name}")
+
+    return {loc: cache[loc] for loc in locations if loc in cache}
+
+
 def main():
     if not DB.exists():
         print(f"ERROR: {DB} not found.", file=sys.stderr)
@@ -104,6 +154,8 @@ def main():
         founders_photo = resolve_photo(founders["vitals"]["photo"], "founders")
 
     people_json = json.dumps(people, separators=(",", ":"))
+    location_coords = resolve_location_coords(people)
+    location_coords_json = json.dumps(location_coords, separators=(",", ":"))
 
     # Compute stats for the header
     descendants = [p for p in people if p.get("branch") != "Founders"]
@@ -112,6 +164,7 @@ def main():
     build_date = date.today().strftime("%B %-d, %Y")
 
     output = template.replace("__PEOPLE_DATA_JSON__", people_json)
+    output = output.replace("__LOCATION_COORDS_JSON__", location_coords_json)
     output = output.replace("__FOUNDERS_PHOTO__", founders_photo)
     output = output.replace("__BUILD_DATE__", build_date)
     output = output.replace("__TOTAL_PERSONS__", str(total_persons))
