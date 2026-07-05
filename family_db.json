@@ -20,7 +20,10 @@
     ],
     "generation": "A",
     "branch": "Henry",
-    "parent": null
+    "parent": null,
+    "vitals": {
+      "obituaryUrl": "https://obits.nj.com/us/obituaries/starledger/name/henry-warshawsky-obituary?id=14993007"
+    }
   },
   {
     "id": "dave",
@@ -177,7 +180,11 @@
     "branch": "Henry",
     "parent": "enid",
     "vitals": {
-      "photo": "louis.jpg"
+      "photo": "louis.jpg",
+      "deceased": true,
+      "dateOfDeath": "2020-04-21",
+      "obituary": "Louis Sarrel, 58, passed away at Hackensack University Medical Center on April 21, 2020. Born in Brooklyn, NY, Louis resided in West Orange before moving to Rockaway 26 years ago.\n\nLouis was a realtor associate with Century 21 Christel Realtors in Rockaway and a property manager for Wilkin Management Group in Wayne. He was a member of the North Central Jersey Board of Realtors and the National Association of Realtors, and was active in many charitable organizations as well as White Meadow Temple. Louis graduated from William Paterson College with a Bachelor's degree in Communications.\n\nLouis had a truly unmatched passion for life and welcoming everyone into his circle and making them feel special. His love of family and friends was second to none. Louis loved sports, and was passionate about the Giants and the Yankees. He loved coaching football and being the biggest cheerleader on the sidelines — for not only his own kids but any person he ever knew. He followed college lacrosse and rooted so loudly for all his \"boys\" that he became a friendly known face around every bleacher across the east coast.\n\nLouis is survived by his wife Marla (nee Geldzahler) Sarrel; his two sons, Eric and Jacob Sarrel; and a brother Ronald (Gina) Sarrel of Whippany. He also leaves behind in-laws that were like parents and siblings to him, and loving nieces and nephews whom he adored. He is predeceased by his mother Enid (nee Warshawsky) Sarrel, his father Seymour Sarrel, and his brother Barnet Sarrel.",
+      "obituaryUrl": "https://www.menorahchapelsatmillburn.com/obituaries/Louis-Sarrel?obId=29432652"
     }
   },
   {

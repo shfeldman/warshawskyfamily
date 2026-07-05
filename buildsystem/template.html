@@ -651,6 +651,19 @@
     color: #3a2e20;
     white-space: pre-line;
   }
+  .obituary-link-wrap {
+    margin-top: 0.8rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid #e0c98a;
+  }
+  .obituary-link {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 0.78rem;
+    color: #8a6d1f;
+    text-decoration: none;
+    font-style: italic;
+  }
+  .obituary-link:hover { text-decoration: underline; }
   .deceased-badge {
     display: inline-block;
     font-size: 0.65rem;
@@ -1727,7 +1740,7 @@ function marriageLabel(v) {
   return '';
 }
 
-function makeObitBlock(obituaryText, dateOfDeath) {
+function makeObitBlock(obituaryText, dateOfDeath, obituaryUrl) {
   const wrap = document.createElement('div');
 
   const toggle = document.createElement('button');
@@ -1754,6 +1767,19 @@ function makeObitBlock(obituaryText, dateOfDeath) {
   text.className = 'obituary-text';
   text.textContent = obituaryText;
   panel.appendChild(text);
+
+  if (obituaryUrl) {
+    const linkWrap = document.createElement('div');
+    linkWrap.className = 'obituary-link-wrap';
+    const link = document.createElement('a');
+    link.href = obituaryUrl;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.className = 'obituary-link';
+    link.textContent = 'Read full obituary →';
+    linkWrap.appendChild(link);
+    panel.appendChild(linkWrap);
+  }
 
   toggle.addEventListener('click', function(e) {
     e.stopPropagation();
@@ -1839,7 +1865,7 @@ function buildPartnersElement(person) {
     block.appendChild(dateRow);
 
     if (pv.deceased && pv.obituary) {
-      block.appendChild(makeObitBlock(pv.obituary, pv.dateOfDeath));
+      block.appendChild(makeObitBlock(pv.obituary, pv.dateOfDeath, pv.obituaryUrl));
     }
 
     wrapper.appendChild(block);
@@ -2031,7 +2057,7 @@ function buildNode(id, depth, siblingIndex, siblingCount) {
   }
 
   if (p.vitals && p.vitals.deceased && p.vitals.obituary) {
-    wrap.insertBefore(makeObitBlock(p.vitals.obituary, p.vitals.dateOfDeath), wrap.querySelector('.marriages') || wrap.querySelector('.meta-row'));
+    wrap.insertBefore(makeObitBlock(p.vitals.obituary, p.vitals.dateOfDeath, p.vitals.obituaryUrl), wrap.querySelector('.marriages') || wrap.querySelector('.meta-row'));
   }
 
   if (hasKids) {
