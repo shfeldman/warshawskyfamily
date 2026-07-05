@@ -70,6 +70,22 @@
     font-size: 1rem;
     color: #9a917e;
   }
+  #echo {
+    position: fixed;
+    bottom: 5.2rem; left: 0; right: 0;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.8s;
+    padding: 0 1rem;
+  }
+  #echo .echo-title {
+    font-family: 'Lora', serif;
+    font-size: 1.05rem;
+    color: #ffe9b0;
+    text-shadow: 0 0 14px #c8963a88;
+  }
+  #echo .echo-names { font-size: 0.78rem; color: #b0a68e; margin-top: 3px; }
 </style>
 </head>
 <body>
@@ -84,6 +100,7 @@
 </div>
 <div id="legend"></div>
 <p class="hint">drag to orbit &middot; scroll or pinch to zoom &middot; hover or tap a star to light up their line</p>
+<div id="echo"></div>
 <div id="tooltip"></div>
 
 <script>const PEOPLE_DATA = __PEOPLE_DATA_JSON__;</script>
@@ -197,6 +214,44 @@ const glow = glowTexture();
   })));
 }
 
+// Generation orbit rings
+const RING_LABELS = ['children', 'grandchildren', 'great-grandchildren', 'great-great-grand', '3× great-grand'];
+function textSprite(text) {
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 64;
+  const g = c.getContext('2d');
+  g.font = '500 30px Inter, sans-serif';
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  g.fillStyle = '#c9bfa4';
+  g.fillText(text, 256, 32);
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: new THREE.CanvasTexture(c), transparent: true, opacity: 0.55, depthWrite: false
+  }));
+  s.scale.set(36, 4.5, 1);
+  return s;
+}
+for (let d = 0; d < 5; d++) {
+  const r = 26 + d * 26;
+  const pts = [];
+  for (let i = 0; i <= 128; i++) {
+    const a = i / 128 * Math.PI * 2;
+    pts.push(new THREE.Vector3(r * Math.sin(a), 0, r * Math.cos(a)));
+  }
+  const ring = new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints(pts),
+    new THREE.LineBasicMaterial({
+      color: '#b8a165', transparent: true, opacity: 0.09,
+      blending: THREE.AdditiveBlending, depthWrite: false
+    })
+  );
+  scene.add(ring);
+  const label = textSprite(RING_LABELS[d]);
+  const la = -0.5;
+  label.position.set((r + 7) * Math.sin(la), 1.5, (r + 7) * Math.cos(la));
+  scene.add(label);
+}
+
 // The founders' sun
 const sun = new THREE.Sprite(new THREE.SpriteMaterial({
   map: glow, color: '#ffd9a0', blending: THREE.AdditiveBlending,
@@ -307,6 +362,98 @@ function showTooltip(obj, x, y) {
   tooltip.style.top = (y + 14) + 'px';
 }
 
+// ── Name echoes: shared first names twinkle together ──────────────────────
+const ECHO_DURATION = 6, ECHO_GAP = 5;
+const SHORT_GEN = { A: 'child', B: 'grandchild', C: 'great-grandchild', D: '2× great-grandchild', E: '3× great-grandchild' };
+const echoEl = document.getElementById('echo');
+const WHITE = new THREE.Color('#fff6e0');
+
+Object.values(sprites).forEach(s => {
+  s.userData.baseColor = s.material.color.clone();
+});
+
+const echoGroups = (() => {
+  const map = {};
+  PEOPLE_DATA.forEach(p => {
+    if (p.branch === 'Founders') return;
+    const fn = p.name.split(' ')[0];
+    (map[fn] = map[fn] || []).push(p.id);
+  });
+  if (map['Louis']) map['Louis'].push('__sun');
+  if (map['Rose']) map['Rose'].push('__sun');
+  return Object.entries(map)
+    .filter(([, ids]) => ids.length >= 2)
+    .map(([fn, ids]) => ({ fn, ids }))
+    .sort((a, b) => b.ids.length - a.ids.length);
+})();
+
+let echoState = null, echoIdx = 0, nextEchoAt = 4, echoSunBoost = 0;
+
+function memberPos(id) { return id === '__sun' ? new THREE.Vector3(0, 0, 0) : positions[id]; }
+
+function startEcho(t) {
+  if (!echoGroups.length) return;
+  const group = echoGroups[echoIdx++ % echoGroups.length];
+  const ids = group.ids.slice().sort((a, b) =>
+    (a === '__sun' ? -1 : GEN_IDX[byId[a].generation]) - (b === '__sun' ? -1 : GEN_IDX[byId[b].generation]));
+  const echoLines = [];
+  for (let i = 0; i < ids.length - 1; i++) {
+    const line = new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints([memberPos(ids[i]), memberPos(ids[i + 1])]),
+      new THREE.LineBasicMaterial({
+        color: '#ffe9b0', transparent: true, opacity: 0,
+        blending: THREE.AdditiveBlending, depthWrite: false
+      })
+    );
+    scene.add(line);
+    echoLines.push(line);
+  }
+  echoEl.innerHTML =
+    '<div class="echo-title">&#10022; The name ' + group.fn + ' echoes through the family</div>' +
+    '<div class="echo-names">' + ids.map(id =>
+      id === '__sun' ? 'Louis Warshawsky (founder)'
+                     : byId[id].name + ' (' + SHORT_GEN[byId[id].generation] + ')'
+    ).join(' &middot; ') + '</div>';
+  echoEl.style.opacity = '1';
+  echoState = { ids, lines: echoLines, start: t };
+}
+
+function endEcho() {
+  echoState.lines.forEach(l => { scene.remove(l); l.geometry.dispose(); l.material.dispose(); });
+  echoState.ids.forEach(id => {
+    const s = sprites[id];
+    if (!s) return;
+    s.scale.setScalar(s.userData.baseScale);
+    s.material.color.copy(s.userData.baseColor);
+  });
+  echoSunBoost = 0;
+  echoEl.style.opacity = '0';
+  echoState = null;
+  applyHighlight(hoveredId);
+}
+
+function tickEcho(t) {
+  if (!echoState) {
+    if (t > nextEchoAt && !hoveredId) startEcho(t);
+    return;
+  }
+  const k = (t - echoState.start) / ECHO_DURATION;
+  if (k >= 1 || hoveredId) {
+    nextEchoAt = t + ECHO_GAP;
+    endEcho();
+    return;
+  }
+  const env = Math.sin(Math.PI * k);
+  const twinkle = 0.65 + 0.35 * Math.sin(t * 7);
+  echoState.ids.forEach(id => {
+    if (id === '__sun') { echoSunBoost = 9 * env * twinkle; return; }
+    const s = sprites[id];
+    s.scale.setScalar(s.userData.baseScale * (1 + 1.2 * env * twinkle));
+    s.material.color.copy(s.userData.baseColor).lerp(WHITE, 0.75 * env * twinkle);
+  });
+  echoState.lines.forEach(l => { l.material.opacity = 0.55 * env * twinkle; });
+}
+
 window.addEventListener('pointermove', e => {
   const obj = pick(e.clientX, e.clientY);
   const id = obj && !obj.userData.isSun ? obj.userData.id : null;
@@ -339,8 +486,9 @@ const clock = new THREE.Clock();
 function animate() {
   requestAnimationFrame(animate);
   const t = clock.getElapsedTime();
-  sun.scale.setScalar(30 + Math.sin(t * 1.6) * 1.6);
-  sunHalo.scale.setScalar(58 + Math.sin(t * 1.1) * 3);
+  tickEcho(t);
+  sun.scale.setScalar(30 + Math.sin(t * 1.6) * 1.6 + echoSunBoost);
+  sunHalo.scale.setScalar(58 + Math.sin(t * 1.1) * 3 + echoSunBoost);
   if (focusTarget) {
     controls.target.lerp(focusTarget, 0.06);
     if (controls.target.distanceTo(focusTarget) < 0.5) focusTarget = null;
