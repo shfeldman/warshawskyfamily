@@ -14,6 +14,7 @@ Usage:
 import argparse
 import base64
 import hashlib
+import io
 import json
 import os
 import sys
@@ -55,6 +56,7 @@ GATE_HTML = """\
     align-items: center;
     justify-content: center;
     padding: 2rem;
+    gap: 1.5rem;
   }
   .card {
     background: #fff;
@@ -91,19 +93,37 @@ GATE_HTML = """\
     margin-bottom: 0.4rem;
     font-weight: 600;
   }
-  input[type="password"] {
+  .pwd-wrap {
+    position: relative;
+    margin-bottom: 1rem;
+  }
+  .pwd-wrap input {
     width: 100%;
-    padding: 0.75rem 1rem;
+    padding: 0.75rem 3rem 0.75rem 1rem;
     font-size: 1.1rem;
     border: 2px solid #d4c5a9;
     border-radius: 8px;
-    margin-bottom: 1rem;
     background: #faf8f4;
     color: #2c1810;
     outline: none;
     transition: border-color 0.2s;
   }
-  input[type="password"]:focus { border-color: #8a6d1f; }
+  .pwd-wrap input:focus { border-color: #8a6d1f; }
+  .eye-btn {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    cursor: pointer;
+    color: #8a7a65;
+    width: auto;
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+  .eye-btn:hover { color: #4a3f33; background: none; }
   .remember-row {
     display: flex;
     align-items: center;
@@ -128,17 +148,27 @@ GATE_HTML = """\
     transition: background 0.2s;
   }
   button:hover { background: #6e5618; }
-  .error {
-    color: #c0392b;
-    font-size: 0.9rem;
-    margin-top: 0.8rem;
-    display: none;
-  }
   .hint {
     margin-top: 1.5rem;
     font-size: 0.78rem;
     color: #b0a090;
   }
+  .qr-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    padding: 1.2rem 2rem;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+  }
+  .qr-card svg { flex-shrink: 0; }
+  .qr-text { text-align: left; }
+  .qr-text strong { display: block; font-size: 0.9rem; color: #2c1810; margin-bottom: 0.2rem; }
+  .qr-text span { font-size: 0.78rem; color: #7a6a55; }
 </style>
 </head>
 <body>
@@ -146,65 +176,80 @@ GATE_HTML = """\
   <h1>Warshawsky Family Tree</h1>
   <p class="subtitle">Members only &mdash; please enter the family password</p>
   <label for="pwd">Password</label>
-  <input type="text" id="pwd" placeholder="Enter family password" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off">
+  <div class="pwd-wrap">
+    <input type="text" id="pwd" placeholder="Enter family password" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off">
+    <button class="eye-btn" id="eye-btn" type="button" aria-label="Show password" title="Show/hide password">&#128065;</button>
+  </div>
   <div class="remember-row">
     <input type="checkbox" id="remember" checked>
     <label for="remember">Remember me on this device</label>
   </div>
-  <button onclick="unlock()">Enter Family Tree</button>
-  <div class="error" id="err">Incorrect password &mdash; please try again.</div>
+  <button id="enter-btn" type="button">Enter Family Tree</button>
   <p class="hint">Contact a family member if you need the password.</p>
+</div>
+
+<div class="qr-card">
+  __QR_CODE_SVG__
+  <div class="qr-text">
+    <strong>On a phone? Scan to open.</strong>
+    <span>Point your camera at this code &mdash; no typing needed.</span>
+  </div>
 </div>
 
 <script>
 const ENCRYPTED = __ENCRYPTED_PAYLOAD__;
 const STORAGE_KEY = 'wfc_pwd';
 
-// ── Password input: show last typed character briefly, then mask ──────────
+// ── Password input: masked with show/hide toggle ──────────────────────────
 let realPwd = '';
 let peekTimer = null;
-const DOT = '•'; // •
+let showingPwd = false;
+const DOT = '•';
 
-function showMasked() {
-  document.getElementById('pwd').value = DOT.repeat(realPwd.length);
+function renderPwd() {
+  const el = document.getElementById('pwd');
+  if (showingPwd) {
+    el.value = realPwd;
+  } else {
+    el.value = DOT.repeat(realPwd.length);
+  }
 }
 
 function showPeek() {
+  if (showingPwd) return;
   clearTimeout(peekTimer);
-  document.getElementById('pwd').value = DOT.repeat(Math.max(0, realPwd.length - 1)) + realPwd.slice(-1);
-  peekTimer = setTimeout(showMasked, 800);
+  const el = document.getElementById('pwd');
+  el.value = DOT.repeat(Math.max(0, realPwd.length - 1)) + realPwd.slice(-1);
+  peekTimer = setTimeout(renderPwd, 800);
 }
 
+document.getElementById('eye-btn').addEventListener('click', function() {
+  showingPwd = !showingPwd;
+  this.textContent = showingPwd ? '✖' : '👁';
+  this.setAttribute('aria-label', showingPwd ? 'Hide password' : 'Show password');
+  clearTimeout(peekTimer);
+  renderPwd();
+});
+
 document.getElementById('pwd').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') return; // handled separately
+  if (e.key === 'Enter') return;
   if (e.ctrlKey || e.metaKey) {
-    if (e.key === 'a') { realPwd = ''; showMasked(); e.preventDefault(); }
+    if (e.key === 'a') { realPwd = ''; renderPwd(); e.preventDefault(); }
     else if (e.key === 'v') {
-      // Paste: read clipboard then append
       navigator.clipboard && navigator.clipboard.readText().then(text => {
-        realPwd += text;
+        realPwd += text.trim();
         showPeek();
       }).catch(() => {});
       e.preventDefault();
     }
     return;
   }
-  if (e.key === 'Backspace') {
-    realPwd = realPwd.slice(0, -1);
-    showMasked();
-    e.preventDefault();
-  } else if (e.key === 'Delete') {
-    realPwd = '';
-    showMasked();
-    e.preventDefault();
-  } else if (e.key.length === 1) {
-    realPwd += e.key;
-    showPeek();
-    e.preventDefault();
-  }
+  if (e.key === 'Backspace') { realPwd = realPwd.slice(0, -1); renderPwd(); e.preventDefault(); }
+  else if (e.key === 'Delete') { realPwd = ''; renderPwd(); e.preventDefault(); }
+  else if (e.key.length === 1) { realPwd += e.key; showPeek(); e.preventDefault(); }
 });
 
-// ── Core decrypt ──────────────────────────────────────────────────────────
+// ── Core decrypt — password is always lowercased ──────────────────────────
 function hexToBytes(hex) {
   const b = new Uint8Array(hex.length / 2);
   for (let i = 0; i < hex.length; i += 2) b[i/2] = parseInt(hex.substr(i,2),16);
@@ -212,6 +257,7 @@ function hexToBytes(hex) {
 }
 
 async function tryDecrypt(pwd) {
+  pwd = pwd.trim().toLowerCase();
   const { ct, salt, iv } = ENCRYPTED;
   const enc = new TextEncoder();
   const mat = await crypto.subtle.importKey('raw', enc.encode(pwd), {name:'PBKDF2'}, false, ['deriveKey']);
@@ -219,15 +265,16 @@ async function tryDecrypt(pwd) {
     {name:'PBKDF2', salt:hexToBytes(salt), iterations:200000, hash:'SHA-256'},
     mat, {name:'AES-CBC',length:256}, false, ['decrypt']
   );
-  const plain = await crypto.subtle.decrypt({name:'AES-CBC',iv:hexToBytes(iv)}, key, hexToBytes(ct));
-  const text = new TextDecoder().decode(plain);
-  if (text.includes('<!DOCTYPE') || text.includes('<html')) return text;
+  try {
+    const plain = await crypto.subtle.decrypt({name:'AES-CBC',iv:hexToBytes(iv)}, key, hexToBytes(ct));
+    const text = new TextDecoder().decode(plain);
+    if (text.includes('<!DOCTYPE') || text.includes('<html')) return text;
+  } catch(e) {}
   return null;
 }
 
 // ── Render decrypted page ─────────────────────────────────────────────────
 function render(html) {
-  // Wipe the gate page completely so nothing shows behind the iframe
   document.body.innerHTML = '';
   document.documentElement.style.cssText = 'margin:0;padding:0;overflow:hidden;height:100%;';
   document.body.style.cssText = 'margin:0;padding:0;overflow:hidden;height:100%;';
@@ -237,7 +284,6 @@ function render(html) {
   document.body.appendChild(iframe);
 }
 
-// ── Show loading overlay immediately (before slow PBKDF2) ────────────────
 function showLoading() {
   document.body.innerHTML = '<div style="font-family:Georgia,serif;display:flex;align-items:center;justify-content:center;min-height:100vh;font-size:1.2rem;color:#8a6d1f;">Opening family tree…</div>';
 }
@@ -247,27 +293,22 @@ async function unlock() {
   const pwd = realPwd.trim();
   if (!pwd) return;
   showLoading();
-  try {
-    const html = await tryDecrypt(pwd);
-    if (html) {
-      const remember = document.getElementById('remember') && document.getElementById('remember').checked;
-      if (remember) {
-        const exp = Date.now() + 30*24*60*60*1000;
-        try { localStorage.setItem(STORAGE_KEY, JSON.stringify({pwd, exp})); } catch(e){}
-      }
-      render(html);
-    } else {
-      location.reload(); // wrong password — restore gate
+  const html = await tryDecrypt(pwd);
+  if (html) {
+    const remember = document.getElementById('remember') && document.getElementById('remember').checked;
+    if (remember) {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify({pwd: pwd.toLowerCase(), exp: Date.now()+30*24*60*60*1000})); } catch(e){}
     }
-  } catch(e) {
+    render(html);
+  } else {
     location.reload();
   }
 }
 
 document.getElementById('pwd').addEventListener('keydown', e => { if(e.key==='Enter') unlock(); }, true);
-document.querySelector('button').addEventListener('click', unlock);
+document.getElementById('enter-btn').addEventListener('click', unlock);
 
-// ── URL bypass runs FIRST — if hash present, skip remember-me entirely ───
+// ── URL bypass runs FIRST ─────────────────────────────────────────────────
 (function() {
   const hash = window.location.hash;
   if (!hash.startsWith('#open:')) return;
@@ -276,31 +317,28 @@ document.querySelector('button').addEventListener('click', unlock);
   showLoading();
   tryDecrypt(bypass).then(html => {
     if (html) {
-      // Update stored password to the new one so remember-me works going forward
-      try {
-        const exp = Date.now() + 30*24*60*60*1000;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({pwd: bypass, exp}));
-      } catch(e) {}
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify({pwd: bypass.toLowerCase(), exp: Date.now()+30*24*60*60*1000})); } catch(e) {}
       render(html);
     } else {
-      // Wrong password in hash — clear hash and show gate
       history.replaceState(null, '', location.pathname);
       location.reload();
     }
   }).catch(() => { history.replaceState(null, '', location.pathname); location.reload(); });
-  return true; // sentinel — outer IIFE checks this
 })();
 
-// ── Remember-me: stored password (skipped if hash bypass is present) ─────
+// ── Remember-me ───────────────────────────────────────────────────────────
 (function() {
-  if (window.location.hash.startsWith('#open:')) return; // hash bypass handles it
+  if (window.location.hash.startsWith('#open:')) return;
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (!saved) return;
     const {pwd, exp} = JSON.parse(saved);
     if (exp && Date.now() > exp) { localStorage.removeItem(STORAGE_KEY); return; }
     showLoading();
-    tryDecrypt(pwd).then(html => { if(html) render(html); else { localStorage.removeItem(STORAGE_KEY); location.reload(); }}).catch(() => { localStorage.removeItem(STORAGE_KEY); location.reload(); });
+    tryDecrypt(pwd).then(html => {
+      if (html) render(html);
+      else { localStorage.removeItem(STORAGE_KEY); location.reload(); }
+    }).catch(() => { localStorage.removeItem(STORAGE_KEY); location.reload(); });
   } catch(e) {}
 })();
 </script>
@@ -334,6 +372,25 @@ def encrypt_html(plaintext: bytes, password: str):
     }
 
 
+def make_qr_svg(url: str, size: int = 120) -> str:
+    """Generate a QR code as an inline SVG string."""
+    try:
+        import qrcode
+        import qrcode.image.svg as qrsvg
+        factory = qrsvg.SvgPathImage
+        qr = qrcode.make(url, image_factory=factory, box_size=4, border=2)
+        buf = io.BytesIO()
+        qr.save(buf)
+        svg = buf.getvalue().decode('utf-8')
+        # Strip XML declaration and set a fixed size
+        svg = svg[svg.index('<svg'):]
+        svg = svg.replace('height="', f'height="{size}" data-orig-height="')
+        svg = svg.replace('width="', f'width="{size}" data-orig-width="')
+        return svg
+    except ImportError:
+        return '<div style="font-size:0.75rem;color:#b0a090;">QR unavailable</div>'
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--password', default=None)
@@ -344,6 +401,9 @@ def main():
         import getpass
         password = getpass.getpass('Family password: ')
 
+    # Always encrypt with lowercase so the gate JS can accept any case
+    password = password.lower()
+
     if not INPUT.exists():
         print(f"ERROR: {INPUT} not found — run build.py first.", file=sys.stderr)
         sys.exit(1)
@@ -352,7 +412,10 @@ def main():
     print(f"Encrypting {INPUT.name} ({len(plaintext)/1024:.1f} KB)...")
     payload = encrypt_html(plaintext, password)
 
+    bypass_url = f'https://warshawskyfamily.com/#open:{password}'
+    qr_svg = make_qr_svg(bypass_url)
     gate = GATE_HTML.replace('__ENCRYPTED_PAYLOAD__', json.dumps(payload))
+    gate = gate.replace('__QR_CODE_SVG__', qr_svg)
     OUTPUT.write_text(gate, encoding='utf-8')
     print(f"Protected page written: {OUTPUT.name} ({OUTPUT.stat().st_size/1024:.1f} KB)")
     print("Password gate is active.")
