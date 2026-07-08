@@ -675,6 +675,103 @@
   }
   .story-share-btn:hover { background: #d4eddf; }
 
+  /* ── Story submission modal ── */
+  .story-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 9000;
+    align-items: center;
+    justify-content: center;
+  }
+  .story-modal-overlay.open { display: flex; }
+  .story-modal {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.6rem 1.8rem;
+    width: min(520px, 92vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+    position: relative;
+  }
+  .story-modal h3 {
+    margin: 0 0 1.1rem;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 1.05rem;
+    color: #1e3d2e;
+  }
+  .story-modal label {
+    display: block;
+    font-size: 0.78rem;
+    color: #3a6b50;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    margin-top: 0.9rem;
+  }
+  .story-modal input, .story-modal textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #6db990;
+    border-radius: 6px;
+    padding: 0.5rem 0.7rem;
+    font-size: 0.85rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #1e3d2e;
+    background: #f9fffe;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .story-modal input:focus, .story-modal textarea:focus { border-color: #2a6b4a; }
+  .story-modal textarea { min-height: 120px; resize: vertical; line-height: 1.6; }
+  .story-modal-actions {
+    display: flex;
+    gap: 0.7rem;
+    margin-top: 1.2rem;
+    justify-content: flex-end;
+  }
+  .story-modal-cancel {
+    padding: 0.45rem 1rem;
+    border: 1px solid #6db990;
+    border-radius: 20px;
+    background: transparent;
+    color: #2a6b4a;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+  .story-modal-submit {
+    padding: 0.45rem 1.2rem;
+    border: none;
+    border-radius: 20px;
+    background: #2a6b4a;
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .story-modal-submit:hover { background: #1e5038; }
+  .story-modal-submit:disabled { background: #6db990; cursor: default; }
+  .story-modal-msg {
+    margin-top: 0.8rem;
+    font-size: 0.8rem;
+    color: #2a6b4a;
+    min-height: 1.2em;
+  }
+  .story-modal-msg.error { color: #a33; }
+  .story-modal-close {
+    position: absolute;
+    top: 0.8rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #6db990;
+    cursor: pointer;
+    line-height: 1;
+  }
+
   .obituary-toggle {
     display: inline-flex;
     align-items: center;
@@ -1261,11 +1358,7 @@
   }
   .reunion-toggle-btn:hover { background: var(--bg-soft); }
   .reunion-body {
-    padding: 0 1rem 1.25rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.25rem;
-    justify-content: center;
+    padding: 0 1rem 1.5rem;
   }
   .reunion-next {
     width: 100%;
@@ -1319,26 +1412,90 @@
     margin-bottom: 0.5rem;
     letter-spacing: 0.03em;
   }
+  .reunion-decade-heading {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1.4rem 0 0.75rem;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-soft);
+  }
+  .reunion-decade-heading::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule-soft);
+  }
+  .reunion-decade-heading.rh-historic {
+    color: #8b6a00;
+  }
+  .reunion-decade-heading.rh-historic::after {
+    background: #d4b860;
+  }
+  .reunion-photo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  @media (max-width: 700px) {
+    .reunion-photo-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 440px) {
+    .reunion-photo-grid { grid-template-columns: 1fr; }
+  }
+  .reunion-photo-grid.rg-historic {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 600px;
+  }
   .reunion-item {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
     cursor: pointer;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.13);
+    background: var(--bg-soft);
+    transition: box-shadow 0.18s, transform 0.18s;
+  }
+  .reunion-item:hover {
+    box-shadow: 0 6px 24px rgba(0,0,0,0.22);
+    transform: translateY(-2px);
   }
   .reunion-item img {
     width: 100%;
-    max-width: 420px;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.18);
-    transition: transform 0.15s;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    display: block;
   }
-  .reunion-item img:hover { transform: scale(1.02); }
+  .reunion-item-label {
+    padding: 0.5rem 0.7rem 0.55rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
   .reunion-year {
-    font-size: 0.9rem;
+    font-size: 0.82rem;
     font-weight: 700;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+  }
+  .reunion-year-sub {
+    font-size: 0.7rem;
     color: var(--ink-soft);
-    letter-spacing: 0.04em;
+  }
+  .reunion-person-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.2rem;
+    font-size: 0.68rem;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
   }
   .reunion-lightbox {
     position: fixed;
@@ -1826,6 +1983,161 @@
 
 <script>const PEOPLE_DATA = __PEOPLE_DATA_JSON__;</script>
 <script>
+const SUPABASE_URL = '__SUPABASE_URL__';
+const SUPABASE_ANON_KEY = '__SUPABASE_ANON_KEY__';
+const SUPABASE_ENABLED = SUPABASE_URL && !SUPABASE_URL.startsWith('__');
+
+async function fetchCloudStories() {
+  if (!SUPABASE_ENABLED) return {};
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/family_stories?select=*&order=created_at.asc', {
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+    });
+    if (!r.ok) return {};
+    const rows = await r.json();
+    const byPerson = {};
+    rows.forEach(function(row) {
+      if (!byPerson[row.person_id]) byPerson[row.person_id] = [];
+      byPerson[row.person_id].push({ author: row.author_name, text: row.story_text, year: null, id: row.id });
+    });
+    return byPerson;
+  } catch(e) { return {}; }
+}
+
+async function submitStoryToCloud(personId, personName, authorName, storyText) {
+  const r = await fetch(SUPABASE_URL + '/rest/v1/family_stories', {
+    method: 'POST',
+    headers: {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify({ person_id: personId, person_name: personName, author_name: authorName, story_text: storyText })
+  });
+  return r.ok;
+}
+
+// ---- Story submission modal (singleton) ----
+let _storyModal = null;
+function getStoryModal() {
+  if (_storyModal) return _storyModal;
+  const overlay = document.createElement('div');
+  overlay.className = 'story-modal-overlay';
+  overlay.innerHTML =
+    '<div class="story-modal">' +
+      '<button class="story-modal-close" aria-label="Close">&times;</button>' +
+      '<h3 id="smodal-title">Share a Memory</h3>' +
+      '<label for="smodal-author">Your name</label>' +
+      '<input id="smodal-author" type="text" placeholder="e.g. Jane Feldman" autocomplete="name">' +
+      '<label for="smodal-text">Your memory or story</label>' +
+      '<textarea id="smodal-text" placeholder="Share a memory, a story, or something that captured who they were…"></textarea>' +
+      '<div class="story-modal-actions">' +
+        '<button class="story-modal-cancel">Cancel</button>' +
+        '<button class="story-modal-submit">Share Memory</button>' +
+      '</div>' +
+      '<div class="story-modal-msg"></div>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  overlay.querySelector('.story-modal-close').addEventListener('click', closeStoryModal);
+  overlay.querySelector('.story-modal-cancel').addEventListener('click', closeStoryModal);
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) closeStoryModal(); });
+  _storyModal = overlay;
+  return overlay;
+}
+
+function closeStoryModal() {
+  const overlay = _storyModal;
+  if (!overlay) return;
+  overlay.classList.remove('open');
+  overlay.querySelector('#smodal-author').value = '';
+  overlay.querySelector('#smodal-text').value = '';
+  overlay.querySelector('.story-modal-msg').textContent = '';
+  overlay.querySelector('.story-modal-msg').className = 'story-modal-msg';
+  overlay.querySelector('.story-modal-submit').disabled = false;
+  overlay._personId = null;
+  overlay._personName = null;
+}
+
+function openStoryModal(personId, personName) {
+  if (!SUPABASE_ENABLED) {
+    window.location.href = 'mailto:shane@innivee.com?subject=' + encodeURIComponent('Memory: ' + personName) + '&body=' + encodeURIComponent('My memory of ' + personName + ':\n\n\n\nMy name: ');
+    return;
+  }
+  const overlay = getStoryModal();
+  overlay.querySelector('#smodal-title').textContent = 'Share a Memory about ' + personName.split(' ')[0];
+  overlay._personId = personId;
+  overlay._personName = personName;
+
+  const submitBtn = overlay.querySelector('.story-modal-submit');
+  submitBtn.onclick = async function() {
+    const author = overlay.querySelector('#smodal-author').value.trim();
+    const text = overlay.querySelector('#smodal-text').value.trim();
+    const msg = overlay.querySelector('.story-modal-msg');
+    if (!author) { msg.className = 'story-modal-msg error'; msg.textContent = 'Please enter your name.'; return; }
+    if (!text) { msg.className = 'story-modal-msg error'; msg.textContent = 'Please write a memory.'; return; }
+    submitBtn.disabled = true;
+    msg.className = 'story-modal-msg';
+    msg.textContent = 'Sharing…';
+    try {
+      const ok = await submitStoryToCloud(overlay._personId, overlay._personName, author, text);
+      if (ok) {
+        msg.textContent = 'Memory shared! Thank you.';
+        // Update the DOM immediately
+        const newStory = { author: author, text: text, year: null };
+        addStoryToSection(overlay._personId, overlay._personName, newStory);
+        setTimeout(closeStoryModal, 1800);
+      } else {
+        msg.className = 'story-modal-msg error';
+        msg.textContent = 'Something went wrong. Please try again.';
+        submitBtn.disabled = false;
+      }
+    } catch(e) {
+      msg.className = 'story-modal-msg error';
+      msg.textContent = 'Network error. Please try again.';
+      submitBtn.disabled = false;
+    }
+  };
+
+  overlay.classList.add('open');
+  setTimeout(function() { overlay.querySelector('#smodal-author').focus(); }, 50);
+}
+
+function addStoryToSection(personId, personName, newStory) {
+  const wrap = document.querySelector('[data-stories-wrap="' + personId + '"]');
+  if (!wrap) return;
+  // If this was a prompt-only section, rebuild it as a full block
+  const existing = wrap.dataset.storiesCount ? parseInt(wrap.dataset.storiesCount) : 0;
+  const allStories = (wrap._stories || []).concat([newStory]);
+  wrap._stories = allStories;
+  // Re-render: replace the contents of wrap with updated block
+  const newBlock = makeStoriesBlock(personId, personName, allStories);
+  // Keep open state if panel was open
+  const wasOpen = wrap.querySelector('.stories-panel.open') !== null;
+  wrap.parentNode.replaceChild(newBlock, wrap);
+  if (wasOpen) {
+    const panel = newBlock.querySelector('.stories-panel');
+    const toggle = newBlock.querySelector('.stories-toggle');
+    if (panel && toggle) { panel.classList.add('open'); toggle.classList.add('open'); }
+  }
+}
+
+async function fetchAndMergeStories() {
+  const cloudByPerson = await fetchCloudStories();
+  PEOPLE_DATA.forEach(function(p) {
+    if (p.branch === 'Founders') return;
+    const cloudArr = cloudByPerson[p.id] || [];
+    if (!cloudArr.length) return;
+    const wrap = document.querySelector('[data-stories-wrap="' + p.id + '"]');
+    if (!wrap) return;
+    const bakedStories = wrap._stories || [];
+    const allStories = bakedStories.concat(cloudArr);
+    const newBlock = makeStoriesBlock(p.id, p.name, allStories);
+    wrap.parentNode.replaceChild(newBlock, wrap);
+  });
+}
+</script>
+<script>
 const BRANCH_COLOR = {
   Henry: 'var(--c-henry)', Dave: 'var(--c-dave)', Jack: 'var(--c-jack)',
   Bessie: 'var(--c-bessie)', Saul: 'var(--c-saul)', Milt: 'var(--c-milt)',
@@ -2002,9 +2314,11 @@ function marriageLabel(v) {
   return '';
 }
 
-function makeStoriesBlock(personName, stories) {
+function makeStoriesBlock(personId, personName, stories) {
   const count = stories.length;
   const wrap = document.createElement('div');
+  wrap.dataset.storiesWrap = personId;
+  wrap._stories = stories;
 
   const toggle = document.createElement('button');
   toggle.type = 'button';
@@ -2018,7 +2332,7 @@ function makeStoriesBlock(personName, stories) {
   const panel = document.createElement('div');
   panel.className = 'stories-panel';
 
-  stories.forEach(s => {
+  stories.forEach(function(s) {
     const item = document.createElement('div');
     item.className = 'story-item';
     const text = document.createElement('div');
@@ -2032,10 +2346,11 @@ function makeStoriesBlock(personName, stories) {
     panel.appendChild(item);
   });
 
-  const shareBtn = document.createElement('a');
+  const shareBtn = document.createElement('button');
+  shareBtn.type = 'button';
   shareBtn.className = 'story-share-btn';
-  shareBtn.href = 'mailto:shane@innivee.com?subject=' + encodeURIComponent('Memory: ' + personName) + '&body=' + encodeURIComponent('My memory of ' + personName + ':\n\n\n\nMy name: ');
   shareBtn.textContent = '+ Share a Memory';
+  shareBtn.addEventListener('click', function(e) { e.stopPropagation(); openStoryModal(personId, personName); });
   panel.appendChild(shareBtn);
 
   toggle.addEventListener('click', function(e) {
@@ -2049,12 +2364,15 @@ function makeStoriesBlock(personName, stories) {
   return wrap;
 }
 
-function makeStoriesPrompt(personName) {
+function makeStoriesPrompt(personId, personName) {
   const wrap = document.createElement('div');
-  const shareBtn = document.createElement('a');
+  wrap.dataset.storiesWrap = personId;
+  wrap._stories = [];
+  const shareBtn = document.createElement('button');
+  shareBtn.type = 'button';
   shareBtn.className = 'story-share-btn';
-  shareBtn.href = 'mailto:shane@innivee.com?subject=' + encodeURIComponent('Memory: ' + personName) + '&body=' + encodeURIComponent('My memory of ' + personName + ':\n\n\n\nMy name: ');
   shareBtn.textContent = '+ Share a Memory about ' + personName.split(' ')[0];
+  shareBtn.addEventListener('click', function(e) { e.stopPropagation(); openStoryModal(personId, personName); });
   wrap.appendChild(shareBtn);
   return wrap;
 }
@@ -2379,13 +2697,13 @@ function buildNode(id, depth, siblingIndex, siblingCount) {
     wrap.insertBefore(makeObitBlock(p.vitals.obituary, p.vitals.dateOfDeath, p.vitals.obituaryUrl), wrap.querySelector('.marriages') || wrap.querySelector('.meta-row'));
   }
 
-  // Stories block — shown for all people (collapsible if stories exist, prompt-only if none)
-  if (p.branch !== 'Founders') {
+  // Stories block — only for deceased people
+  if (p.branch !== 'Founders' && p.vitals && p.vitals.deceased) {
     const anchor = wrap.querySelector('.marriages') || wrap.querySelector('.meta-row');
     if (p.stories && p.stories.length) {
-      wrap.insertBefore(makeStoriesBlock(p.name, p.stories), anchor);
+      wrap.insertBefore(makeStoriesBlock(p.id, p.name, p.stories), anchor);
     } else {
-      wrap.insertBefore(makeStoriesPrompt(p.name), anchor);
+      wrap.insertBefore(makeStoriesPrompt(p.id, p.name), anchor);
     }
   }
 
@@ -2416,6 +2734,7 @@ roots.forEach(r => {
   li.style.setProperty('--branch-color', BRANCH_COLOR[r.branch]);
   treeEl.appendChild(li);
 });
+fetchAndMergeStories();
 
 function syncExplorerFilter(branchKey) {
   if (!explorerBuilt) return;
@@ -3430,20 +3749,46 @@ function flashListCard(id) {
     const wrap = document.createElement('div');
     wrap.className = 'reunion-body';
     buildCountdown(wrap);
-    // Sort newest first
-    const sorted = [...REUNION_PHOTOS].sort((a, b) => b.year - a.year);
-    sorted.forEach(entry => {
+
+    // Separate historic (no year or pre-1960) from reunions
+    const reunions = [...REUNION_PHOTOS].filter(e => e.year >= 1960).sort((a, b) => b.year - a.year);
+    const historic = [...REUNION_PHOTOS].filter(e => !e.year || e.year < 1960);
+
+    // Group reunions by decade
+    const decades = {};
+    reunions.forEach(e => {
+      const dec = Math.floor(e.year / 10) * 10;
+      if (!decades[dec]) decades[dec] = [];
+      decades[dec].push(e);
+    });
+
+    function makeItem(entry) {
       const item = document.createElement('div');
       item.className = 'reunion-item';
       const img = document.createElement('img');
       img.src = entry.photo;
       img.alt = entry.title || `Warshawsky Family Reunion ${entry.year}`;
       img.loading = 'lazy';
-      const label = document.createElement('div');
-      label.className = 'reunion-year';
-      label.textContent = entry.title;
+      const labelWrap = document.createElement('div');
+      labelWrap.className = 'reunion-item-label';
+      const yearEl = document.createElement('div');
+      yearEl.className = 'reunion-year';
+      yearEl.textContent = entry.year ? entry.year : 'Historic';
+      const subEl = document.createElement('div');
+      subEl.className = 'reunion-year-sub';
+      // Extract location/short description from title
+      const titleParts = (entry.title || '').split(',');
+      subEl.textContent = titleParts.length > 1 ? titleParts.slice(1).join(',').trim() : '';
+      labelWrap.appendChild(yearEl);
+      if (subEl.textContent) labelWrap.appendChild(subEl);
+      if (entry.personCount) {
+        const countEl = document.createElement('div');
+        countEl.className = 'reunion-person-count';
+        countEl.textContent = '👥 ~' + entry.personCount + ' people in photo';
+        labelWrap.appendChild(countEl);
+      }
       item.appendChild(img);
-      item.appendChild(label);
+      item.appendChild(labelWrap);
       // Lightbox on click — with scroll/pinch zoom and drag-to-pan
       item.addEventListener('click', () => {
         const lb = document.createElement('div');
@@ -3554,8 +3899,34 @@ function flashListCard(id) {
         document.body.appendChild(lb);
         applyTransform();
       });
-      wrap.appendChild(item);
+      return item;
+    }
+
+    // Render decade groups (newest first)
+    const decadeKeys = Object.keys(decades).map(Number).sort((a, b) => b - a);
+    decadeKeys.forEach(dec => {
+      const heading = document.createElement('div');
+      heading.className = 'reunion-decade-heading';
+      heading.textContent = dec + 's';
+      wrap.appendChild(heading);
+      const grid = document.createElement('div');
+      grid.className = 'reunion-photo-grid';
+      decades[dec].forEach(entry => grid.appendChild(makeItem(entry)));
+      wrap.appendChild(grid);
     });
+
+    // Historic photos section
+    if (historic.length) {
+      const heading = document.createElement('div');
+      heading.className = 'reunion-decade-heading rh-historic';
+      heading.textContent = 'Historic';
+      wrap.appendChild(heading);
+      const grid = document.createElement('div');
+      grid.className = 'reunion-photo-grid rg-historic';
+      historic.forEach(entry => grid.appendChild(makeItem(entry)));
+      wrap.appendChild(grid);
+    }
+
     body.appendChild(wrap);
   }
 
