@@ -1,4 +1,11 @@
 .wfc_password
+.supabase
+
+# Sensitive source data — stays local only, never committed
+family_db.json
+reunion_db.json
+photos/
+locations_cache.json
 
 # Local crop editor tool
 crop_editor.html
