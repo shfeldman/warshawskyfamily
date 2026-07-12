@@ -804,6 +804,65 @@
     width: min(600px, 90vw);
   }
   .obituary-panel.open { display: block; }
+
+  /* ── Audio recordings ── */
+  .audio-block {
+    margin-top: 0.5rem;
+  }
+  .audio-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    padding: 0.22rem 0.65rem;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #4a3080;
+    background: #f3eeff;
+    border: 1px solid #9b7fe8;
+    border-radius: 20px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .audio-toggle:hover { background: #e6d9ff; }
+  .audio-toggle .at-caret { font-size: 0.6rem; transition: transform 0.2s; }
+  .audio-toggle.open .at-caret { transform: rotate(90deg); }
+  .audio-panel {
+    display: none;
+    margin-top: 0.6rem;
+    padding: 0.9rem 1.1rem;
+    background: linear-gradient(135deg, #f8f4ff 0%, #f0e9ff 100%);
+    border-left: 3px solid #9b7fe8;
+    border-radius: 0 8px 8px 0;
+    width: min(620px, 90vw);
+  }
+  .audio-panel.open { display: block; }
+  .audio-item {
+    margin-bottom: 0.9rem;
+  }
+  .audio-item:last-child { margin-bottom: 0; }
+  .audio-item-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #2e1a6e;
+    margin-bottom: 0.15rem;
+  }
+  .audio-item-desc {
+    font-size: 0.72rem;
+    color: #6b5a9e;
+    margin-bottom: 0.4rem;
+  }
+  .audio-item audio {
+    width: 100%;
+    max-width: 480px;
+    height: 36px;
+    border-radius: 20px;
+    outline: none;
+  }
   .obituary-date {
     font-family: Georgia, 'Times New Roman', serif;
     font-size: 0.72rem;
@@ -2377,6 +2436,57 @@ function makeStoriesPrompt(personId, personName) {
   return wrap;
 }
 
+function makeAudioBlock(audioArr) {
+  const wrap = document.createElement('div');
+  wrap.className = 'audio-block';
+
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'audio-toggle';
+  const caret = document.createElement('span');
+  caret.className = 'at-caret';
+  caret.textContent = '▶';
+  toggle.appendChild(caret);
+  toggle.appendChild(document.createTextNode(' 🎙 Recordings (' + audioArr.length + ')'));
+
+  const panel = document.createElement('div');
+  panel.className = 'audio-panel';
+
+  audioArr.forEach(function(a) {
+    const item = document.createElement('div');
+    item.className = 'audio-item';
+    const title = document.createElement('div');
+    title.className = 'audio-item-title';
+    title.textContent = a.title || 'Recording';
+    item.appendChild(title);
+    if (a.description) {
+      const desc = document.createElement('div');
+      desc.className = 'audio-item-desc';
+      desc.textContent = a.description;
+      item.appendChild(desc);
+    }
+    const player = document.createElement('audio');
+    player.controls = true;
+    player.preload = 'none';
+    const source = document.createElement('source');
+    source.src = a.url;
+    source.type = 'audio/mpeg';
+    player.appendChild(source);
+    item.appendChild(player);
+    panel.appendChild(item);
+  });
+
+  toggle.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const open = panel.classList.toggle('open');
+    toggle.classList.toggle('open', open);
+  });
+
+  wrap.appendChild(toggle);
+  wrap.appendChild(panel);
+  return wrap;
+}
+
 function makeObitBlock(obituaryText, dateOfDeath, obituaryUrl) {
   const wrap = document.createElement('div');
 
@@ -2695,6 +2805,10 @@ function buildNode(id, depth, siblingIndex, siblingCount) {
 
   if (p.vitals && p.vitals.deceased && p.vitals.obituary) {
     wrap.insertBefore(makeObitBlock(p.vitals.obituary, p.vitals.dateOfDeath, p.vitals.obituaryUrl), wrap.querySelector('.marriages') || wrap.querySelector('.meta-row'));
+  }
+
+  if (p.vitals && p.vitals.audio && p.vitals.audio.length) {
+    wrap.insertBefore(makeAudioBlock(p.vitals.audio), wrap.querySelector('.marriages') || wrap.querySelector('.meta-row'));
   }
 
   // Stories block — only for deceased people
