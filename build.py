@@ -247,6 +247,7 @@ def main():
     output = output.replace("__PARTNER_COUNT__", str(partner_count))
     output = output.replace("'__SUPABASE_URL__'", json.dumps(supabase_url))
     output = output.replace("'__SUPABASE_ANON_KEY__'", json.dumps(supabase_key))
+    output = output.replace("__GALAXY_PEOPLE_JSON__", json.dumps(viz_people, separators=(",", ":")))
 
     if "__PEOPLE_DATA_JSON__" in output:
         print("ERROR: Placeholder was not replaced.", file=sys.stderr)
