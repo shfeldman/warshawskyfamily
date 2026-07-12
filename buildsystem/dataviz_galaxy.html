@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Warshawsky Family &mdash; The Family Galaxy</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body { background: #06070d; color: #e8e0d0; font-family: 'Inter', sans-serif; overflow: hidden; }
+  #scene { position: fixed; inset: 0; }
+  .hud {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    padding: 1.1rem 1.4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    pointer-events: none;
+    background: linear-gradient(#06070dcc, transparent);
+  }
+  .hud a { pointer-events: auto; }
+  h1 { font-family: 'Lora', serif; font-weight: 600; font-size: 1.35rem; }
+  .subtitle { font-size: 0.8rem; color: #9a917e; margin-top: 2px; }
+  .back { color: #8fb8f0; text-decoration: none; font-size: 0.85rem; }
+  .back:hover { text-decoration: underline; }
+  .hint {
+    position: fixed;
+    bottom: 1rem; left: 0; right: 0;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #7a7264;
+    pointer-events: none;
+  }
+  #tooltip {
+    display: none;
+    position: fixed;
+    pointer-events: none;
+    background: #12141ecc;
+    border: 1px solid #3a3d4d;
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    backdrop-filter: blur(4px);
+    z-index: 5;
+    max-width: 230px;
+  }
+  #tooltip .tt-name { font-weight: 600; }
+  #tooltip .tt-sub { color: #9a917e; font-size: 0.76rem; }
+  #legend {
+    position: fixed;
+    bottom: 2.6rem; left: 0; right: 0;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    font-size: 0.72rem;
+    color: #9a917e;
+    pointer-events: none;
+    padding: 0 1rem;
+  }
+  #legend span { display: inline-flex; align-items: center; gap: 4px; }
+  #legend i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  #loading {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    color: #9a917e;
+  }
+  #echo {
+    position: fixed;
+    bottom: 5.2rem; left: 0; right: 0;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.8s;
+    padding: 0 1rem;
+  }
+  #echo .echo-title {
+    font-family: 'Lora', serif;
+    font-size: 1.05rem;
+    color: #ffe9b0;
+    text-shadow: 0 0 14px #c8963a88;
+  }
+  #echo .echo-names { font-size: 0.78rem; color: #b0a68e; margin-top: 3px; }
+  #spanel {
+    display: none;
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 4.8rem;
+    width: min(360px, calc(100vw - 2rem));
+    background: #12141ede;
+    border: 1px solid #3a3d4d;
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+    backdrop-filter: blur(6px);
+    z-index: 6;
+  }
+  .sp-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
+  .sp-head .sp-name { font-family: 'Lora', serif; font-size: 0.98rem; color: #ffe9b0; }
+  .sp-head button {
+    background: none; border: none; color: #9a917e; font-size: 1.2rem;
+    cursor: pointer; line-height: 1; padding: 0 0.2rem;
+  }
+  .sp-head button:hover { color: #e8e0d0; }
+  #sp-input {
+    width: 100%;
+    background: #1c1f2c;
+    border: 1px solid #3a3d4d;
+    border-radius: 8px;
+    color: #e8e0d0;
+    font-family: inherit;
+    font-size: 0.9rem;
+    padding: 0.55rem 0.7rem;
+    outline: none;
+  }
+  #sp-input:focus { border-color: #8fb8f0; }
+  #sp-list {
+    list-style: none;
+    margin-top: 0.4rem;
+    max-height: 168px;
+    overflow-y: auto;
+  }
+  #sp-list li {
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: #cfc7b2;
+  }
+  #sp-list li:hover { background: #23273a; color: #fff; }
+  #sp-list li .sp-branch { color: #7a7264; font-size: 0.75rem; }
+  #sp-result { display: none; text-align: center; padding: 0.3rem 0 0.1rem; }
+  #sp-result .sp-verdict {
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    color: #ffe9b0;
+    text-shadow: 0 0 14px #c8963a88;
+  }
+  #sp-result .sp-via { font-size: 0.76rem; color: #9a917e; margin-top: 4px; }
+  #sp-tracing { display: none; text-align: center; font-size: 0.85rem; color: #9a917e; padding: 0.2rem 0; }
+  .sp-row { margin-bottom: 0.45rem; }
+  .sp-chip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1c1f2c;
+    border: 1px solid #4a4432;
+    border-radius: 8px;
+    padding: 0.45rem 0.7rem;
+    font-size: 0.88rem;
+    color: #ffe9b0;
+  }
+  .sp-chip button {
+    background: none; border: none; color: #9a917e;
+    font-size: 1rem; cursor: pointer; padding: 0 0.1rem; line-height: 1;
+  }
+  .sp-chip button:hover { color: #e8e0d0; }
+  #sp-launch {
+    position: fixed;
+    right: 1.2rem;
+    bottom: 4.8rem;
+    z-index: 6;
+    background: #12141ede;
+    border: 1px solid #3a3d4d;
+    color: #ffe9b0;
+    border-radius: 999px;
+    padding: 0.55rem 1rem;
+    font-family: inherit;
+    font-size: 0.82rem;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+  }
+  #sp-launch:hover { border-color: #8fb8f0; }
+</style>
+</head>
+<body>
+<div id="scene"></div>
+<div id="loading">Lighting the stars&hellip;</div>
+<div class="hud">
+  <div>
+    <h1>The Family Galaxy</h1>
+    <p class="subtitle">166 descendants of Louis &amp; Rose, orbiting the founders</p>
+  </div>
+  <a class="back" href="/data-viz/" target="_top">&larr; All charts</a>
+</div>
+<div id="legend"></div>
+<p class="hint">drag to orbit &middot; scroll or pinch to zoom &middot; hover or tap a star to light up their line</p>
+<div id="echo"></div>
+<div id="spanel">
+  <div class="sp-head">
+    <span class="sp-name" id="sp-name">&#10022; How are they related?</span>
+    <button id="sp-close" type="button" aria-label="Close">&times;</button>
+  </div>
+  <div id="sp-body">
+    <div class="sp-row" id="sp-row-a"></div>
+    <div class="sp-row" id="sp-row-b"></div>
+    <input id="sp-input" placeholder="First person&hellip;" autocomplete="off" spellcheck="false">
+    <ul id="sp-list"></ul>
+  </div>
+  <div id="sp-tracing">Tracing starpath&hellip;</div>
+  <div id="sp-result">
+    <div class="sp-verdict" id="sp-verdict"></div>
+    <div class="sp-via" id="sp-via"></div>
+  </div>
+</div>
+<button id="sp-launch" type="button">&#10022; How are they related?</button>
+<div id="tooltip"></div>
+
+<script>const PEOPLE_DATA = __PEOPLE_DATA_JSON__;</script>
+<script type="importmap">
+{ "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const BRANCH_COLORS = {
+  Henry: '#e0602a', Dave: '#2f8dc4', Jack: '#3aa070', Bessie: '#b05fb3',
+  Saul: '#8d74e0', Milt: '#d9a52b', Evelyn: '#3ab5a8', Sylvia: '#e0509d', Rudy: '#b07c3a'
+};
+const GEN_IDX = { A: 0, B: 1, C: 2, D: 3, E: 4 };
+const GEN_LABEL = {
+  A: 'Child of Louis & Rose', B: 'Grandchild of Louis & Rose',
+  C: 'Great-grandchild', D: 'Great-great-grandchild', E: 'Great-great-great-grandchild'
+};
+
+// ── Family structure ──────────────────────────────────────────────────────
+const byId = {}, kids = {};
+PEOPLE_DATA.forEach(p => { byId[p.id] = p; kids[p.id] = []; });
+PEOPLE_DATA.forEach(p => { if (p.parent && kids[p.parent]) kids[p.parent].push(p.id); });
+const roots = PEOPLE_DATA.filter(p => !p.parent && p.branch !== 'Founders').map(p => p.id);
+
+function leaves(id) {
+  const c = kids[id];
+  return c.length ? c.reduce((s, k) => s + leaves(k), 0) : 1;
+}
+
+// Deterministic per-person jitter so the galaxy is stable between visits
+function hash(str) {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return (h >>> 0) / 4294967295;
+}
+
+// Angular layout identical to the sunburst, then swirled into spiral arms
+const positions = {};
+const totalLeaves = roots.reduce((s, r) => s + leaves(r), 0);
+(function walk(list, a0, a1, parentLeaves) {
+  let a = a0;
+  list.forEach(id => {
+    const p = byId[id];
+    const w = (a1 - a0) * leaves(id) / parentLeaves;
+    const mid = a + w / 2;
+    const depth = GEN_IDX[p.generation];
+    const r = 26 + depth * 26 + (hash(id) - 0.5) * 10;
+    const theta = mid + r * 0.028;
+    const y = (hash(id + 'y') - 0.5) * (24 - depth * 3.5);
+    positions[id] = new THREE.Vector3(r * Math.sin(theta), y, r * Math.cos(theta));
+    if (kids[id].length) walk(kids[id], a, a + w, leaves(id));
+    a += w;
+  });
+})(roots, 0, Math.PI * 2, totalLeaves);
+
+// ── Scene ─────────────────────────────────────────────────────────────────
+const container = document.getElementById('scene');
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+container.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#06070d');
+scene.fog = new THREE.FogExp2('#06070d', 0.0022);
+
+const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 2000);
+camera.position.set(0, 95, 195);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.4;
+controls.minDistance = 40;
+controls.maxDistance = 480;
+
+// Soft round glow texture, shared by every star
+function glowTexture() {
+  const c = document.createElement('canvas');
+  c.width = c.height = 64;
+  const g = c.getContext('2d');
+  const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+  grad.addColorStop(0, 'rgba(255,255,255,1)');
+  grad.addColorStop(0.25, 'rgba(255,255,255,0.85)');
+  grad.addColorStop(0.6, 'rgba(255,255,255,0.18)');
+  grad.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 64, 64);
+  return new THREE.CanvasTexture(c);
+}
+const glow = glowTexture();
+
+// Background starfield
+{
+  const n = 1400, pos = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) {
+    const v = new THREE.Vector3().randomDirection().multiplyScalar(500 + Math.random() * 500);
+    pos.set([v.x, v.y, v.z], i * 3);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  scene.add(new THREE.Points(geo, new THREE.PointsMaterial({
+    color: '#aab2cc', size: 1.4, sizeAttenuation: true,
+    transparent: true, opacity: 0.55, depthWrite: false
+  })));
+}
+
+// Generation orbit rings
+const RING_LABELS = ['children', 'grandchildren', 'great-grandchildren', 'great-great-grand', '3× great-grand'];
+function textSprite(text) {
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 64;
+  const g = c.getContext('2d');
+  g.font = '500 30px Inter, sans-serif';
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  g.fillStyle = '#c9bfa4';
+  g.fillText(text, 256, 32);
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: new THREE.CanvasTexture(c), transparent: true, opacity: 0.55, depthWrite: false
+  }));
+  s.scale.set(36, 4.5, 1);
+  return s;
+}
+for (let d = 0; d < 5; d++) {
+  const r = 26 + d * 26;
+  const pts = [];
+  for (let i = 0; i <= 128; i++) {
+    const a = i / 128 * Math.PI * 2;
+    pts.push(new THREE.Vector3(r * Math.sin(a), 0, r * Math.cos(a)));
+  }
+  const ring = new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints(pts),
+    new THREE.LineBasicMaterial({
+      color: '#b8a165', transparent: true, opacity: 0.09,
+      blending: THREE.AdditiveBlending, depthWrite: false
+    })
+  );
+  scene.add(ring);
+  const label = textSprite(RING_LABELS[d]);
+  const la = -0.5;
+  label.position.set((r + 7) * Math.sin(la), 1.5, (r + 7) * Math.cos(la));
+  scene.add(label);
+}
+
+// The founders' sun
+const sun = new THREE.Sprite(new THREE.SpriteMaterial({
+  map: glow, color: '#ffd9a0', blending: THREE.AdditiveBlending,
+  depthWrite: false, transparent: true
+}));
+sun.scale.setScalar(30);
+sun.userData.isSun = true;
+scene.add(sun);
+const sunHalo = new THREE.Sprite(new THREE.SpriteMaterial({
+  map: glow, color: '#c88a3a', blending: THREE.AdditiveBlending,
+  depthWrite: false, transparent: true, opacity: 0.45
+}));
+sunHalo.scale.setScalar(58);
+scene.add(sunHalo);
+
+// One star sprite per descendant — a bit brighter on phones, where the
+// screen is small and glare washes out dim sprites
+const STAR_BOOST = matchMedia('(pointer: coarse)').matches ? 1.35 : 1;
+const sprites = {};
+const starGroup = new THREE.Group();
+PEOPLE_DATA.forEach(p => {
+  if (p.branch === 'Founders') return;
+  const depth = GEN_IDX[p.generation];
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: glow, color: BRANCH_COLORS[p.branch], blending: THREE.AdditiveBlending,
+    depthWrite: false, transparent: true
+  }));
+  s.position.copy(positions[p.id]);
+  s.scale.setScalar((7.5 - depth * 0.9) * STAR_BOOST);
+  s.userData.id = p.id;
+  s.userData.baseScale = s.scale.x;
+  sprites[p.id] = s;
+  starGroup.add(s);
+});
+scene.add(starGroup);
+
+// Curved constellation lines, parent → child
+const lines = {};
+const curves = {};
+PEOPLE_DATA.forEach(p => {
+  if (p.branch === 'Founders') return;
+  const from = p.parent ? positions[p.parent] : new THREE.Vector3(0, 0, 0);
+  const to = positions[p.id];
+  const ctrl = from.clone().add(to).multiplyScalar(0.5).multiplyScalar(0.88);
+  const curve = new THREE.QuadraticBezierCurve3(from, ctrl, to);
+  curves[p.id] = curve;
+  const geo = new THREE.BufferGeometry().setFromPoints(curve.getPoints(12));
+  const mat = new THREE.LineBasicMaterial({
+    color: BRANCH_COLORS[p.branch], transparent: true, opacity: 0.28,
+    blending: THREE.AdditiveBlending, depthWrite: false
+  });
+  const line = new THREE.Line(geo, mat);
+  lines[p.id] = line;
+  scene.add(line);
+});
+
+// Legend
+document.getElementById('legend').innerHTML = Object.entries(BRANCH_COLORS).map(([b, c]) =>
+  '<span><i style="background:' + c + ';box-shadow:0 0 6px ' + c + '"></i>' + b + '</span>'
+).join('');
+
+// ── Hover / tap: light up a lineage ───────────────────────────────────────
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+const tooltip = document.getElementById('tooltip');
+let hoveredId = null;
+let focusTarget = null;
+
+function chainOf(id) {
+  const set = new Set();
+  for (let c = id; c; c = byId[c].parent) set.add(c);
+  (function down(x) { set.add(x); kids[x].forEach(down); })(id);
+  return set;
+}
+
+function applyHighlight(id) {
+  const chain = id ? chainOf(id) : null;
+  Object.values(sprites).forEach(s => {
+    const mine = !chain || chain.has(s.userData.id);
+    s.material.opacity = mine ? 1 : 0.12;
+    s.scale.setScalar(s.userData.baseScale * (id === s.userData.id ? 1.8 : 1));
+  });
+  Object.entries(lines).forEach(([childId, line]) => {
+    const parentId = byId[childId].parent;
+    const on = chain && chain.has(childId) && (!parentId || chain.has(parentId));
+    line.material.opacity = chain ? (on ? 0.85 : 0.05) : 0.28;
+  });
+  sun.material.opacity = chain ? 0.55 : 1;
+}
+
+function pickStar(clientX, clientY) {
+  pointer.x = (clientX / window.innerWidth) * 2 - 1;
+  pointer.y = -(clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects([...starGroup.children, sun]);
+  return hits.length ? hits[0].object : null;
+}
+
+function showTooltip(obj, x, y) {
+  if (obj.userData.isSun) {
+    tooltip.innerHTML = '<div class="tt-name">Louis &amp; Rose Warshawsky</div>' +
+      '<div class="tt-sub">The founders &mdash; where every line begins</div>';
+  } else {
+    const p = byId[obj.userData.id];
+    const nk = kids[p.id].length;
+    tooltip.innerHTML = '<div class="tt-name">' + p.name + '</div>' +
+      '<div class="tt-sub">' + GEN_LABEL[p.generation] + ' &middot; ' + p.branch + "'s line" +
+      (nk ? ' &middot; ' + nk + (nk === 1 ? ' child' : ' children') : '') + '</div>';
+  }
+  tooltip.style.display = 'block';
+  tooltip.style.left = Math.min(x + 14, window.innerWidth - 240) + 'px';
+  tooltip.style.top = (y + 14) + 'px';
+}
+
+// ── Name echoes: shared first names twinkle together ──────────────────────
+const ECHO_DURATION = 6, ECHO_GAP = 5;
+const SHORT_GEN = { A: 'child', B: 'grandchild', C: 'great-grandchild', D: '2× great-grandchild', E: '3× great-grandchild' };
+const echoEl = document.getElementById('echo');
+const WHITE = new THREE.Color('#fff6e0');
+
+Object.values(sprites).forEach(s => {
+  s.userData.baseColor = s.material.color.clone();
+});
+
+const echoGroups = (() => {
+  const map = {};
+  PEOPLE_DATA.forEach(p => {
+    if (p.branch === 'Founders') return;
+    const fn = p.name.split(' ')[0];
+    (map[fn] = map[fn] || []).push(p.id);
+  });
+  if (map['Louis']) map['Louis'].push('__sun');
+  if (map['Rose']) map['Rose'].push('__sun');
+  return Object.entries(map)
+    .filter(([, ids]) => ids.length >= 2)
+    .map(([fn, ids]) => ({ fn, ids }))
+    .sort((a, b) => b.ids.length - a.ids.length);
+})();
+
+let echoState = null, echoIdx = 0, nextEchoAt = 4, echoSunBoost = 0;
+
+function memberPos(id) { return id === '__sun' ? new THREE.Vector3(0, 0, 0) : positions[id]; }
+
+function startEcho(t) {
+  if (!echoGroups.length) return;
+  const group = echoGroups[echoIdx++ % echoGroups.length];
+  const ids = group.ids.slice().sort((a, b) =>
+    (a === '__sun' ? -1 : GEN_IDX[byId[a].generation]) - (b === '__sun' ? -1 : GEN_IDX[byId[b].generation]));
+  const echoLines = [];
+  for (let i = 0; i < ids.length - 1; i++) {
+    const line = new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints([memberPos(ids[i]), memberPos(ids[i + 1])]),
+      new THREE.LineBasicMaterial({
+        color: '#ffe9b0', transparent: true, opacity: 0,
+        blending: THREE.AdditiveBlending, depthWrite: false
+      })
+    );
+    scene.add(line);
+    echoLines.push(line);
+  }
+  echoEl.innerHTML =
+    '<div class="echo-title">&#10022; The name ' + group.fn + ' echoes through the family</div>' +
+    '<div class="echo-names">' + ids.map(id =>
+      id === '__sun' ? 'Louis Warshawsky (founder)'
+                     : byId[id].name + ' (' + SHORT_GEN[byId[id].generation] + ')'
+    ).join(' &middot; ') + '</div>';
+  echoEl.style.opacity = '1';
+  echoState = { ids, lines: echoLines, start: t };
+}
+
+function endEcho() {
+  echoState.lines.forEach(l => { scene.remove(l); l.geometry.dispose(); l.material.dispose(); });
+  echoState.ids.forEach(id => {
+    const s = sprites[id];
+    if (!s) return;
+    s.scale.setScalar(s.userData.baseScale);
+    s.material.color.copy(s.userData.baseColor);
+  });
+  echoSunBoost = 0;
+  echoEl.style.opacity = '0';
+  echoState = null;
+  applyHighlight(hoveredId);
+}
+
+function tickEcho(t) {
+  if (!echoState) {
+    if (t > nextEchoAt && !hoveredId && !panelOpen() && !pathMembers) startEcho(t);
+    return;
+  }
+  const k = (t - echoState.start) / ECHO_DURATION;
+  if (k >= 1 || hoveredId) {
+    nextEchoAt = t + ECHO_GAP;
+    endEcho();
+    return;
+  }
+  const env = Math.sin(Math.PI * k);
+  const twinkle = 0.65 + 0.35 * Math.sin(t * 7);
+  echoState.ids.forEach(id => {
+    if (id === '__sun') { echoSunBoost = 9 * env * twinkle; return; }
+    const s = sprites[id];
+    s.scale.setScalar(s.userData.baseScale * (1 + 1.2 * env * twinkle));
+    s.material.color.copy(s.userData.baseColor).lerp(WHITE, 0.75 * env * twinkle);
+  });
+  echoState.lines.forEach(l => { l.material.opacity = 0.55 * env * twinkle; });
+}
+
+// ── Starpath: pick two stars, trace the path, name the relationship ───────
+const spanel = document.getElementById('spanel');
+const spName = document.getElementById('sp-name');
+const spBody = document.getElementById('sp-body');
+const spInput = document.getElementById('sp-input');
+const spList = document.getElementById('sp-list');
+const spTracing = document.getElementById('sp-tracing');
+const spResult = document.getElementById('sp-result');
+const spLaunch = document.getElementById('sp-launch');
+const SEG_DURATION = 0.45;
+
+let pathAnim = null, pathMembers = null, pathEdges = null;
+const pick = { a: null, b: null };
+const pathLabels = [];
+const litStars = new Set();
+
+const comet = new THREE.Sprite(new THREE.SpriteMaterial({
+  map: glow, color: '#fff2c8', blending: THREE.AdditiveBlending,
+  depthWrite: false, transparent: true
+}));
+comet.scale.setScalar(7);
+comet.visible = false;
+scene.add(comet);
+
+const NAME_INDEX = PEOPLE_DATA
+  .filter(p => p.branch !== 'Founders')
+  .map(p => ({ id: p.id, name: p.name, branch: p.branch }))
+  .sort((a, b) => a.name.localeCompare(b.name));
+NAME_INDEX.unshift({ id: '__sun', name: 'Louis & Rose Warshawsky', branch: 'the founders' });
+
+function parentOf(id) {
+  if (id === '__sun') return null;
+  return byId[id].parent || '__sun';
+}
+function chainUp(id) {
+  const c = [];
+  for (let x = id; x; x = parentOf(x)) c.push(x);
+  return c;   // [id, ..., '__sun']
+}
+
+function ordinal(n) {
+  return ['first','second','third','fourth','fifth'][n - 1] || (n + 'th');
+}
+function greats(n) { return 'great-'.repeat(n); }
+function descTerm(n) {
+  return n === 1 ? 'child' : greats(n - 2) + 'grandchild';
+}
+function ancTerm(n) {
+  return n === 1 ? 'parent' : greats(n - 2) + 'grandparent';
+}
+function displayName(id) {
+  return id === '__sun' ? 'Louis & Rose' : byId[id].name.split(' ')[0];
+}
+
+function relationship(aId, bId, lca, da, db) {
+  const a = displayName(aId), b = displayName(bId);
+  if (da === 0) return b + ' is ' + a + "'s " + descTerm(db);
+  if (db === 0) return b + ' is ' + a + "'s " + ancTerm(da);
+  if (da === 1 && db === 1) return a + ' and ' + b + ' are siblings';
+  if (da === 1) return b + ' is ' + a + "'s " + greats(db - 2) + 'niece or nephew';
+  if (db === 1) return b + ' is ' + a + "'s " + greats(da - 2) + 'aunt or uncle';
+  const degree = Math.min(da, db) - 1;
+  const removed = Math.abs(da - db);
+  return a + ' and ' + b + ' are ' + ordinal(degree) + ' cousins' +
+    (removed ? ', ' + (removed === 1 ? 'once' : removed === 2 ? 'twice' : removed + ' times') + ' removed' : '');
+}
+
+function panelOpen() { return spanel.style.display === 'block'; }
+function activeSlot() { return pick.a ? (pick.b ? null : 'b') : 'a'; }
+
+function openPanel(id) {
+  if (echoState) { nextEchoAt = clock.getElapsedTime() + ECHO_GAP; endEcho(); }
+  clearPath();
+  pick.a = id || null;
+  pick.b = null;
+  spBody.style.display = 'block';
+  spTracing.style.display = 'none';
+  spResult.style.display = 'none';
+  spanel.style.display = 'block';
+  spLaunch.style.display = 'none';
+  renderRows();
+}
+
+function closePanel() {
+  spanel.style.display = 'none';
+  spLaunch.style.display = '';
+  pick.a = pick.b = null;
+  clearPath();
+  applyHighlight(hoveredId);
+}
+
+function clearPath() {
+  pathAnim = null;
+  pathMembers = null;
+  pathEdges = null;
+  comet.visible = false;
+  pathLabels.forEach(({ sprite }) => {
+    scene.remove(sprite);
+    sprite.material.map.dispose();
+    sprite.material.dispose();
+  });
+  pathLabels.length = 0;
+  litStars.forEach(id => {
+    const s = sprites[id];
+    s.scale.setScalar(s.userData.baseScale);
+    s.material.color.copy(s.userData.baseColor);
+  });
+  litStars.clear();
+}
+
+// A floating name plate, legible against the starfield
+function nameLabelSprite(text) {
+  const fs = 46, pad = 30;
+  const measure = document.createElement('canvas').getContext('2d');
+  measure.font = '600 ' + fs + 'px Inter, sans-serif';
+  const tw = Math.ceil(measure.measureText(text).width);
+  const c = document.createElement('canvas');
+  c.width = tw + pad * 2;
+  c.height = 100;
+  const g = c.getContext('2d');
+  g.fillStyle = 'rgba(6,7,13,0.78)';
+  if (g.roundRect) {
+    g.beginPath();
+    g.roundRect(4, 14, c.width - 8, 72, 36);
+    g.fill();
+  } else {
+    g.fillRect(4, 14, c.width - 8, 72);
+  }
+  g.font = '600 ' + fs + 'px Inter, sans-serif';
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  g.shadowColor = '#c8963a';
+  g.shadowBlur = 16;
+  g.fillStyle = '#ffe9b0';
+  g.fillText(text, c.width / 2, 52);
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: new THREE.CanvasTexture(c), transparent: true,
+    depthWrite: false, depthTest: false, opacity: 0
+  }));
+  sprite.renderOrder = 10;
+  const S = 0.11;
+  sprite.scale.set(c.width * S, c.height * S, 1);
+  return sprite;
+}
+
+// Light a star on the traced path: brighten it and hang its name above it
+function lightPathNode(id, t) {
+  let lift = 22;
+  if (id !== '__sun') {
+    const s = sprites[id];
+    litStars.add(id);
+    s.scale.setScalar(s.userData.baseScale * 1.7);
+    s.material.color.copy(s.userData.baseColor).lerp(WHITE, 0.6);
+    lift = s.userData.baseScale * 0.8 + 3.5;
+  }
+  const label = nameLabelSprite(fullName(id));
+  label.position.copy(memberPos(id));
+  label.position.y += lift;
+  scene.add(label);
+  pathLabels.push({ sprite: label, born: t });
+}
+
+function fullName(id) {
+  return id === '__sun' ? 'Louis & Rose Warshawsky' : byId[id].name;
+}
+
+function renderRows() {
+  const rowA = document.getElementById('sp-row-a');
+  const rowB = document.getElementById('sp-row-b');
+  const chip = (slot, id) =>
+    '<div class="sp-chip"><span>' + fullName(id) + '</span>' +
+    '<button type="button" data-unpick="' + slot + '" aria-label="Remove">&times;</button></div>';
+  rowA.innerHTML = pick.a ? chip('a', pick.a) : '';
+  rowB.innerHTML = pick.b ? chip('b', pick.b) : '';
+  const slot = activeSlot();
+  if (slot) {
+    (slot === 'a' ? rowA : rowB).appendChild(spInput);
+    spInput.placeholder = slot === 'a' ? 'First person…'
+      : 'Relate ' + displayName(pick.a) + ' to…';
+    spInput.value = '';
+    spInput.style.display = 'block';
+    spList.style.display = 'block';
+    renderSuggestions('');
+    if (matchMedia('(hover: hover)').matches) spInput.focus();
+  } else {
+    spInput.style.display = 'none';
+    spList.style.display = 'none';
+  }
+}
+
+function renderSuggestions(q) {
+  const ql = q.trim().toLowerCase();
+  const rows = NAME_INDEX
+    .filter(e => e.id !== pick.a && e.id !== pick.b && (!ql || e.name.toLowerCase().includes(ql)))
+    .slice(0, 8);
+  spList.innerHTML = rows.map(e =>
+    '<li data-id="' + e.id + '">' + e.name +
+    ' <span class="sp-branch">&middot; ' + (e.id === '__sun' ? e.branch : e.branch + "'s line") + '</span></li>'
+  ).join('');
+}
+
+spInput.addEventListener('input', () => renderSuggestions(spInput.value));
+spList.addEventListener('click', e => {
+  const li = e.target.closest('li[data-id]');
+  if (!li) return;
+  const id = li.getAttribute('data-id');
+  if (!pick.a) { pick.a = id; renderRows(); }
+  else if (!pick.b) {
+    pick.b = id;
+    renderRows();
+    startPath(pick.a, pick.b);
+  }
+});
+spanel.addEventListener('click', e => {
+  const btn = e.target.closest('button[data-unpick]');
+  if (!btn) return;
+  pick[btn.getAttribute('data-unpick')] = null;
+  clearPath();
+  applyHighlight(hoveredId);
+  spBody.style.display = 'block';
+  spTracing.style.display = 'none';
+  spResult.style.display = 'none';
+  renderRows();
+});
+document.getElementById('sp-close').addEventListener('click', closePanel);
+spLaunch.addEventListener('click', () => {
+  if (panelOpen()) closePanel();
+  else openPanel(null);
+});
+window.addEventListener('keydown', e => { if (e.key === 'Escape' && panelOpen()) closePanel(); });
+
+function startPath(aId, bId) {
+  const chainA = chainUp(aId);
+  const idxA = {};
+  chainA.forEach((id, i) => { idxA[id] = i; });
+  const chainB = [];
+  let lca = null;
+  for (let x = bId; x; x = parentOf(x)) {
+    if (idxA[x] !== undefined) { lca = x; break; }
+    chainB.push(x);
+  }
+  const da = idxA[lca];          // steps from A up to LCA
+  const db = chainB.length;      // steps from B up to LCA
+
+  // Edges: up from A to LCA (traversed child→parent), then down to B
+  const segments = [];
+  for (let i = 0; i < da; i++) segments.push({ child: chainA[i], reverse: true });
+  for (let i = chainB.length - 1; i >= 0; i--) segments.push({ child: chainB[i], reverse: false });
+
+  // Stars visited in order: A up to the shared ancestor, then down to B
+  const nodes = [...chainA.slice(0, da + 1), ...chainB.slice().reverse()];
+
+  pathMembers = new Set([aId, bId, lca, ...chainA.slice(0, da), ...chainB]);
+  pathEdges = new Set(segments.map(s => s.child));
+
+  // Dim the universe, faintly pre-light the route
+  Object.values(sprites).forEach(s => { s.material.opacity = pathMembers.has(s.userData.id) ? 1 : 0.08; });
+  Object.entries(lines).forEach(([childId, l]) => {
+    l.material.opacity = pathEdges.has(childId) ? 0.16 : 0.03;
+  });
+  sun.material.opacity = pathMembers.has('__sun') ? 1 : 0.4;
+
+  spBody.style.display = 'none';
+  spResult.style.display = 'none';
+  spTracing.style.display = 'block';
+
+  const verdict = aId === bId ? 'That is the same star' : relationship(aId, bId, lca, da, db);
+  const via = lca === '__sun'
+    ? 'starpath runs through Louis & Rose themselves'
+    : 'closest shared ancestor: ' + byId[lca].name;
+  pathAnim = {
+    segments, nodes, seg: 0, segStart: clock.getElapsedTime(),
+    verdict, via: aId === bId ? '' : via, target: bId
+  };
+  lightPathNode(nodes[0], clock.getElapsedTime());
+  if (!segments.length) finishPath();   // same star
+  else comet.visible = true;
+}
+
+function finishPath() {
+  comet.visible = false;
+  document.getElementById('sp-verdict').textContent = '✦ ' + pathAnim.verdict;
+  document.getElementById('sp-via').textContent = pathAnim.via;
+  spTracing.style.display = 'none';
+  spResult.style.display = 'block';
+  pathAnim = null;
+}
+
+function tickStarpath(t) {
+  if (!pathAnim) return;
+  const seg = pathAnim.segments[pathAnim.seg];
+  const k = Math.min((t - pathAnim.segStart) / SEG_DURATION, 1);
+  const curve = curves[seg.child];
+  comet.position.copy(curve.getPoint(seg.reverse ? 1 - k : k));
+  comet.scale.setScalar(7 + Math.sin(t * 12) * 1.2);
+  lines[seg.child].material.opacity = 0.16 + 0.74 * k;
+  if (k >= 1) {
+    lines[seg.child].material.opacity = 0.9;
+    pathAnim.seg++;
+    pathAnim.segStart = t;
+    lightPathNode(pathAnim.nodes[pathAnim.seg], t);
+    if (pathAnim.seg >= pathAnim.segments.length) finishPath();
+  }
+}
+
+window.addEventListener('pointermove', e => {
+  if (pathAnim || pathMembers) { tooltip.style.display = 'none'; return; }
+  const obj = pickStar(e.clientX, e.clientY);
+  const id = obj && !obj.userData.isSun ? obj.userData.id : null;
+  if (id !== hoveredId) { hoveredId = id; applyHighlight(id); }
+  if (obj) showTooltip(obj, e.clientX, e.clientY);
+  else tooltip.style.display = 'none';
+  document.body.style.cursor = obj ? 'pointer' : '';
+});
+
+window.addEventListener('pointerdown', e => {
+  if (e.target !== renderer.domElement) return;
+  const obj = pickStar(e.clientX, e.clientY);
+  if (obj && !obj.userData.isSun) {
+    hoveredId = obj.userData.id;
+    openPanel(obj.userData.id);
+    applyHighlight(hoveredId);
+    showTooltip(obj, e.clientX, e.clientY);
+    focusTarget = obj.position.clone();
+  } else if (obj && obj.userData.isSun) {
+    focusTarget = new THREE.Vector3(0, 0, 0);
+  } else if (spanel.style.display === 'block') {
+    closePanel();
+  }
+});
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ── Animate ───────────────────────────────────────────────────────────────
+const clock = new THREE.Clock();
+function animate() {
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+  tickEcho(t);
+  tickStarpath(t);
+  pathLabels.forEach(l => { l.sprite.material.opacity = Math.min(1, (t - l.born) * 2.5); });
+  sun.scale.setScalar(30 + Math.sin(t * 1.6) * 1.6 + echoSunBoost);
+  sunHalo.scale.setScalar(58 + Math.sin(t * 1.1) * 3 + echoSunBoost);
+  if (focusTarget) {
+    controls.target.lerp(focusTarget, 0.06);
+    if (controls.target.distanceTo(focusTarget) < 0.5) focusTarget = null;
+  }
+  controls.update();
+  renderer.render(scene, camera);
+}
+document.getElementById('loading').remove();
+window.__galaxy = { openPanel, startPath, closePanel };
+animate();
+</script>
+</body>
+</html>

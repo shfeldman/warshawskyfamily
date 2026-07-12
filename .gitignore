@@ -7,6 +7,10 @@ reunion_db.json
 photos/
 locations_cache.json
 
+# Data-viz build outputs (plaintext — only encrypted versions committed)
+data-viz/index.html.plain
+data-viz/galaxy/index.html.plain
+
 # Local crop editor tool
 crop_editor.html
 crop_editor.py
